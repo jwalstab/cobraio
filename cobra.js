@@ -4,6 +4,13 @@ const bodyParser = require('body-parser');
 var app = express();
 var expressLayouts = require('express-ejs-layouts');
 app.use(bodyParser.json());
+const basicAuth = require('express-basic-auth')
+var session = require('express-session')
+ 
+app.use(basicAuth({
+    users: { 'Legioguard': 'Quantum4277' },
+    challenge: true // <--- needed to actually show the login dialog!
+}))
 
 const nodemailer = require("nodemailer");
 
@@ -22,7 +29,7 @@ var outsideDatabase;
   
   //db = database;
   app.listen(3000);
-  console.log("Delta is up and running on port 3000 since " + new Date().toLocaleDateString() + "  " + new Date().toLocaleTimeString());
+  console.log("Cobra is up and running on port 3000 since " + new Date().toLocaleDateString() + "  " + new Date().toLocaleTimeString());
 });
 
 var transporter = nodemailer.createTransport({
@@ -35,30 +42,15 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-//SendEmail("test subject","<h1>hello</h1>");
-
 async function SendEmail(emailAddress,subjectToUse,htmlToUse){
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
-  //let testAccount = await nodemailer.createTestAccount();
-
-  // create reusable transporter object using the default SMTP transport
-
-  // send mail with defined transport object
   let info = await transporter.sendMail({
     from: '"QTM Data Alarm System" <alarmsystem@quantumdata.com.au>', // sender address
     to: emailAddress, // list of receivers
     subject: subjectToUse, // Subject line
-    //text: "Hello world?", // plain text body
     html: htmlToUse//"<b>Hello world?</b>" // html body
   });
 
   console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-/*   // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou... */
 }
 
 
@@ -118,8 +110,6 @@ app.get("/:deviceid/get", function(req, res) {
     res.end();
   });
 });
-
-
 
 //retrieve last known data with a packet amount
 app.get("/:deviceid/last/:amount", function(req, res) {
@@ -438,38 +428,31 @@ app.set('view engine', 'ejs');
 app.get('/public/assets/images/favico.ico' , function(req , res){/*code*/});
 
 app.get("/index", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('index');
 });
 
 app.get("/monitor", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('monitor');
 });
 
 app.get("/phaser", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('phaser', { layout: 'emptylayout' });
 });
 
 app.get("/", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('sign_in', { layout: 'emptylayout' });
 });
 
 app.get("/login", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('login', { layout: 'loginlayout' });
 });
 
 
 app.get("/data_tables", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('data_tables');
 });
 
 app.get("/devices", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
   res.render('devices');
 });
 
@@ -499,95 +482,6 @@ app.get("/alarms", function(req, res) {
 app.get("/phaser/:fileToGet", function(req, res) {
   res.sendFile(__dirname + '/public/assets/phaser/' + req.params.fileToGet);
 });
-
-app.post("/register_iot", function(req, res) {
-  //res.sendFile(__dirname + '/Index.html');
-  res.render('register_iot');
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* app.get("/:url", function(req, res) {
-  //res.sendFile(__dirname + '/' + req.params.url + '.html');
-  res.render(req.params.url);
-}); */
-
-
-
-
-
-
-
-//legacy
-
-/* app.post("/:deviceid/last1/:amount", function(req, res) {
-  console.log(req.body);
-  var limitAmount = parseInt(req.params.amount);
-  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(limitAmount).toArray(function(err, docs){
-    res.send(docs);
-    res.end();
-  });
-});
-
-app.get("/:deviceid/date", function(req, res) {
-  iotdb.collection(req.params.deviceid).find({}).toArray(function(err, docs){
-    arrayResult = [];
-    to = new Date(2021,10,30);
-    from = new Date(2011,10,30);
-    docs.forEach(element => {
-      var check = new Date(element.time);
-      if((check.getTime() <= to.getTime() && check.getTime() >= from.getTime()))
-      {
-        arrayResult.push(check);
-      }
-    });
-    arrayResult.forEach(element => {
-      console.log(element);
-    });
-    res.send("finished!");
-    res.end();
-  });
-}); */
-
-/////////////////////////////////check for other datab
-/* app.post("/:username/register_device", function(req, res) {
-  adminDb.listDatabases(function(err, result) {
-  var allDatabases = result.databases;
-  allDatabases.forEach(element => {
-    console.log(element);
-    });
-  });
-res.send(req.body);
-res.end();
-});
- */
-
-
-
- ///can lookup individual devices using a query..not needed idiot
-/* app.get("/:username/lookup_device/:deviceid", function(req, res) {
-    var name = "deviceID";
-    var value = parseInt(req.params.deviceid);
-    var query = {};
-    query[name] = value;
-    devicedb.collection(req.params.username).find(query).toArray(function(err, docs){
-    if (docs[0] == null) {console.log("A!");}
-    res.send(docs);
-    res.end();
-  });
-}); */
 
 
 //graph API 
@@ -735,29 +629,8 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
 
 app.post("/:deviceid/betweendates", function(req, res) {
   console.log("Between dates fired!");
-  console.log(req.body);
   var objectArray = [];
-/*   var q1 = '{time:{$gt:' + req.body.from +',$lt:'+ req.body.to +'}}';
-  console.log(q1);
-  //{time:{$gt:0,$lt:15604533658671}}
-  var value = (req.body.alarmName);
-  var query = {};
-  query[name] = value; */
-  console.log(req.body.timea);
   iotdb.collection(req.params.deviceid).find(req.body).toArray(function(err, docs){
-     //= [];
-/*     console.log(req.body);
-    to = new Date(req.body.to);
-    console.log(to);
-    from = new Date(req.body.from);
-    console.log(from);
-    docs.forEach(element => {
-      var check = new Date(element.time);
-      if((check.getTime() <= to.getTime() && check.getTime() >= from.getTime()))
-      {
-        arrayResult.push(element);
-      }
-    }); */
     if (docs[0] == null)
     {
       console.log("no data");
@@ -822,32 +695,6 @@ app.post("/:deviceid/betweendates", function(req, res) {
   });
 
 });
-
-
-/* 
-app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
-  var limitAmount = parseInt(req.params.number);
-  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(limitAmount).toArray(function(err, docs){
-    if (err){console.log(err);}
-    console.log(docs);
-    console.log(docs[req.params.number - 1]);
-    res.send(docs[req.params.number - 1]);
-    res.end();
-  });
-});
-
-
-//retrieve last known data with a packet amount
-app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
-  var limitAmount = parseInt(req.params.number);
-  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(limitAmount).toArray(function(err, docs){
-    if (err){console.log(err);}
-    console.log(docs);
-    console.log(docs[req.params.number - 1]);
-    res.send(docs[req.params.number - 1]);
-    res.end();
-  });
-}); */
 
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
@@ -932,7 +779,72 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     HighP_SenserRead_Active: req.body.discreteInputs[63],
 
     //HOLDING REGISTERS
-
+    Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Cl_HotMainVlv_Delay: uInt16ToFloat32([req.body.holdingRegisters[2],req.body.holdingRegisters[3]]),
+    Master_Ctrl_Mng_Hot_S2_OpenT: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_MinOn_T: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_MinOff_T: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_Start_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_BlanceVlv_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_InjecVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_InjecVlv_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Injec_MaxTime: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Injec_ReStart_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EleHeater_Mng_EleH_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EleHeater_Mng_EleH_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_HotVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_HotVlv_DeadBand: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_Hot_Min_Op: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_Hot_Max_Op: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_Cold_Min_Op: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_Cold_Max_Op: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_Hot_Op_ProAl: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_Cold_Op_ProAl: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_ColdVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_ColdVlv_DeadBand: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Hot_S1_Inter: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_High_DiscT_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_High_DiscT_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_Low_SuctT_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_Low_SuctT_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_High_DiscT_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_Low_SuctT_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_RunWFlow_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Flush_Week_Set: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Flush_Hour_Set: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Flush_Minute_Set: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Flush_Time: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flow_Switch_Low_Level_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Cold_SupplyVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_ColdVlv_Kp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_ColdVlv_Ti: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_ColdVlv_Td: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_HotVlv_Kp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_HotVlv_Ti: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    PVlv_Mng_HotVlv_Td: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EleHeater_Mng_CRT_Ele_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EleHeater_Mng_CRT_Ele_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EleHeater_Mng_EBT_Ele_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EleHeater_Mng_EBT_Ele_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Hot_SupplyVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Hot_SupplyVlv_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_WSB_Supply_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_WSB_Supply_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Flush_Valve_Cold_SupplyVlv_Offset: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Input_Mng_Ain1_Type_Sel: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Rot_Type: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Fan_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Fan_HRT_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Fan_CRT_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_CRT_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Comp_HRT_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    EVD_Emb_1_Min_OpPosc: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_LP_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_LP_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_HP_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    AlarmMng_HP_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
 
     //INPUT REGISTERS
     Suct_Temp: uInt16ToFloat32([req.body.inputRegisters[0],req.body.inputRegisters[1]]),
@@ -983,8 +895,6 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     High_Pressure: uInt16ToFloat32([req.body.inputRegisters[165],req.body.inputRegisters[166]])
   }
 
-  //ProcessData(req.body, req.params.deviceid);
-
   iotdb.collection(req.params.deviceid).insertOne(LegioGuardDataObject).then (function() {
   });
   
@@ -996,180 +906,6 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
 
   //AlarmProcessor(req.params.deviceid,req.body,"jwalstab");
 });
-
-/* 
-function ProcessData(data, deviceID){
-
-    //COILS
-    var LegioGuardFinalDataObject = {
-      EleHeater_Mng_Hot_Ele_Man_Msk: data.coils[7],
-      AlarmMng_AlrmResByBms: data.coils[8],
-      OnOffUnitMng_KeybOnOff: data.coils[9],
-      Flush_Valve_Op_ColdVlv_Al: data.coils[29],
-      Flush_Valve_Manual_On_Flush: data.coils[51],
-      Master_Ctrl_Mng_Rot_CP: data.coils[59],
-      Master_Ctrl_Mng_Rot_HP: data.coils[60],
-  
-      //DISCRETE INPUT
-      Cold_EleHeater: data.discreteInputs[0],
-      Hot_P1: data.discreteInputs[1],
-      Hot_Solend1: data.discreteInputs[2],
-      Hot_EleHeater: data.discreteInputs[3],
-      Glob_Al: data.discreteInputs[4],
-      Hot_P2: data.discreteInputs[5],
-      Hot_Fan: data.discreteInputs[6],
-      Blance_Vlv: data.discreteInputs[7],
-      Injection_Vlv: data.discreteInputs[8],
-      Hot_Solend2: data.discreteInputs[9],
-      Cold_P1: data.discreteInputs[10],
-      HotW_FlowS1: data.discreteInputs[11],
-      ColdW_FlowS: data.discreteInputs[12],
-      High_P: data.discreteInputs[13],
-      Low_P: data.discreteInputs[14],
-      Comp_Overload: data.discreteInputs[15],
-      Master_Slave: data.discreteInputs[16],
-      Cold_P_Switch: data.discreteInputs[17],
-      Al_retain_Active: data.discreteInputs[18],
-      Al_Err_retain_write_Active: data.discreteInputs[19],
-      Alrm_Prob1_Active: data.discreteInputs[20],
-      Alrm_Prob2_Active: data.discreteInputs[21],
-      Alrm_Prob3_Active: data.discreteInputs[22],
-      Alrm_Prob4_Active: data.discreteInputs[23],
-      Alrm_Prob5_Active: data.discreteInputs[24],
-      Alrm_Prob6_Active: data.discreteInputs[25],
-      Alrm_Prob7_Active: data.discreteInputs[26],
-      Alrm_Prob8_Active: data.discreteInputs[27],
-      Alrm_Prob9_Active: data.discreteInputs[28],
-      Alrm_Prob10_Active: data.discreteInputs[29],
-      Hot1_Flow_Al_Active: data.discreteInputs[30],
-      Hot2_Flow_Al_Active: data.discreteInputs[31],
-      ColdFlow_Al_Active: data.discreteInputs[32],
-      HP_Al_Active: data.discreteInputs[33],
-      LP_Al_Active: data.discreteInputs[34],
-      Comp_Oload_Al_Active: data.discreteInputs[35],
-      High_DiscT_Al_Active: data.discreteInputs[36],
-      Fan_Over_Al_Active: data.discreteInputs[37],
-      Low_SuctT_Al_Active: data.discreteInputs[38],
-      Board2_Offline: data.discreteInputs[39],
-      Comp_On: data.discreteInputs[40],
-      Flush_Valve_Flush_Valve_On: data.discreteInputs[41],
-      Flush_Valve_Cold_SuplyW_Vlv: data.discreteInputs[42],
-      Alrm_Prob11_Active: data.discreteInputs[43],
-      Alrm_Prob12_Active: data.discreteInputs[44],
-      Alrm_Master_Unit_Active: data.discreteInputs[45],
-      Alrm_Slave_Unit_Active: data.discreteInputs[46],
-      Alrm_Low_EvapInT_Active: data.discreteInputs[47],
-      Alrm_Low_HT1_Active: data.discreteInputs[48],
-      Alrm_High_CT1_Active: data.discreteInputs[49],
-      Al_Warm_Supply_Low_Active: data.discreteInputs[50],
-      Al_Warm_Supply_High_Active: data.discreteInputs[51],
-      AlarmMng_Read_Ain1_Al: data.discreteInputs[52],
-      AlarmMng_Read_Ain2_Al: data.discreteInputs[53],
-      AlarmMng_Read_Ain3_Al: data.discreteInputs[54],
-      Read_Ain4_Al: data.discreteInputs[55],
-      Read_Ain5_Al: data.discreteInputs[56],
-      Read_Ain6_Al: data.discreteInputs[57],
-      AlarmMng_Read_Ain11_Al: data.discreteInputs[58],
-      AlarmMng_Read_Ain8_Al: data.discreteInputs[59],
-      AlarmMng_Read_Ain9_Al: data.discreteInputs[60],
-      Cold_P2: data.discreteInputs[61],
-      LowP_SenserRead_Active: data.discreteInputs[62],
-      HighP_SenserRead_Active: data.discreteInputs[63],
-  
-      //HOLDING REGISTERS
-  
-  
-      //INPUT REGISTERS
-      Suct_Temp: uInt16ToFloat32([data.inputRegisters[0],data.inputRegisters[1]]),
-      Evap_Inlet_Temp: uInt16ToFloat32([data.inputRegisters[2],data.inputRegisters[3]]),
-      Cond_Outlet_Temp: uInt16ToFloat32([data.inputRegisters[4],data.inputRegisters[5]]),
-      Hot_Supply_Temp: uInt16ToFloat32([data.inputRegisters[6],data.inputRegisters[7]]),
-      Hot_Return_Temp: uInt16ToFloat32([data.inputRegisters[8],data.inputRegisters[9]]),
-      Cold_Supply_Temp: uInt16ToFloat32([data.inputRegisters[10],data.inputRegisters[11]]),
-      Cold_Return_Temp: uInt16ToFloat32([data.inputRegisters[12],data.inputRegisters[13]]),
-      Hot_Tank_Temp1: uInt16ToFloat32([data.inputRegisters[14],data.inputRegisters[15]]),
-      Hot_Tank_Temp2: uInt16ToFloat32([data.inputRegisters[16],data.inputRegisters[17]]),
-      HP_Yout1_Act: uInt16ToFloat32([data.inputRegisters[18],data.inputRegisters[19]]),
-      HP_Yout2_Act: uInt16ToFloat32([data.inputRegisters[20],data.inputRegisters[21]]),
-      Disc_Temp: uInt16ToFloat32([data.inputRegisters[22],data.inputRegisters[23]]),
-      Flow_Switch_Read_Cold_FlowS1: uInt16ToFloat32([data.inputRegisters[29],data.inputRegisters[30]]),
-      Flow_Switch_Read_Hot_FlowS1: uInt16ToFloat32([data.inputRegisters[31],data.inputRegisters[32]]),
-      Flow_Switch_Read_Hot_FlowS2: uInt16ToFloat32([data.inputRegisters[33],data.inputRegisters[34]]),
-      ColdFlow_Senser_Al_Active: data.inputRegisters[36],
-      HotFlow1_Senser_Al_Active: data.inputRegisters[37],
-      HotFlow2_Senser_Al_Active: data.inputRegisters[38],
-      Flow_Switch_ColdFS1_Feq: uInt16ToFloat32([data.inputRegisters[39],data.inputRegisters[40]]),
-      Flow_Switch_ColdFS_Char: uInt16ToFloat32([data.inputRegisters[41],data.inputRegisters[42]]),
-      Flow_Switch_HotFS1_Feq: uInt16ToFloat32([data.inputRegisters[43],data.inputRegisters[44]]),
-      Flow_Switch_HotFS1_Char: uInt16ToFloat32([data.inputRegisters[45],data.inputRegisters[46]]),
-      Flow_Switch_HotFS2_Feq: uInt16ToFloat32([data.inputRegisters[47],data.inputRegisters[48]]),
-      Flow_Switch_HotFS2_Char: uInt16ToFloat32([data.inputRegisters[49],data.inputRegisters[50]]),
-      Hot_Tank_Temp3: uInt16ToFloat32([data.inputRegisters[51],data.inputRegisters[52]]),
-      Cold_Tank_Temp1: uInt16ToFloat32([data.inputRegisters[53],data.inputRegisters[54]]),
-      Cold_Tank_Temp2: uInt16ToFloat32([data.inputRegisters[55],data.inputRegisters[56]]),
-      Cold_Tank_Temp3: uInt16ToFloat32([data.inputRegisters[57],data.inputRegisters[58]]),
-      Cold_SupToVlv_Temp: uInt16ToFloat32([data.inputRegisters[59],data.inputRegisters[60]]),
-      Warm_ToBuild_Temp: uInt16ToFloat32([data.inputRegisters[61],data.inputRegisters[62]]),
-      Warm_ReturnBuild_Temp: uInt16ToFloat32([data.inputRegisters[63],data.inputRegisters[64]]),
-      Hot_SupToVlv_Temp: uInt16ToFloat32([data.inputRegisters[65],data.inputRegisters[66]]),
-      Ele_Boost_Temp: uInt16ToFloat32([data.inputRegisters[118],data.inputRegisters[119]]),
-      Heat_Exchange_Cold: uInt16ToFloat32([data.inputRegisters[120],data.inputRegisters[121]]),
-      Heat_Exchange_Hot: uInt16ToFloat32([data.inputRegisters[122],data.inputRegisters[123]]),
-      EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val: data.inputRegisters[124],
-      EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val: uInt16ToFloat32([data.inputRegisters[125],data.inputRegisters[126]]),
-      CP_Yout1_Act: uInt16ToFloat32([data.inputRegisters[157],data.inputRegisters[158]]),
-      CP_Yout2_Act: uInt16ToFloat32([data.inputRegisters[159],data.inputRegisters[160]]),
-      Flow_Switch_ColdFS2_Char: uInt16ToFloat32([data.inputRegisters[161],data.inputRegisters[162]]),
-      Low_Pressure: uInt16ToFloat32([data.inputRegisters[163],data.inputRegisters[164]]),
-      High_Pressure: uInt16ToFloat32([data.inputRegisters[165],data.inputRegisters[166]])
-    }
-
-    iotdb.collection(deviceID + "ftest").insertOne(LegioGuardFinalDataObject).then (function() {
-      res.send("o");
-      res.end();
-    });
-} */
-
-/* function uInt16ToFloat32(data){
-  var ui16 = new Uint16Array(data);
-  var fl32 = new Float32Array(ui16.buffer, ui16.byteOffset, ui16.byteLength / Float32Array.BYTES_PER_ELEMENT);
-  return fl32[0];
-} */
-/* function uInt16ToFloat32(uint16array) {
-  var buffer = new ArrayBuffer(4);
-  var intView = new Uint16Array(buffer);
-  var floatView = new Float32Array(buffer);
-
-  intView[0] = uint16array[0];
-  intView[1] = uint16array[1];
-  return floatView[0];
-} */
-
-/* function uInt16ToFloat32(data) {
-  var realNumber = data[0] + data[1];
-  var devideNumber = realNumber / 1000;
-  return devideNumber;
-} */
-
-/* function uInt16ToFloat32(data){
-  var low = data[0];
-  var high = data[1];
-  var fpnum=low|(high<<16)
-  var negative=(fpnum>>31)&1;
-  var exponent=(fpnum>>23)&0xFF
-  var mantissa=(fpnum&0x7FFFFF)
-  if(exponent==255){
-   if(mantissa!=0)return Number.NaN;
-   return (negative) ? Number.NEGATIVE_INFINITY :
-         Number.POSITIVE_INFINITY;
-  }
-  if(exponent==0)exponent++;
-  else mantissa|=0x800000;
-  exponent-=127
-  var ret=(mantissa*1.0/0x800000)*Math.pow(2,exponent)
-  if(negative)ret=-ret;
-  return ret;
-} */
 
 function uInt16ToFloat32(uint16array) {
   var buffer = new ArrayBuffer(4);

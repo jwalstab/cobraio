@@ -242,12 +242,12 @@ function DiagramDataGrab(){
                 this.add.image(600, 300, 'background');
                 arrows = this.add.image(600, 300, 'arrows');
                 arrows.setVisible(false);
-                lcdFan = this.add.image(997, 301, 'lcdfan'); 
+                lcdFan = this.add.image(970, 330, 'lcdfan'); 
                 greenStatusLight = this.add.image(56, 41, 'greenstatus');
                 blueStatusLight = this.add.image(56, 41, 'bluestatus');
-/*                 this.add.image(367, 239, 'greenvalve'); 
+                this.add.image(537, 365, 'greenvalve'); 
                 this.add.image(610, 410, 'greenvalve'); 
-                this.add.image(690, 375, 'greenvalve');  */
+                this.add.image(690, 375, 'greenvalve'); 
 
                 greenStatusLight.setVisible(false);
                 blueStatusLight.setVisible(false);
@@ -264,23 +264,37 @@ function DiagramDataGrab(){
                 Hot_Tank_Temp3_Text = this.add.text(1075, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }) 
                 
 
-                Cold_Return_Temp_Text = this.add.text(130, 170, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Cold_Supply_Temp_Text = this.add.text(210, 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Suct_Temp_Text = this.add.text(445 , 170, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Evap_Inlet_Temp_Text = this.add.text(443 , 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Disc_Temp_Text = this.add.text(645 , 169, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Hot_Return_Temp_Text = this.add.text(1016 , 402, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Hot_Supply_Temp_Text = this.add.text(876 , 171, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                this.add.text(175, 160, "Cold Return Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Cold_Return_Temp_Text = this.add.text(175, 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(110, 400, "Cold Supply Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Cold_Supply_Temp_Text = this.add.text(110, 415, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                
+                this.add.text(405, 160, "Suction Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Suct_Temp_Text = this.add.text(405 , 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(390, 405, "Evap Inlet Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Evap_Inlet_Temp_Text = this.add.text(390 , 420, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(660, 160, "Exhaust Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Disc_Temp_Text = this.add.text(660 , 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(830, 410, "Hot Return Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Hot_Return_Temp_Text = this.add.text(830 , 425, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(930, 160, "Hot Supply Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Hot_Supply_Temp_Text = this.add.text(930 , 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
 
 
                 //pumps
-                Flow_Switch_ColdFS_Char_Text = this.add.text(320 , 160, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Flow_Switch_ColdFS2_Char_Text = this.add.text(320 , 180, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Flow_Switch_HotFS1_Char_Text = this.add.text(780 , 383, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                Flow_Switch_HotFS2_Char_Text = this.add.text(780 , 403, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                Flow_Switch_ColdFS_Char_Text = this.add.text(237 , 377, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                Flow_Switch_ColdFS2_Char_Text = this.add.text(237 , 450, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                Flow_Switch_HotFS1_Char_Text = this.add.text(803 , 184, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                Flow_Switch_HotFS2_Char_Text = this.add.text(803 , 257, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
 
                 //fan
-                Hot_Fan_Text = this.add.text(895 , 302, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                this.add.text(860, 325, "Hot Fan", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Hot_Fan_Text = this.add.text(860 , 345, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
         },
 
         update: function (time, delta)
@@ -339,8 +353,8 @@ function DiagramDataGrab(){
             }
             
             Cold_Tank_Temp1_Text.setText("T1: " + Cold_Tank_Temp1 + "°C");
-            Cold_Tank_Temp2_Text.setText("T2: " + Cold_Tank_Temp2 + "°C");
-            Cold_Tank_Temp3_Text.setText("T3: " + Cold_Tank_Temp3 + "°C");
+            Cold_Tank_Temp1_Text.setText("T2: " + Cold_Tank_Temp2 + "°C");
+            Cold_Tank_Temp1_Text.setText("T3: " + Cold_Tank_Temp3 + "°C");
             Hot_Tank_Temp1_Text.setText("T1: " + Hot_Tank_Temp1 + "°C");
             Hot_Tank_Temp2_Text.setText("T2: " + Hot_Tank_Temp2 + "°C");
             Hot_Tank_Temp3_Text.setText("T3: " + Hot_Tank_Temp3 + "°C");
@@ -403,7 +417,6 @@ function DiagramDataGrab(){
             console.log("loading comp");
             this.load.image('ccbackground', 'phaser/compcontrol.png');
             this.load.image('buttonmask', 'phaser/buttonmask.png')
-            this.load.image('arrowmask', 'phaser/arrowmask.png')
         },
 
         create: function ()
@@ -444,15 +457,6 @@ function DiagramDataGrab(){
             Master_Ctrl_Mng_InjecVlv_Setp_Text = this.add.text(800 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
             Master_Ctrl_Mng_InjecVlv_Offset_Text = this.add.text(1000 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
             Master_Ctrl_Mng_Injec_MaxTime_Text = this.add.text(800 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-
-            var nextArrow = this.add.image(1125,279, 'arrowmask');
-            nextArrow.setInteractive();
-            nextArrow.on('pointerdown', () => { 
-            this.scene.start("SystemControl");
-            console.log("pressed!");
-            });
-
         },
 
         update: function (){
@@ -545,22 +549,11 @@ function DiagramDataGrab(){
         {
             this.add.image(600, 300, 'fancbackground');
             LoadMenuButtons(this);
-            Hot_Fan_Text = this.add.text(310 , 185, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-            Master_Ctrl_Mng_Fan_Setp_Text = this.add.text(310 , 235, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-            Hot_Return_Temp_Text = this.add.text(310 , 285, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-            Hot_Supply_Temp_Text = this.add.text(310 , 335, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-            Master_Ctrl_Mng_Fan_Diff_Text = this.add.text(1095 , 170, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
-            Master_Ctrl_Mng_Fan_CRT_Diff_Text = this.add.text(1095 , 200, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
-            Master_Ctrl_Mng_Fan_HRT_Diff_Text = this.add.text(760 , 200, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
 
+            
         },
 
         update: function (){
-            if (Hot_Fan === 0){Hot_Fan_Text.setText("OFF");}
-            else{hotfan.setText("ON");}
-            Master_Ctrl_Mng_Fan_Setp_Text.setText(Master_Ctrl_Mng_Fan_Setp + "°C");
-            Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
-            Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
 
         }
         });
@@ -736,34 +729,6 @@ function DiagramDataGrab(){
         }
         });
 
-    var ValveControl = new Phaser.Class({
-
-        Extends: Phaser.Scene,
-
-        initialize:
-
-        function ValveControl ()
-        {
-            Phaser.Scene.call(this, { key: 'ValveControl' });
-        },
-
-        preload: function ()
-        {
-            this.load.image('valvebackground', 'phaser/valvecontrol.png');
-            this.load.image('buttonmask', 'phaser/buttonmask.png')
-        },
-
-        create: function ()
-        {
-            this.add.image(600, 300, 'valvebackground');
-            LoadMenuButtons(this);
-        },
-
-        update: function (){
-
-        }
-        });
-
     var ChangeBool = new Phaser.Class({
 
         Extends: Phaser.Scene,
@@ -803,7 +768,7 @@ function DiagramDataGrab(){
                 height: 600
             },
             scene: [MonitoringDiagramScreen,SystemControl,CompControl,FlushControl,FanControl,
-            ProbeControl,EEVControl,EEVControl2,EEVControl3,PumpControl,ValveControl]
+            ProbeControl,EEVControl,EEVControl2,EEVControl3,PumpControl]
         };
     var game = new Phaser.Game(config);
     
@@ -816,7 +781,7 @@ function LoadMenuButtons(sceneobj)
             
         var systemControlButton = sceneobj.add.image(1100,545, 'buttonmask');
             systemControlButton.setInteractive();
-            systemControlButton.on('pointerdown', () => {sceneobj.scene.start("ValveControl");});
+            systemControlButton.on('pointerdown', () => {sceneobj.scene.start("SystemControl");});
 
         var compControlButton = sceneobj.add.image(240,545, 'buttonmask');
             compControlButton.setInteractive();
