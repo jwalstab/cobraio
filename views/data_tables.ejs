@@ -75,7 +75,7 @@
     
     //////////////////////////////////////////////////////////////////////drop down box area
     function LoadDropDownBox(){
-        var res3 = masterURL + "jwalstab/lookup_devices/"
+        var res3 = masterURL + "/jwalstab/lookup_devices/"
         $.ajax({
             type: "GET",
             url: res3,
@@ -156,22 +156,20 @@
         var packetsToDisplay = 10;
         var fromVal = new Date(document.getElementById("dateFrom").value);
         var toVal = new Date(document.getElementById("dateTo").value);
-        var dates = {
-            from: fromVal,
-            to: toVal
-        };
-        console.log(dates.to);
-        console.log(dates.from);
-        console.log(dates);
-        //var lgid = document.getElementById('LegioGuardIDText').value;
-        var res3 = "http://127.0.0.1:3000/" + chosenDevice + "/betweendates";
+        console.log(fromVal);
+        var fromValSeconds = fromVal.getTime();
+        var toVal = new Date(document.getElementById("dateTo").value);
+        console.log(toVal);
+        var toValSeconds = toVal.getTime();
+        var findString = "{time:{$gt:" + fromValSeconds +",$lt:"+ toValSeconds +"}}";
+        var res3 = masterURL + "/" + chosenDevice + "/betweendates";
         $.ajax({
             type: "POST",
             url: res3,
-            data: JSON.stringify(dates),
-            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(findString),
+            contentType: "application/javascript",
             crossDomain: true,
-            dataType: "json",
+            //dataType: "json",
             success: function (data, status, jqXHR) {
                 GlobalData = [];
                 data.forEach(element => {

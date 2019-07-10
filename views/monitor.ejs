@@ -165,7 +165,8 @@
                 else{
                     countingMagic++;
                     var magicPercentage = countingMagic / 20 * 100;
-                    chart1.setTitle({text: "Loading data for " + chosenDeviceName + " - %" + magicPercentage});
+                    var betterMagicPercentage = magicPercentage.toFixed(0);
+                    chart1.setTitle({text: "Loading data for " + chosenDeviceName + " - %" + betterMagicPercentage});
                     magicNumber = magicNumber - 1;
                     DataUpdate();
                 }

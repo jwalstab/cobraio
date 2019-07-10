@@ -511,7 +511,6 @@ app.get("/:deviceid/getmonitorlabels", function(req, res) {
 app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
-  var objectArray = [];
   iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
@@ -520,10 +519,26 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
       res.end();
       return;
     }
-    LGDataLabelsList.forEach(propname => {
+    console.log("fired anyway");
+    keyNames = [];
+    var objectArray = [];
+    var getLabelsSmall = Object.keys(docs[limitAmount]);
+    getLabelsSmall.forEach(element => { //gets labels for buttons
+        if (element == "Suct_Temp" || element == "Evap_Inlet_Temp" || element == "Cond_Outlet_Temp" || element == "Cold_Return_Temp" ||
+            element == "Hot_Supply_Temp" || element == "Hot_Fan" || element == "Hot_Return_Temp" || element == "Cold_Supply_Temp" ||
+            element == "Hot_Tank_Temp1" || element == "Hot_Tank_Temp2" || element == "Hot_Tank_Temp3" || element == "Cold_Tank_Temp1" ||
+            element == "Cold_Tank_Temp2" || element == "Cold_Tank_Temp3" || element == "Disc_Temp" || element == "Cold_SupToVlv_Temp" ||
+            element == "Warm_ToBuild_Temp" || element == "Warm_ReturnBuild_Temp" || element == "Hot_SupToVlv_Temp" || element == "Ele_Boost_Temp" ||
+            element == "Heat_Exchange_Cold" || element == "Heat_Exchange_Hot"){
+            keyNames.push(element);
+          
+        }
+    });
+    keyNames.forEach(propname => {
       var isABool = false;
       if (typeof docs[limitAmount][propname] === "boolean")
       {
+        console.log([propname] + " is a bool")
         isABool = true;
       }
       if (isABool == false){
@@ -561,8 +576,22 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
       res.end();
       return;
     }
+    keyNames = [];
     var returnArray = [];
-    LGDataLabelsList.forEach(propname => {
+    var getLabelsSmall = Object.keys(docs[limitAmount]);
+    getLabelsSmall.forEach(element => { //gets labels for buttons
+      if (element == "Suct_Temp" || element == "Evap_Inlet_Temp" || element == "Cond_Outlet_Temp" || element == "Cold_Return_Temp" ||
+      element == "Hot_Supply_Temp" || element == "Hot_Fan" || element == "Hot_Return_Temp" || element == "Cold_Supply_Temp" ||
+      element == "Hot_Tank_Temp1" || element == "Hot_Tank_Temp2" || element == "Hot_Tank_Temp3" || element == "Cold_Tank_Temp1" ||
+      element == "Cold_Tank_Temp2" || element == "Cold_Tank_Temp3" || element == "Disc_Temp" || element == "Cold_SupToVlv_Temp" ||
+      element == "Warm_ToBuild_Temp" || element == "Warm_ReturnBuild_Temp" || element == "Hot_SupToVlv_Temp" || element == "Ele_Boost_Temp" ||
+      element == "Heat_Exchange_Cold" || element == "Heat_Exchange_Hot"){
+      keyNames.push(element);
+      }
+    });
+    
+
+    keyNames.forEach(propname => {
       if (typeof docs[limitAmount][propname] === "boolean")
       {
         
@@ -609,7 +638,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
         keyNames.push(element);
         }
     });
-    LGDataLabelsList.forEach(propname => {
+    keyNames.forEach(propname => {
       var keyArray = [];
       var isABool = false;
       docs.forEach(dataPiece => {
@@ -657,9 +686,9 @@ app.post("/:deviceid/betweendates", function(req, res) {
 
 });
 
-var LGDataLabelsList = ["Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
-                        "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
-                        "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp"]
+var LGDataLabelsList = [Suct_Temp, Evap_Inlet_Temp,Cond_Outlet_Temp,Hot_Supply_Temp,Hot_Return_Temp,Cold_Supply_Temp,Cold_Return_Temp,
+                        Hot_Tank_Temp1,Hot_Tank_Temp2,Hot_Tank_Temp3,Cold_Tank_Temp1,Cold_Tank_Temp2,Cold_Tank_Temp3,Cold_SupToVlv_Temp,
+                        Warm_ToBuild_Temp,Warm_ReturnBuild_Temp,Hot_SupToVlv_Temp,Ele_Boost_Temp,Heat_Exchange_Cold,Heat_Exchange_Hot,Disc_Temp]
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
 
