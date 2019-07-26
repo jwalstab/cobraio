@@ -4,20 +4,65 @@ const bodyParser = require('body-parser');
 var app = express();
 var expressLayouts = require('express-ejs-layouts');
 app.use(bodyParser.json());
-/* const basicAuth = require('express-basic-auth')
-var session = require('express-session') */
- 
-/* app.use(basicAuth({
-    users: { 'Legioguard': 'Quantum4277' },
-    challenge: true // <--- needed to actually show the login dialog!
-})) */
 
-const nodemailer = require("nodemailer");
+var session = require('express-session')
+var MongoDBStore = require('connect-mongodb-session')(session);
+
+var store = new MongoDBStore({
+  uri: 'mongodb://165.22.241.11:27017',
+  databaseName: 'sessions',
+  collection: 'mySessions'
+});
 
 
-//MongoClient.connect("mongodb+srv://quantum:Quantumdata123@cluster0-jjukt.mongodb.net/test?retryWrites=true", {useNewUrlParser: true}, function(err, database) {
+
+
+
+
+app.use(session({
+  secret: 'adgaigdj3wakg23o2323_3311fasa',
+  resave: false,
+  saveUninitialized: false,
+  store: store
+}));
+
+var auth = function(req, res, next) {
+  //console.log(req.session);
+  if (req.session && req.session.user)
+    return next();
+  else
+    //return res.sendStatus(401);
+    return res.render('sign_in', { layout: 'emptylayout' });
+};
+
+app.post('/logincheck', function (req, res) {
+  usersdb.collection('users').find({}).toArray(function(err, docs){
+    loggedIn = false;
+    docs.forEach(element => {
+      if (element.user === req.body.user){
+        if (element.pass === req.body.pass){
+          req.session.user = element.user;
+          req.session.name = element.name;
+          req.session.level = element.level;
+          req.session.tag = element.tag;
+          req.session.pool = element.pool;
+          loggedIn = true;
+        }
+      }
+    });
+    if (loggedIn == true){
+      res.send("OK");
+    }
+    else{
+      res.send("NO ACCESS!");
+    }
+  });
+});
+
+
+
 var MongoClient = require('mongodb').MongoClient;
-//var db;
+
 var outsideDatabase;
   MongoClient.connect("mongodb://165.22.241.11:27017", {useNewUrlParser: true}, function(err, database) {
   //MongoClient.connect("mongodb://127.0.0.1:27017", {useNewUrlParser: true}, function(err, database) {
@@ -25,12 +70,35 @@ var outsideDatabase;
   throw err;
   iotdb = database.db('iot');
   devicedb = database.db('devices');
+  usersdb = database.db('users');
   outsideDatabase = database;
   
   //db = database;
   app.listen(3000);
   console.log("Cobra is up and running on port 3000 since " + new Date().toLocaleDateString() + "  " + new Date().toLocaleTimeString());
 });
+
+/*   app.post('/logincheck', function (req, res) {
+    console.log(req.body)
+    if (req.body.user == "Jwalstab" && req.body.pass == "Quantum4277"){
+      console.log("USER LOGGED IN AT ");
+      req.session.user = "Jay Walstab";
+      req.session.level = "1";
+      req.session.tag = "Engineer"
+      res.send("OK");
+    }
+    else{
+      console.log("USER LOGIN DENIED!");
+      res.send("NO ACCESS!");
+    }
+    
+  }); */
+
+
+const nodemailer = require("nodemailer");
+
+
+
 
 var transporter = nodemailer.createTransport({
   host: "webcloud42.au.syrahost.com",
@@ -431,33 +499,66 @@ app.get("/index", function(req, res) {
   res.render('index');
 });
 
-app.get("/monitor", function(req, res) {
-  res.render('monitor');
-});
+
 
 app.get("/phaser", function(req, res) {
   res.render('phaser', { layout: 'emptylayout' });
 });
 
 app.get("/", function(req, res) {
+  if (req.session.user){
+  res.render('devices');
+  }
+  else{
+    res.render('sign_in', { layout: 'emptylayout' });
+  }
+});
+
+app.get("/sign_out", function(req, res) {
+  req.session.destroy();
   res.render('sign_in', { layout: 'emptylayout' });
 });
 
-app.get("/login", function(req, res) {
-  res.render('login', { layout: 'loginlayout' });
+app.get("/monitor", auth, function(req, res) {
+  res.render('monitor', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool,
+  });
 });
 
-
-app.get("/data_tables", function(req, res) {
-  res.render('data_tables');
+app.get("/data_tables", auth, function(req, res) {
+  res.render('data_tables', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool
+  });
 });
 
-app.get("/devices", function(req, res) {
-  res.render('devices');
+app.get("/devices", auth, function(req, res) {
+  //res.render('');
+    console.log(req.session.user);
+    res.render('devices', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool
+  });
 });
 
 app.get("/data_charts", function(req, res) {
-  res.render('data_charts');
+  res.render('data_charts', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool
+  });
 });
 
 app.get("/calc", function(req, res) {
@@ -465,18 +566,23 @@ app.get("/calc", function(req, res) {
 });
 
 app.get("/control", function(req, res) {
-  res.render('control');
-});
-app.get("/control_fs", function(req, res) {
-  res.render('control_fs', { layout: 'emptylayout' });
-});
-
-app.get("/register_iot", function(req, res) {
-  res.render('register_iot');
+  res.render('control', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool
+  });
 });
 
 app.get("/alarms", function(req, res) {
-  res.render('alarms');
+  res.render('alarms', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool
+  });
 });
 
 app.get("/phaser/:fileToGet", function(req, res) {
@@ -509,6 +615,10 @@ app.get("/:deviceid/getmonitorlabels", function(req, res) {
 
 //retrieve last known data with a packet amount
 app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  if (req.params.deviceid == 10555){
+    dataLabelsList = testDataLabelsList;
+  }
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
   var objectArray = [];
@@ -520,7 +630,7 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
       res.end();
       return;
     }
-    LGDataLabelsList.forEach(propname => {
+    dataLabelsList.forEach(propname => {
       var isABool = false;
       if (typeof docs[limitAmount][propname] === "boolean")
       {
@@ -552,6 +662,10 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
 
 //retrieve last known data with a packet amount
 app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  if (req.params.deviceid == 10555){
+    dataLabelsList = testDataLabelsList;
+  }
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
   iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
@@ -562,7 +676,7 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
       return;
     }
     var returnArray = [];
-    LGDataLabelsList.forEach(propname => {
+    dataLabelsList.forEach(propname => {
       if (typeof docs[limitAmount][propname] === "boolean")
       {
         
@@ -587,8 +701,11 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
 });
 
 
-
 app.post("/:deviceid/betweendates", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  if (req.params.deviceid == 10555){
+    dataLabelsList = testDataLabelsList;
+  }
   console.log("Between dates fired!");
   var objectArray = [];
   iotdb.collection(req.params.deviceid).find(req.body).toArray(function(err, docs){
@@ -609,7 +726,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
         keyNames.push(element);
         }
     });
-    LGDataLabelsList.forEach(propname => {
+    dataLabelsList.forEach(propname => {
       var keyArray = [];
       var isABool = false;
       docs.forEach(dataPiece => {
@@ -656,6 +773,10 @@ app.post("/:deviceid/betweendates", function(req, res) {
   });
 
 });
+
+var dataLabelsList = [];
+
+var testDataLabelsList = ["Random_Data_1", "Random_Data_2", "Random_Data_3"];
 
 var LGDataLabelsList = ["Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
@@ -869,6 +990,18 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
   res.end();
 
   //AlarmProcessor(req.params.deviceid,req.body,"jwalstab");
+});
+
+app.post("/testdevice/postdatafordevice/:deviceid", function (req, res) {
+  testDataObect = {
+    time: req.body.time,
+    Random_Data_1: req.body.Random_Data_1,
+    Random_Data_2: req.body.Random_Data_2,
+    Random_Data_3: req.body.Random_Data_3,
+  }
+  iotdb.collection(req.params.deviceid).insertOne(testDataObect).then (function() {
+    res.send("Recieved!");
+  });
 });
 
 function uInt16ToFloat32(uint16array) {

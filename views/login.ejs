@@ -48,7 +48,17 @@
 
 <script>
 function Redirect() {
-    var username = document.getElementById('usernamebox').value;
+
+    objToSend = {
+        bla: 12,
+        blab: "gaf"
+    }
+    fetch('127.0.0.1:3000/logincheck', {
+    method: 'POST',
+    headers: {'Content-Type':'application/javascript'}, // this line is important, if this content-type is not set it wont work
+    body: objToSend
+    });
+/*     var username = document.getElementById('usernamebox').value;
     var password = document.getElementById('passwordbox').value;
     if (username == "Legioguard" && password == "Quantum4277"){
         var myNode2 = document.getElementById("responsebody");
@@ -66,7 +76,7 @@ function Redirect() {
         }
         var rbody = $('<p>Login Failed! The username or password you entered was incorrect</p>');
         $('#responsebody').append(rbody);
-    }
+    } */
 }
 //setTimeout('Redirect()', 3000);
 </script>

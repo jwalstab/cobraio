@@ -87,23 +87,46 @@
 function Redirect() {
     var username = document.getElementById('usernamebox').value;
     var password = document.getElementById('passwordbox').value;
-    if (username == "Legioguard" && password == "Quantum4277"){
-        var myNode2 = document.getElementById("responsebody");
-        while (myNode2.firstChild) {
-            myNode2.removeChild(myNode2.firstChild);
+    objToSend = {
+        user: username,
+        pass: password
+    }
+
+    $.ajax({
+        type: "POST",
+        url: 'http://127.0.0.1:3000/logincheck',
+        data: JSON.stringify(objToSend),
+        contentType: "application/json",
+        crossDomain: true,
+        success: function (data, status, jqXHR) {
+        console.log(data);
+        if (data === "OK"){
+            var myNode2 = document.getElementById("responsebody");
+            while (myNode2.firstChild) {myNode2.removeChild(myNode2.firstChild);}
+            var rbody = $('<p>Login Sucessful! Please stand by...</p>');
+            $('#responsebody').append(rbody);
+            window.location="devices";
         }
-        var rbody = $('<p>Login Sucessful! Please stand by...</p>');
-        $('#responsebody').append(rbody);
-        window.location="devices";
+        else{
+            var myNode2 = document.getElementById("responsebody");
+            while (myNode2.firstChild) {myNode2.removeChild(myNode2.firstChild);}
+            var rbody = $('<p>Login Failed! The username or password you entered was incorrect</p>');
+            $('#responsebody').append(rbody);
+        }
+        },
+        error: function (jqXHR, status) {
+            console.log("ERROR" + jqXHR + " status: " + status);
+        }
+        });
+
+/*     
+    
+    if (username == "Legioguard" && password == "Quantum4277"){
+
     }
     else{
-        var myNode2 = document.getElementById("responsebody");
-        while (myNode2.firstChild) {
-            myNode2.removeChild(myNode2.firstChild);
-        }
-        var rbody = $('<p>Login Failed! The username or password you entered was incorrect</p>');
-        $('#responsebody').append(rbody);
-    }
+
+    } */
 }
 </script>
 </html>
