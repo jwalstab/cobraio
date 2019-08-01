@@ -968,11 +968,11 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     Hot_SupToVlv_Temp: uInt16ToFloat32([req.body.inputRegisters[64],req.body.inputRegisters[65]]),
 
     // input registers 2
-    Ele_Boost_Temp: uInt16ToFloat32([req.body.inputRegisters2[20],req.body.inputRegisters2[21]]),
-    Heat_Exchange_Cold: uInt16ToFloat32([req.body.inputRegisters2[22],req.body.inputRegisters2[23]]),
-    Heat_Exchange_Hot: uInt16ToFloat32([req.body.inputRegisters2[24],req.body.inputRegisters2[25]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val: req.body.inputRegisters2[26],
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val: uInt16ToFloat32([req.body.inputRegisters2[27],req.body.inputRegisters2[28]]),
+    Ele_Boost_Temp: uInt16ToFloat32([req.body.inputRegisters2[19],req.body.inputRegisters2[20]]),
+    Heat_Exchange_Cold: uInt16ToFloat32([req.body.inputRegisters2[21],req.body.inputRegisters2[22]]),
+    Heat_Exchange_Hot: uInt16ToFloat32([req.body.inputRegisters2[23],req.body.inputRegisters2[24]]),
+    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val: req.body.inputRegisters2[25],
+    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val: uInt16ToFloat32([req.body.inputRegisters2[26],req.body.inputRegisters2[27]]),
     CP_Yout1_Act: uInt16ToFloat32([req.body.inputRegisters2[56],req.body.inputRegisters2[57]]),
     CP_Yout2_Act: uInt16ToFloat32([req.body.inputRegisters2[58],req.body.inputRegisters2[59]]),
     Flow_Switch_ColdFS2_Char: uInt16ToFloat32([req.body.inputRegisters2[60],req.body.inputRegisters2[61]]),
