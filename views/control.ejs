@@ -64,7 +64,8 @@ var chosenDeviceName;
 
 LoadDeviceSelectBox();
 function LoadDeviceSelectBox(){
-        var dropboxURL = masterURL + "/jwalstab/lookup_devices/";
+        var dropboxURL = masterURL + "/<%= loggedInPool %>/lookup_devices/";
+        console.log(dropboxURL);
         $.ajax({type: "GET", url: dropboxURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
             success: function (data, status, jqXHR) {
                 //creates the links in the dropdown menu and populates device list
@@ -102,25 +103,6 @@ setTimeout(DiagramDataGrab,3000);
 var diagramStatusText = "Please select an IoT device to begin monitoring"
 var diagramTimeText;
 
-/* var Cold_Tank_Temp1 = 0;
-var Cold_Tank_Temp2 = 0;
-var Cold_Tank_Temp3 = 0;
-var Hot_Tank_temp1 = 0;
-var Hot_Tank_temp2 = 0;
-var Hot_Tank_temp3 = 0;
-var Cold_Return_Temp = 0;
-var Cold_Supply_Temp = 0;
-var Suct_Temp = 0;
-var Disc_temp = 0;
-var Evap_Inlet_Temp = 0;
-var Hot_Return_Temp = 0;
-var Hot_Supply_Temp = 0;
-var Flow_Switch_ColdFS_Char = 0;
-var Flow_Switch_ColdFS2_Char = 0;
-var Flow_Switch_HotFS1_Char = 0;
-var Flow_Switch_HotFS2_Char = 0;
-var Hot_Fan = false; */
-
 var fanOn;
 
 var idTime;
@@ -148,9 +130,9 @@ function DiagramDataGrab(){
                 Cold_Tank_Temp1 = data[0].Cold_Tank_Temp1;
                 Cold_Tank_Temp2 = data[0].Cold_Tank_Temp2;
                 Cold_Tank_Temp3 = data[0].Cold_Tank_Temp3;
-                Hot_Tank_temp1 = data[0].Hot_Tank_Temp1;
-                Hot_Tank_temp2 = data[0].Hot_Tank_Temp2;
-                Hot_Tank_temp3 = data[0].Hot_Tank_Temp3;
+                Hot_Tank_Temp1 = data[0].Hot_Tank_Temp1;
+                Hot_Tank_Temp2 = data[0].Hot_Tank_Temp2;
+                Hot_Tank_Temp3 = data[0].Hot_Tank_Temp3;
                 Cold_Tank_Temp3 = data[0].Cold_Tank_Temp3;
                 Cold_Return_Temp = data[0].Cold_Return_Temp;
                 Cold_Supply_Temp = data[0].Cold_Supply_Temp;
@@ -160,10 +142,18 @@ function DiagramDataGrab(){
                 Hot_Return_Temp = data[0].Hot_Return_Temp;
                 Hot_Supply_Temp = data[0].Hot_Supply_Temp;
                 Hot_Fan = data[0].Hot_Fan;
-/*                 Flow_Switch_ColdFS_Char = data[0].Flow_Switch_ColdFS_Char;
+                Disc_Temp = data[0].Disc_Temp;
+                Cond_Outlet_Temp = data[0].Cond_Outlet_Temp;
+                Ele_Boost_Temp = data[0].Ele_Boost_Temp;
+
+                //pumps
+                Flow_Switch_ColdFS_Char = data[0].Flow_Switch_ColdFS_Char;
                 Flow_Switch_ColdFS2_Char = data[0].Flow_Switch_ColdFS2_Char;
                 Flow_Switch_HotFS1_Char = data[0].Flow_Switch_HotFS1_Char;
-                Flow_Switch_HotFS2_Char = data[0].Flow_Switch_HotFS2_Char; */
+                Flow_Switch_HotFS2_Char = data[0].Flow_Switch_HotFS2_Char;
+                CP_Yout1_Act = data[0].CP_Yout1_Act;
+                HP_Yout1_Act = data[0].HP_Yout1_Act;
+                EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val = data[0].EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val
                 Hot_Fan = true;
                 console.log(Hot_Fan);
                 //ManageFan();
@@ -270,14 +260,21 @@ function DiagramDataGrab(){
                 Evap_Inlet_Temp_Text = this.add.text(443 , 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Disc_Temp_Text = this.add.text(645 , 169, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Hot_Return_Temp_Text = this.add.text(1016 , 402, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                Ele_Boost_Temp_Text = this.add.text(1016 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Hot_Supply_Temp_Text = this.add.text(876 , 171, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-
+                Cond_Outlet_Temp_Text = this.add.text(660 , 410, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
 
                 //pumps
                 Flow_Switch_ColdFS_Char_Text = this.add.text(320 , 160, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Flow_Switch_ColdFS2_Char_Text = this.add.text(320 , 180, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                CP_Yout1_Act_Text = this.add.text(318 , 200, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Flow_Switch_HotFS1_Char_Text = this.add.text(780 , 383, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Flow_Switch_HotFS2_Char_Text = this.add.text(780 , 403, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                HP_Yout1_Act_Text = this.add.text(780 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+                //eev
+                EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text = this.add.text(550 , 380, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
 
                 //fan
                 Hot_Fan_Text = this.add.text(895 , 302, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
@@ -321,7 +318,7 @@ function DiagramDataGrab(){
                 }
                 else{
                     var clientTime = Date.now();
-                    if (clientTime - 30000 < idTime){
+                    if (clientTime - 60000 < idTime){
                         connectionText.setText("Connected to device " + chosenDeviceName + ", last data recieved at: " + diagramTimeText);
                         blueStatusLight.setVisible(true);
                         
@@ -348,13 +345,20 @@ function DiagramDataGrab(){
             Cold_Supply_Temp_Text.setText(Cold_Supply_Temp + "°C");
             Suct_Temp_Text.setText(Suct_Temp + "°C");
             Disc_Temp_Text.setText(Disc_Temp + "°C");
+            Cond_Outlet_Temp_Text.setText(Cond_Outlet_Temp + "°C");
+            
             Evap_Inlet_Temp_Text.setText(Evap_Inlet_Temp + "°C");
             Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
+            Ele_Boost_Temp_Text.setText(Ele_Boost_Temp + "°C");
             Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
-            Flow_Switch_ColdFS_Char_Text.setText(Flow_Switch_ColdFS_Char + " L/H");
+            Flow_Switch_ColdFS_Char_Text.setText(Math.round(Flow_Switch_ColdFS_Char) + " L/H");
             Flow_Switch_ColdFS2_Char_Text.setText(Flow_Switch_ColdFS2_Char + " L/H");
-            Flow_Switch_HotFS1_Char_Text.setText(Flow_Switch_HotFS1_Char + " L/H");
-            Flow_Switch_HotFS2_Char_Text.setText(Flow_Switch_HotFS2_Char + " L/H");
+            CP_Yout1_Act_Text.setText(CP_Yout1_Act + "%");
+            Flow_Switch_HotFS1_Char_Text.setText(Math.round(Flow_Switch_HotFS1_Char) + " L/H");
+            Flow_Switch_HotFS2_Char_Text.setText(Math.round(Flow_Switch_HotFS2_Char) + " L/H");
+            HP_Yout1_Act_Text.setText(HP_Yout1_Act + "%");
+
+            EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text.setText(EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val + "%");
         }
 
         });

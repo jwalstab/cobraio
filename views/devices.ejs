@@ -70,7 +70,6 @@
     var id;
     var idstring;
     var name;
-    var loggedonuser = "jwalstab";
     var chosenDevice;
     var chosenDeviceName;
     var deviceList = [];
@@ -89,7 +88,7 @@
 
         if (idstring != "" && name != "" && id != null)
         {
-            var lookupurl = masterURL + "/" + loggedonuser + "/lookup_devices/"
+            var lookupurl = masterURL + "/" + '<%= loggedInPool %>' + "/lookup_devices/"
             $.ajax({type: "GET", url: lookupurl, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json", 
             success: function (data, status, jqXHR) {
                     var exists = false;
@@ -100,7 +99,7 @@
                         }
                     });
                     if (exists == true){DisplayResult("exists");}
-                    else{RegisterToDB(id,name,loggedonuser);}
+                    else{RegisterToDB(id,name);}
                 },
                 error: function (jqXHR, status) {
                     console.log(jqXHR, status);
@@ -114,12 +113,12 @@
         }
     }
 
-    function RegisterToDB(id,name,loggedonuser) {
+    function RegisterToDB(id,name) {
         var objtopost = {
                 deviceID: id,
                 devicename: name
             };
-        var registerurl = masterURL + "/" + loggedonuser + "/register_device/"
+        var registerurl = masterURL + "/" + '<%= loggedInPool %>' + "/register_device/"
         $.ajax({
             type: "POST",
             url: registerurl,
@@ -170,7 +169,7 @@
     }
 
     function LoadDeviceRemoveSelectBoxAndDeviceList(){
-        var dropboxURL = masterURL + "/jwalstab/lookup_devices/";
+        var dropboxURL = masterURL + "/<%= loggedInPool %>/lookup_devices/";
         $.ajax({type: "GET", url: dropboxURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
             success: function (data, status, jqXHR) {
                 //creates the links in the dropdown menu and populates device list
@@ -210,7 +209,7 @@
 
     function RemoveDeviceButtonPress()
         {
-            var deleteDeviceURL = masterURL + "/devices/delete/" + loggedonuser;
+            var deleteDeviceURL = masterURL + "/devices/delete/" + '<%= loggedInPool %>';
                     
             var deviceToDelete = {
                     deviceID: chosenDevice

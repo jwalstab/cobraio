@@ -75,7 +75,7 @@
 
     //////////////////////////////////////////////////////////////////////drop down box area
     function LoadDropDownBox(){
-        var res3 = masterURL + "/jwalstab/lookup_devices/";
+        var res3 = masterURL + "/<%= loggedInPool %>/lookup_devices/";
         $.ajax({
             type: "GET",
             url: res3,
@@ -156,14 +156,14 @@
             }
         });
 
-        fetch(res3, {
+/*         fetch(res3, {
           method: 'post',
           body: dates
         }).then(function(response) {
           
         }).catch(function(err) {
           // Error :(
-        });
+        }); */
     }
 
     var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]

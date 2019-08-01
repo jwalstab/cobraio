@@ -73,7 +73,8 @@
     var dataUpdateTimeout;
 
     function LoadDeviceSelectBox(){
-        var dropboxURL = masterURL + "/jwalstab/lookup_devices/";
+        var dropboxURL = masterURL + "/<%= loggedInPool %>/lookup_devices/";
+        console.log(dropboxURL);
         $.ajax({type: "GET", url: dropboxURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
             success: function (data, status, jqXHR) {
                 //creates the links in the dropdown menu and populates device list

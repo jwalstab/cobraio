@@ -130,7 +130,6 @@
     //var labelList = [];
     var alarmList = [];
     var triggeredAlarmsList = [];
-    var chosenUser = "jwalstab";
 
     
     LoadDeviceSelectMenu();
@@ -151,14 +150,14 @@
     }
     else
     {
-                RegisterAlarmTodb(chosenUser,chosenDevice, chosenName, chosenValue, chosenOperator, chosenNumber, chosenEmailAlerts,chosenEmail)
+                RegisterAlarmTodb(chosenDevice, chosenName, chosenValue, chosenOperator, chosenNumber, chosenEmailAlerts,chosenEmail)
     }
     }
 
-    function RegisterAlarmTodb(chosenUser,chosenDevice,chosenName,chosenValue,chosenOperator,chosenNumber, chosenEmailAlerts, chosenEmail) {
+    function RegisterAlarmTodb(chosenDevice,chosenName,chosenValue,chosenOperator,chosenNumber, chosenEmailAlerts, chosenEmail) {
         
         createdAlarm = chosenName;
-        var registerurl = masterURL + "/alarms/" + chosenUser + "/" + chosenDevice;
+        var registerurl = masterURL + "/alarms/" + '<%= loggedInPool %>' + "/" + chosenDevice;
         var alarmAlreadyExists = false;
         var objtopost = {
                 alarmName: chosenName,
@@ -205,7 +204,7 @@
     //////////////////////////////////////////////////////////////////////drop down box area
     function RemoveAlarmButtonPress()
     {
-        var deleteAlarmURL = masterURL + "/alarms/delete/" + chosenUser + "/" + chosenDevice;
+        var deleteAlarmURL = masterURL + "/alarms/delete/" + '<%= loggedInPool %>' + "/" + chosenDevice;
                 
         var alarmToDelete = {
                 alarmName: chosenAlarm
@@ -236,7 +235,7 @@
     }
 
     function LoadDeviceSelectMenu(){
-        var res3 = masterURL + "/jwalstab/lookup_devices/";
+        var res3 = masterURL + "/<%= loggedInPool %>/lookup_devices/";
         $.ajax({
             type: "GET",
             url: res3,
@@ -449,7 +448,7 @@
 
         //load alarm setup table
 
-        var urlstr = masterURL + "/alarmlist/" + chosenUser + "/" + chosenDevice;
+        var urlstr = masterURL + "/alarmlist/" + '<%= loggedInPool %>' + "/" + chosenDevice;
         $.ajax({ type: "GET", url: urlstr, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
             success: function (data, status, jqXHR) {
                 if (data != null)
@@ -469,7 +468,7 @@
         });
 
         //load triggered alarm table
-        var talarmURL = masterURL + "/triggeredalarmlist/" + chosenUser + "/" + chosenDevice;
+        var talarmURL = masterURL + "/triggeredalarmlist/" + '<%= loggedInPool %>' + "/" + chosenDevice;
         $.ajax({ type: "GET", url: talarmURL, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
             success: function (data, status, jqXHR) {
                 if (data != null)
@@ -491,7 +490,7 @@
     
 
     function ClearTriggeredAlarms(){
-    var clearTriggeredAlarms = masterURL + "/deletetriggeredalarmlist/" + chosenUser + "/" + chosenDevice;
+    var clearTriggeredAlarms = masterURL + "/deletetriggeredalarmlist/" + '<%= loggedInPool %>' + "/" + chosenDevice;
         $.ajax({ type: "GET", url: clearTriggeredAlarms, contentType: "application/json; charset=utf-8", crossDomain: true,
             success: function (data, status, jqXHR) {
             LoadTableDataFromAPI();

@@ -75,7 +75,7 @@
     
     //////////////////////////////////////////////////////////////////////drop down box area
     function LoadDropDownBox(){
-        var res3 = masterURL + "/jwalstab/lookup_devices/"
+        var res3 = masterURL + "/<%= loggedInPool %>/lookup_devices/"
         $.ajax({
             type: "GET",
             url: res3,

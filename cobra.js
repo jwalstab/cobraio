@@ -134,17 +134,17 @@ app.use(function(req, res, next) {
 
 
 //registers a new device
-app.post("/:username/register_device", function(req, res) {
-  devicedb.collection(req.params.username).insertOne(req.body).then (function() {
+app.post("/:iotpool/register_device", function(req, res) {
+  devicedb.collection(req.params.iotpool).insertOne(req.body).then (function() {
     res.send(req.body);
     res.end();
   });
 });
 
 
-//returns list of IDs/Names based on username
-app.get("/:username/lookup_devices", function(req, res) {
-  devicedb.collection(req.params.username).find({}).toArray(function(err, docs){
+//returns list of IDs/Names based on iot pool
+app.get("/:iotpool/lookup_devices", function(req, res) {
+  devicedb.collection(req.params.iotpool).find({}).toArray(function(err, docs){
   idArrayToReturn = [];
   docs.forEach(element => {
     if (element.devicename != null){
@@ -226,8 +226,8 @@ app.get("/alarmtest", function(req, res) {
 });
 
 //create a new alarm from req.body
-app.post("/alarms/:username/:deviceid", function(req, res) {
-  alarmdb = outsideDatabase.db('alarms_' + req.params.username);
+app.post("/alarms/:iotpool/:deviceid", function(req, res) {
+  alarmdb = outsideDatabase.db('alarms_' + req.params.iotpool);
   alarmdb.collection(req.params.deviceid).insertOne(req.body).then (function() {
     res.send("Recieved");
     res.end();
@@ -235,8 +235,8 @@ app.post("/alarms/:username/:deviceid", function(req, res) {
 });
 
 //delete an alarm based of req.body
-app.post("/alarms/delete/:username/:deviceid/", function(req, res) {
-  alarmdb = outsideDatabase.db('alarms_' + req.params.username);
+app.post("/alarms/delete/:iotpool/:deviceid/", function(req, res) {
+  alarmdb = outsideDatabase.db('alarms_' + req.params.iotpool);
   console.log(req.body);
   var name = "alarmName";
   var value = (req.body.alarmName);
@@ -250,21 +250,21 @@ app.post("/alarms/delete/:username/:deviceid/", function(req, res) {
 });
 
 //delete a device based of req.body
-app.post("/devices/delete/:username/", function(req, res) {
+app.post("/devices/delete/:iotpool/", function(req, res) {
   deviceDB = outsideDatabase.db('devices');
   var name = "deviceID";
   var value = (req.body.deviceID);
   var query = {};
   query[name] = value;
-  deviceDB.collection(req.params.username).deleteOne(req.body).then (function() {
+  deviceDB.collection(req.params.iotpool).deleteOne(req.body).then (function() {
     res.send("Recieved");
     res.end();
   });
 });
 
 //returns list of alarms for that user and that device
-app.get("/alarmlist/:username/:deviceid", function(req,res) {
-  alarmdb = outsideDatabase.db('alarms_' + req.params.username);
+app.get("/alarmlist/:iotpool/:deviceid", function(req,res) {
+  alarmdb = outsideDatabase.db('alarms_' + req.params.iotpool);
   alarmdb.collection(req.params.deviceid).find({}).toArray(function(err, alarmsList){
     res.send(alarmsList);
     res.end();
@@ -272,8 +272,8 @@ app.get("/alarmlist/:username/:deviceid", function(req,res) {
 });
 
 //returns list of triggered alarms for that user and that device
-app.get("/triggeredalarmlist/:username/:deviceid", function(req,res) {
-  alarmdb = outsideDatabase.db('triggered_alarms_' + req.params.username);
+app.get("/triggeredalarmlist/:iotpool/:deviceid", function(req,res) {
+  alarmdb = outsideDatabase.db('triggered_alarms_' + req.params.iotpool);
   alarmdb.collection(req.params.deviceid).find({}).toArray(function(err, triggeredAlarmsList){
     res.send(triggeredAlarmsList);
     res.end();
@@ -281,8 +281,8 @@ app.get("/triggeredalarmlist/:username/:deviceid", function(req,res) {
 });
 
 //deletes entire list of triggered alarms for one device
-app.get("/deletetriggeredalarmlist/:username/:deviceid", function(req, res) {
-  alarmdb = outsideDatabase.db('triggered_alarms_' + req.params.username);
+app.get("/deletetriggeredalarmlist/:iotpool/:deviceid", function(req, res) {
+  alarmdb = outsideDatabase.db('triggered_alarms_' + req.params.iotpool);
   alarmdb.collection(req.params.deviceid).deleteMany({}).then (function(err, triggeredAlarmsList){
     res.send("OK!");
     res.end();
@@ -290,8 +290,8 @@ app.get("/deletetriggeredalarmlist/:username/:deviceid", function(req, res) {
 });
 
 //returns list of triggered bell alarms for that user and all devices
-app.get("/triggeredbellalarmlist/:username/", function(req,res) {
-  alarmdb = outsideDatabase.db('triggered_bell_alarms_' + req.params.username);
+app.get("/triggeredbellalarmlist/:iotpoo/", function(req,res) {
+  alarmdb = outsideDatabase.db('triggered_bell_alarms_' + req.params.iotpool);
   alarmdb.collection('all').find({}).toArray(function(err, triggeredBellAlarmsList){
     res.send(triggeredBellAlarmsList);
     res.end();
@@ -299,8 +299,8 @@ app.get("/triggeredbellalarmlist/:username/", function(req,res) {
 });
 
 //deletes entire list of triggered bell alarms
-app.get("/deletebellalarms/:username/", function(req, res) {
-  bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + req.params.username);
+app.get("/deletebellalarms/:iotpool/", function(req, res) {
+  bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + req.params.iotpool);
   bellTriggeredAlarmsDB.collection('all').deleteMany({}).then (function() {
   });
   res.send("ok!");
@@ -316,8 +316,8 @@ app.get("/deletebellalarms/:username/", function(req, res) {
 
 
 //ALARM SYSTEM
-function ReturnDeviceNameFromID(username,deviceID){
-  devicedb.collection(username).find({}).toArray(function(err, docs){
+function ReturnDeviceNameFromID(iotpool,deviceID){
+  devicedb.collection(iotpool).find({}).toArray(function(err, docs){
     docs.forEach(element => {
       if (element.deviceID == deviceID){
       }
@@ -325,8 +325,8 @@ function ReturnDeviceNameFromID(username,deviceID){
 });
 }
 
-function AlarmProcessor(deviceID, deviceData, username){
-  alarmdb = outsideDatabase.db('alarms_' + username);
+function AlarmProcessor(deviceID, deviceData, iotpool){
+  alarmdb = outsideDatabase.db('alarms_' + iotpool);
   var dataValues = Object.keys(deviceData);
   alarmdb.collection(deviceID).find({}).toArray(function(err, alarmsList){
     if (alarmsList == null){return;} // checks if no alarms db exists for this device, then quits
@@ -339,7 +339,7 @@ function AlarmProcessor(deviceID, deviceData, username){
           {
             if (deviceData[deviceValue] > alarm.alarmNumber)
             {
-              devicedb.collection(username).find({}).toArray(function(err, deviceList)
+              devicedb.collection(iotpool).find({}).toArray(function(err, deviceList)
               {
                 deviceList.forEach(device => {if (device.deviceID == deviceID)
                   {
@@ -361,7 +361,7 @@ function AlarmProcessor(deviceID, deviceData, username){
                       alarmTriggeredAt: deviceData.time,
                       alarmEmailAddress: alarm.alarmEmailAddress
                     }
-                    triggeredAlarmsDB = outsideDatabase.db('triggered_alarms_' + username);
+                    triggeredAlarmsDB = outsideDatabase.db('triggered_alarms_' + iotpool);
                     triggeredAlarmsDB.collection(deviceID).insertOne(alarmRecord).then (function() {});
 
                     var bellAlarmRecord = {
@@ -374,7 +374,7 @@ function AlarmProcessor(deviceID, deviceData, username){
                       deviceName: device.devicename
                     }
 
-                    bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + username);
+                    bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + iotpool);
                     bellTriggeredAlarmsDB.collection('all').insertOne(bellAlarmRecord).then (function() {});
                   }
                 });
@@ -385,7 +385,7 @@ function AlarmProcessor(deviceID, deviceData, username){
           {
             if (deviceData[deviceValue] < alarm.alarmNumber)
             {
-              devicedb.collection(username).find({}).toArray(function(err, deviceList)
+              devicedb.collection(iotpool).find({}).toArray(function(err, deviceList)
               {
                 deviceList.forEach(device => {if (device.deviceID == deviceID)
                   {
@@ -407,7 +407,7 @@ function AlarmProcessor(deviceID, deviceData, username){
                       alarmTriggeredAt: deviceData.time,
                       alarmEmailAddress: alarm.alarmEmailAddress
                     }
-                    triggeredAlarmsDB = outsideDatabase.db('triggered_alarms_' + username);
+                    triggeredAlarmsDB = outsideDatabase.db('triggered_alarms_' + iotpool);
                     triggeredAlarmsDB.collection(deviceID).insertOne(alarmRecord).then (function() {});
 
                     var bellAlarmRecord = {
@@ -420,7 +420,7 @@ function AlarmProcessor(deviceID, deviceData, username){
                       deviceName: device.devicename
                     }
 
-                    bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + username);
+                    bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + iotpool);
                     bellTriggeredAlarmsDB.collection('all').insertOne(bellAlarmRecord).then (function() {});
                   }
                 });
@@ -431,7 +431,7 @@ function AlarmProcessor(deviceID, deviceData, username){
           {
             if (deviceData[deviceValue] == alarm.alarmNumber)
             {
-              devicedb.collection(username).find({}).toArray(function(err, deviceList)
+              devicedb.collection(iotpool).find({}).toArray(function(err, deviceList)
               {
                 deviceList.forEach(device => {if (device.deviceID == deviceID)
                   {
@@ -453,7 +453,7 @@ function AlarmProcessor(deviceID, deviceData, username){
                       alarmTriggeredAt: deviceData.time,
                       alarmEmailAddress: alarm.alarmEmailAddress
                     }
-                    triggeredAlarmsDB = outsideDatabase.db('triggered_alarms_' + username);
+                    triggeredAlarmsDB = outsideDatabase.db('triggered_alarms_' + iotpool);
                     triggeredAlarmsDB.collection(deviceID).insertOne(alarmRecord).then (function() {console.log(alarmRecord);});
 
                     var bellAlarmRecord = {
@@ -466,7 +466,7 @@ function AlarmProcessor(deviceID, deviceData, username){
                       deviceName: device.devicename
                     }
 
-                    bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + username);
+                    bellTriggeredAlarmsDB = outsideDatabase.db('triggered_bell_alarms_' + iotpool);
                     bellTriggeredAlarmsDB.collection('all').insertOne(bellAlarmRecord).then (function() {console.log(alarmRecord);});
                   }
                 });
@@ -540,8 +540,6 @@ app.get("/data_tables", auth, function(req, res) {
 });
 
 app.get("/devices", auth, function(req, res) {
-  //res.render('');
-    console.log(req.session.user);
     res.render('devices', {
     loggedInUser: req.session.user,
     loggedInName: req.session.name,

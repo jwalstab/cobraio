@@ -25,8 +25,8 @@
 
 
 <script>
-    var masterURL = "http://165.22.241.11:3000" //CLOUD
-    //var masterURL = "http://127.0.0.1:3000" //LOCAL
+    //var masterURL = "http://165.22.241.11:3000" //CLOUD
+    var masterURL = "http://127.0.0.1:3000" //LOCAL
 </script>
 
 
@@ -188,9 +188,13 @@
 </body>
 </html>
 
+
+
+
 <script>
+    //ALARM BELL SCRIPTS
 function ClearList(){
-    var clearBellAlarmListURL = masterURL + "/deletebellalarms/jwalstab";
+    var clearBellAlarmListURL = masterURL + "/deletebellalarms/<%= loggedInPool %>";
         $.ajax({ type: "GET", url: clearBellAlarmListURL, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
             success: function (data, status, jqXHR) {
             console.log("alarm bell list cleared!");
@@ -212,7 +216,7 @@ function BellUpdater(){
     setTimeout(BellUpdater, 10000);
 }
 function LoadAlarmBell(){
-    var alarmbellURL = masterURL + "/triggeredbellalarmlist/jwalstab/";
+    var alarmbellURL = masterURL + "/triggeredbellalarmlist/<%= loggedInPool %>/";
         $.ajax({ type: "GET", url: alarmbellURL, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
             success: function (data, status, jqXHR) {
                 if (data != null)
@@ -238,7 +242,6 @@ function LoadAlarmBell(){
         });
 }
 </script>
-
 
 
 

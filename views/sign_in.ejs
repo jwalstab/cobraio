@@ -94,7 +94,7 @@ function Redirect() {
 
     $.ajax({
         type: "POST",
-        url: 'http://165.22.241.11:3000/logincheck',
+        url:  masterURL + '/logincheck',
         data: JSON.stringify(objToSend),
         contentType: "application/json",
         crossDomain: true,
