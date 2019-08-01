@@ -145,18 +145,17 @@ function DiagramDataGrab(){
                 Disc_Temp = data[0].Disc_Temp;
                 Cond_Outlet_Temp = data[0].Cond_Outlet_Temp;
                 Ele_Boost_Temp = data[0].Ele_Boost_Temp;
+                Injection_Vlv = data[0].Injection_Vlv;
 
                 //pumps
                 Flow_Switch_ColdFS_Char = data[0].Flow_Switch_ColdFS_Char;
                 Flow_Switch_ColdFS2_Char = data[0].Flow_Switch_ColdFS2_Char;
                 Flow_Switch_HotFS1_Char = data[0].Flow_Switch_HotFS1_Char;
                 Flow_Switch_HotFS2_Char = data[0].Flow_Switch_HotFS2_Char;
-                CP_Yout1_Act = data[0].CP_Yout1_Act;
+                CP_Yout2_Act = data[0].CP_Yout2_Act;
                 HP_Yout1_Act = data[0].HP_Yout1_Act;
-                EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val = data[0].EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val
-                Hot_Fan = true;
-                console.log(Hot_Fan);
-                //ManageFan();
+                EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val = data[0].EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val;
+
             },
             error: function (jqXHR, status) {
                 diagramStatusText = jqXHR;
@@ -235,10 +234,12 @@ function DiagramDataGrab(){
                 lcdFan = this.add.image(997, 301, 'lcdfan'); 
                 greenStatusLight = this.add.image(56, 41, 'greenstatus');
                 blueStatusLight = this.add.image(56, 41, 'bluestatus');
-/*                 this.add.image(367, 239, 'greenvalve'); 
-                this.add.image(610, 410, 'greenvalve'); 
-                this.add.image(690, 375, 'greenvalve');  */
+                eevValveLight = this.add.image(607, 367, 'greenvalve'); 
+                injValveLight = this.add.image(497, 273, 'greenvalve'); 
+                //this.add.image(690, 375, 'greenvalve');
 
+                eevValveLight.setVisible(false);
+                injValveLight.setVisible(false);
                 greenStatusLight.setVisible(false);
                 blueStatusLight.setVisible(false);
 
@@ -267,7 +268,7 @@ function DiagramDataGrab(){
                 //pumps
                 Flow_Switch_ColdFS_Char_Text = this.add.text(320 , 160, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Flow_Switch_ColdFS2_Char_Text = this.add.text(320 , 180, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-                CP_Yout1_Act_Text = this.add.text(318 , 200, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                CP_Yout2_Act_Text = this.add.text(320 , 198, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Flow_Switch_HotFS1_Char_Text = this.add.text(780 , 383, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 Flow_Switch_HotFS2_Char_Text = this.add.text(780 , 403, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
                 HP_Yout1_Act_Text = this.add.text(780 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
@@ -275,6 +276,11 @@ function DiagramDataGrab(){
                 //eev
                 EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text = this.add.text(550 , 380, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
 
+
+                Injection_Vlv_Text = this.add.text(445 , 280, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+                EvapBypassValvePlaceHolderText = this.add.text(314 , 254, "Closed", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+                CondBypassValvePlaceHolderText = this.add.text(765 , 324, "Closed", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
 
                 //fan
                 Hot_Fan_Text = this.add.text(895 , 302, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
@@ -289,6 +295,14 @@ function DiagramDataGrab(){
             }
             else{
                 Hot_Fan_Text.setText("OFF");
+            }
+            if (EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val > 0)
+            {
+                eevValveLight.setVisible(true);
+            }
+            else
+            {
+                eevValveLight.setVisible(false);
             }
             if (recieving == true){
                 greenStatusLight.setVisible(true);
@@ -353,12 +367,15 @@ function DiagramDataGrab(){
             Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
             Flow_Switch_ColdFS_Char_Text.setText(Math.round(Flow_Switch_ColdFS_Char) + " L/H");
             Flow_Switch_ColdFS2_Char_Text.setText(Flow_Switch_ColdFS2_Char + " L/H");
-            CP_Yout1_Act_Text.setText(CP_Yout1_Act + "%");
+            CP_Yout2_Act_Text.setText(CP_Yout2_Act + "%");
             Flow_Switch_HotFS1_Char_Text.setText(Math.round(Flow_Switch_HotFS1_Char) + " L/H");
             Flow_Switch_HotFS2_Char_Text.setText(Math.round(Flow_Switch_HotFS2_Char) + " L/H");
             HP_Yout1_Act_Text.setText(HP_Yout1_Act + "%");
 
             EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text.setText(EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val + "%");
+
+            if (Injection_Vlv === 0){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
+            else{Injection_Vlv_Text.setText("Open"); injValveLight.setVisible(true);}
         }
 
         });
