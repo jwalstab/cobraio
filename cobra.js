@@ -968,16 +968,16 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     Hot_SupToVlv_Temp: uInt16ToFloat32([req.body.inputRegisters[64],req.body.inputRegisters[65]]),
 
     // input registers 2
-    Ele_Boost_Temp: uInt16ToFloat32([req.body.inputRegisters2[18],req.body.inputRegisters2[19]]),
-    Heat_Exchange_Cold: uInt16ToFloat32([req.body.inputRegisters2[120],req.body.inputRegisters2[21]]),
-    Heat_Exchange_Hot: uInt16ToFloat32([req.body.inputRegisters2[122],req.body.inputRegisters2[23]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val: req.body.inputRegisters2[24],
+    Ele_Boost_Temp: uInt16ToFloat32([req.body.inputRegisters2[20],req.body.inputRegisters2[21]]),
+    Heat_Exchange_Cold: uInt16ToFloat32([req.body.inputRegisters2[22],req.body.inputRegisters2[23]]),
+    Heat_Exchange_Hot: uInt16ToFloat32([req.body.inputRegisters2[24],req.body.inputRegisters2[25]]),
+    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val: req.body.inputRegisters2[26],
     EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val: uInt16ToFloat32([req.body.inputRegisters2[25],req.body.inputRegisters2[26]]),
-    CP_Yout1_Act: uInt16ToFloat32([req.body.inputRegisters2[57],req.body.inputRegisters2[58]]),
-    CP_Yout2_Act: uInt16ToFloat32([req.body.inputRegisters2[59],req.body.inputRegisters2[60]]),
-    Flow_Switch_ColdFS2_Char: uInt16ToFloat32([req.body.inputRegisters2[61],req.body.inputRegisters2[62]]),
-    Low_Pressure: uInt16ToFloat32([req.body.inputRegisters2[63],req.body.inputRegisters2[64]]),
-    High_Pressure: uInt16ToFloat32([req.body.inputRegisters2[65],req.body.inputRegisters2[66]])
+    CP_Yout1_Act: uInt16ToFloat32([req.body.inputRegisters2[56],req.body.inputRegisters2[57]]),
+    CP_Yout2_Act: uInt16ToFloat32([req.body.inputRegisters2[58],req.body.inputRegisters2[59]]),
+    Flow_Switch_ColdFS2_Char: uInt16ToFloat32([req.body.inputRegisters2[60],req.body.inputRegisters2[61]]),
+    Low_Pressure: uInt16ToFloat32([req.body.inputRegisters2[62],req.body.inputRegisters2[63]]),
+    High_Pressure: uInt16ToFloat32([req.body.inputRegisters2[64],req.body.inputRegisters2[65]])
   }
 
   iotdb.collection(req.params.deviceid).insertOne(LegioGuardDataObject).then (function() {
