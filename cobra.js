@@ -865,8 +865,8 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
 
     //HOLDING REGISTERS
     Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[1],req.body.holdingRegisters[2]]),
-    Master_Ctrl_Mng_Cl_HotMainVlv_Delay: req.body.ho.holdingRegisters[5],
-    Master_Ctrl_Mng_Hot_S2_OpenT: req.body.ho.holdingRegisters[6],
+    Master_Ctrl_Mng_Cl_HotMainVlv_Delay: req.body.holdingRegisters[5],
+    Master_Ctrl_Mng_Hot_S2_OpenT: req.body.holdingRegisters[6],
     Master_Ctrl_Mng_Comp_Setp: uInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]),
     Master_Ctrl_Mng_Comp_Diff: uInt16ToFloat32([req.body.holdingRegisters[9],req.body.holdingRegisters[10]]),
     Master_Ctrl_Mng_Comp_MinOn_T: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
