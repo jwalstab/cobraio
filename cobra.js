@@ -786,6 +786,8 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
 
     time: req.body.time,
 
+    
+
     //COILS
     EleHeater_Mng_Hot_Ele_Man_Msk: req.body.coils[7],
     AlarmMng_AlrmResByBms: req.body.coils[8],
@@ -862,11 +864,11 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     HighP_SenserRead_Active: req.body.discreteInputs[63],
 
     //HOLDING REGISTERS
-    Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
-    Master_Ctrl_Mng_Cl_HotMainVlv_Delay: uInt16ToFloat32([req.body.holdingRegisters[2],req.body.holdingRegisters[3]]),
-    Master_Ctrl_Mng_Hot_S2_OpenT: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
-    Master_Ctrl_Mng_Comp_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
-    Master_Ctrl_Mng_Comp_Diff: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[1],req.body.holdingRegisters[2]]),
+    Master_Ctrl_Mng_Cl_HotMainVlv_Delay: req.body.ho.holdingRegisters[5],
+    Master_Ctrl_Mng_Hot_S2_OpenT: req.body.ho.holdingRegisters[6],
+    Master_Ctrl_Mng_Comp_Setp: uInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]),
+    Master_Ctrl_Mng_Comp_Diff: uInt16ToFloat32([req.body.holdingRegisters[9],req.body.holdingRegisters[10]]),
     Master_Ctrl_Mng_Comp_MinOn_T: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
     Master_Ctrl_Mng_Comp_MinOff_T: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
     Master_Ctrl_Mng_Comp_Start_Delay: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
@@ -980,6 +982,10 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     High_Pressure: uInt16ToFloat32([req.body.inputRegisters2[64],req.body.inputRegisters2[65]])
   }
 
+  var dataValues = Object.keys(LegioGuardDataObject);
+  dataValues.forEach(element => {
+    console.log(element);
+  });
   iotdb.collection(req.params.deviceid).insertOne(LegioGuardDataObject).then (function() {
   });
   
