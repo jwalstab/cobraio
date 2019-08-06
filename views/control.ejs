@@ -5,55 +5,23 @@
                 <div class="card">
                     <div class="body block-header">
                         <div class="row">
-<!--                             <div class="col-lg-12 col-md-12 col-sm-12">
-                                <h2>Real Time IoT Device Monitor</h2>
-                                <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
-                                    <li class="breadcrumb-item active" id="phaserdiv" >Select an IoT device to monitor incoming data in real time</li>
-                                </ul>
-                            </div> -->
-                            <div class="col-lg-12 col-md-12 col-sm-12" id="phaserdiv">
-                                    <h2>Real Time IoT Device Monitor</h2>
-                                    <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <h2>IoT Monitoring and Control Page</h2>
+<!--                                     <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
                                         <li class="breadcrumb-item active" >Select an IoT device to monitor incoming data in real time</li>
-                                    </ul>
-                                </div>
+                                    </ul> -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-<!--             <div class="col-lg-12 col-md-12 col-sm-12">
-                    <div class="card">
-                         <div class="header" id="rheader">
-                            <h2><strong>Loading chart...</strong></h2>
-
-                            </div>
-                        </div>
-                        <div class="body">
-                                <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                          Select Device
-                                          <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenu">
-                                        </ul>
-                                </div>
-                    </div>
-                </div> -->
-<!--                         <div class="card" >
-                            <div class ="header" >
-
-                            </div>
-                                 <div class="body" >
-                                </div>
-                        </div> -->
-            </div>
-<!--             <div class="col-lg-9 col-md-9 col-sm-9">
-                <div id="phaserdiv" width="1200" height="600">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card" id="phaserdiv">
                 </div>
-
-            </div> -->
-
+            </div>
+        </div>
     </div>
 </section>
 
@@ -206,6 +174,14 @@ function DiagramDataGrab(){
                     EleHeater_Mng_EBT_Ele_Setp = data[0].EleHeater_Mng_EBT_Ele_Setp;
                     EleHeater_Mng_EleH_Offset = data[0].EleHeater_Mng_EleH_Offset;
 
+
+                    Warm_ToBuild_Temp = data[0].Warm_ToBuild_Temp;
+                    Warm_ReturnBuild_Temp = data[0].Warm_ReturnBuild_Temp;
+                    Hot_SupToVlv_Temp = data[0].Hot_SupToVlv_Temp;
+                    Heat_Exchange_Cold = data[0].Heat_Exchange_Cold;
+                    Heat_Exchange_Hot = data[0].Heat_Exchange_Hot;
+                    Cold_SupToVlv_Temp = data[0].Cold_SupToVlv_Temp;
+
                 }
                 else{
                     gotData = false;
@@ -284,7 +260,7 @@ var ChooseDeviceMenu = new Phaser.Class({
         
         this.add.image(600, 300, 'choosedevicebackground');
         
-        deviceNameTitle = this.add.text(80, 20, "Select IoT Device to Monitor", { fontFamily: 'Arial', fontSize: 36, color: '#ffffff' })
+        //deviceNameTitle = this.add.text(80, 20, "Select IoT Device to Monitor", { fontFamily: 'Arial', fontSize: 36, color: '#ffffff' })
         
         //loads buttons then hides them
         cdmButtons = [
@@ -1130,10 +1106,25 @@ var ValveControl = new Phaser.Class({
     {
         this.add.image(600, 300, 'valvebackground');
         LoadMenuButtons(this);
+
+        Cold_SupToVlv_Temp_Text = this.add.text(361 , 299, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Heat_Exchange_Cold_Text = this.add.text(361 , 196, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });  
+        Heat_Exchange_Hot_Text = this.add.text(797 , 300, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Hot_SupToVlv_Temp_Text = this.add.text(798 , 199, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Warm_ToBuild_Temp_Text = this.add.text(490 , 90, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Warm_ReturnBuild_Temp_Text = this.add.text(645 , 90, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+
+        //Heat_Exchange_Hot_Text = this.add.text(567 , 393, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' }); for last value
+
     },
 
     update: function (){
-
+        Cold_SupToVlv_Temp_Text.setText(Cold_SupToVlv_Temp);
+        Heat_Exchange_Hot_Text.setText(Heat_Exchange_Hot);
+        Heat_Exchange_Cold_Text.setText(Heat_Exchange_Cold);
+        Hot_SupToVlv_Temp_Text.setText(Hot_SupToVlv_Temp);
+        Warm_ToBuild_Temp_Text.setText(Warm_ToBuild_Temp);
+        Warm_ReturnBuild_Temp_Text.setText(Warm_ReturnBuild_Temp);
     }
     });
 

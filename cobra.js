@@ -28,10 +28,10 @@ app.use(session({
 
 //return res.sendStatus(401);
 var auth = function(req, res, next) {
-  //if (req.session && req.session.user)
+  if (req.session && req.session.user && req.session.pool)
     return next();
-  //else
-   // return res.render('sign_in', { layout: 'emptylayout' });
+  else
+    return res.render('sign_in', { layout: 'emptylayout' });
 };
 
 app.post('/logincheck', function (req, res) {
@@ -63,8 +63,8 @@ app.post('/logincheck', function (req, res) {
 var MongoClient = require('mongodb').MongoClient;
 
 var outsideDatabase;
-  MongoClient.connect("mongodb://165.22.241.11:27017", {useNewUrlParser: true}, function(err, database) {
-  //MongoClient.connect("mongodb://127.0.0.1:27017", {useNewUrlParser: true}, function(err, database) {
+  //MongoClient.connect("mongodb://165.22.241.11:27017", {useNewUrlParser: true}, function(err, database) {
+  MongoClient.connect("mongodb://127.0.0.1:27017", {useNewUrlParser: true}, function(err, database) {
   if(err)
   throw err;
   iotdb = database.db('iot');
@@ -983,7 +983,7 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
 
     //eev holding registers
 
-
+/* 
     EVD_Emb_1_Params_EVDEMB_1_Superparameters_EEVtype_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
     EVD_Emb_1_Params_EVDEMB_1_Superparameters_MainRegulation_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
     EVD_Emb_1_Params_EVDEMB_1_Superparameters_AuxRegulationCom_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
@@ -1012,7 +1012,7 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_MOP_AlrmDT_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[95],req.body.holdingRegisters2[96]]),
     EVD_Emb_1_Params_EVDEMB_1_EVD_Manual_ManPositSteps_Val: req.body.holdingRegisters2[97],
     EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_HiTempCondThrsh_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[98],req.body.holdingRegisters2[99]]),
-
+ */
     /*200EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_HiTempCondTi_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
     202EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_HiTempCondAlrmDT_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
     203EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_ModThermSet_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
