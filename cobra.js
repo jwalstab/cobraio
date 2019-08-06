@@ -155,11 +155,57 @@ app.get("/:iotpool/lookup_devices", function(req, res) {
   res.end();
 });
 });
+
+
+//returns an object with device ID, name and whether its sent data in last sixty seconds
+app.get("/:iotpool/lookup_devices_time", function(req, res) {
+  idArrayToReturn = [];
+
+  devicedb.collection(req.params.iotpool).find({}).toArray(function(err, docs){
+  var amountOfDevices = docs.length;
+  var currentCount = 0;
+  docs.forEach(element => { //FIRST LOOP GETS THE DEVICEID
+    if (element.devicename != null){
+      iotdb.collection("" + element.deviceID).find({}).sort( { _id : -1 } ).limit(1).toArray(function(err, docs){
+        if (err){console.log(err);}//SECOND LOOP GETS A DATA PACKET THEN CHECKS THE ID TIME
+        if (docs[0] != null){
+          var timestamp = (docs[0]._id).toString().substring(0,8);
+          var idTime = new Date( parseInt( timestamp, 16 ) * 1000 );
+          var clientTime = Date.now();
+          var deviceStatus = 'empty';
+          if (clientTime - 60000 < idTime){ ///SET TO 60 SECONDS TO SHOW ONLINE OR OFFLINE
+            deviceStatus = "Online"
+          }
+          else{
+            deviceStatus = "Offline";
+          }
+        }
+        else{
+          deviceStatus = "Offline";
+        }
+
+        var deviceObject = {
+          deviceName: element.devicename,
+          deviceID: element.deviceID,
+          deviceStatus: deviceStatus
+        }
+        idArrayToReturn.push(deviceObject);
+        if (amountOfDevices != currentCount + 1){
+          currentCount++;
+        }
+        else{
+          res.send(idArrayToReturn);
+          res.end();
+        }
+      });
+    }
+  });
+});
+
+});
 ///////////////////////////////////////////////////////////////////////////////
 
 
-
-//iot api stuff
 
 
 //used for iot to send data packets to api server, checks agaisnt alarm system
@@ -290,7 +336,7 @@ app.get("/deletetriggeredalarmlist/:iotpool/:deviceid", function(req, res) {
 });
 
 //returns list of triggered bell alarms for that user and all devices
-app.get("/triggeredbellalarmlist/:iotpoo/", function(req,res) {
+app.get("/triggeredbellalarmlist/:iotpool/", function(req,res) {
   alarmdb = outsideDatabase.db('triggered_bell_alarms_' + req.params.iotpool);
   alarmdb.collection('all').find({}).toArray(function(err, triggeredBellAlarmsList){
     res.send(triggeredBellAlarmsList);
@@ -986,10 +1032,13 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     High_Pressure: uInt16ToFloat32([req.body.inputRegisters2[64],req.body.inputRegisters2[65]])
   }
 
-  var dataValues = Object.keys(LegioGuardDataObject);
+/*   var dataValues = Object.keys(LegioGuardDataObject);
   dataValues.forEach(element => {
     console.log(element);
-  });
+  }); */
+
+  var hardcodedIoTPool = 'Quantum'
+  AlarmProcessor(req.params.deviceid,LegioGuardDataObject,hardcodedIoTPool);
   iotdb.collection(req.params.deviceid).insertOne(LegioGuardDataObject).then (function() {
   });
   
