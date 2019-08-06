@@ -87,7 +87,7 @@ function Redirect() {
     var result;
     var username = document.getElementById('usernamebox').value;
     var password = document.getElementById('passwordbox').value;
-    var result = RunNumbers([username, password]);
+    var result = RunNumbers([username, password]) + "   R:   " + RunNumbersReversed([username, password]);
         var myNode2 = document.getElementById("responsebody");
         while (myNode2.firstChild) {
             myNode2.removeChild(myNode2.firstChild);
@@ -135,6 +135,20 @@ function RunNumbers(uint16array) {
   var realNumber = floatView[0].toFixed(2);
   return realNumber;
 }
+
+function RunNumbersReversed(uint16array) {
+  uint16array.reverse();
+  var buffer = new ArrayBuffer(4);
+  var intView = new Uint16Array(buffer);
+  var floatView = new Float32Array(buffer);
+
+  intView[0] = uint16array[0];
+  intView[1] = uint16array[1];
+
+  var realNumber = floatView[0].toFixed(2);
+  return realNumber;
+}
+
 
 /* function RunNumbers(data) {
   var realNumber = data[0] + data[1];
