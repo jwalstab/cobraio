@@ -910,7 +910,7 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     HighP_SenserRead_Active: req.body.discreteInputs[63],
 
     //HOLDING REGISTERS
-    Master_Ctrl_Mng_Fan_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
     Master_Ctrl_Mng_Cl_HotMainVlv_Delay: req.body.holdingRegisters[5],
     Master_Ctrl_Mng_Hot_S2_OpenT: req.body.holdingRegisters[6],
     Master_Ctrl_Mng_Comp_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]),
