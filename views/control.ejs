@@ -5,12 +5,18 @@
                 <div class="card">
                     <div class="body block-header">
                         <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12">
+<!--                             <div class="col-lg-12 col-md-12 col-sm-12">
                                 <h2>Real Time IoT Device Monitor</h2>
                                 <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
-                                    <li class="breadcrumb-item active">Select an IoT device to monitor incoming data in real time</li>
+                                    <li class="breadcrumb-item active" id="phaserdiv" >Select an IoT device to monitor incoming data in real time</li>
                                 </ul>
-                            </div>
+                            </div> -->
+                            <div class="col-lg-12 col-md-12 col-sm-12" id="phaserdiv">
+                                    <h2>Real Time IoT Device Monitor</h2>
+                                    <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
+                                        <li class="breadcrumb-item active" >Select an IoT device to monitor incoming data in real time</li>
+                                    </ul>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -34,10 +40,13 @@
                                 </div>
                     </div>
                 </div> -->
-                        <div class="card" id="phaserdiv">
+<!--                         <div class="card" >
+                            <div class ="header" >
+
+                            </div>
                                  <div class="body" >
                                 </div>
-                        </div>
+                        </div> -->
             </div>
 <!--             <div class="col-lg-9 col-md-9 col-sm-9">
                 <div id="phaserdiv" width="1200" height="600">
@@ -147,6 +156,26 @@ function DiagramDataGrab(){
                     HP_Yout1_Act = data[0].HP_Yout1_Act;
                     EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val = data[0].EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val;
 
+                    //pump specific page
+                    PVlv_Mng_ColdVlv_Setp = data[0].PVlv_Mng_ColdVlv_Setp;
+                    PVlv_Mng_Cold_Min_Op = data[0].PVlv_Mng_Cold_Min_Op;
+                    PVlv_Mng_Cold_Max_Op = data[0].PVlv_Mng_Cold_Max_Op;
+                    PVlv_Mng_Cold_Op_ProAl = data[0].PVlv_Mng_Cold_Op_ProAl;
+                    PVlv_Mng_ColdVlv_DeadBand = data[0].PVlv_Mng_ColdVlv_DeadBand;
+                    PVlv_Mng_ColdVlv_Kp = data[0].PVlv_Mng_ColdVlv_Kp;
+                    PVlv_Mng_ColdVlv_Ti = data[0].PVlv_Mng_ColdVlv_Ti;
+                    PVlv_Mng_ColdVlv_Td = data[0].PVlv_Mng_ColdVlv_Td;
+
+                    PVlv_Mng_HotVlv_Setp = data[0].PVlv_Mng_HotVlv_Setp;
+                    PVlv_Mng_Hot_Min_Op = data[0].PVlv_Mng_Hot_Min_Op;
+                    PVlv_Mng_Hot_Max_Op = data[0].PVlv_Mng_Hot_Max_Op;
+                    PVlv_Mng_Hot_Op_ProAl = data[0].PVlv_Mng_Hot_Op_ProAl;
+                    PVlv_Mng_HotVlv_DeadBand = data[0].PVlv_Mng_HotVlv_DeadBand;
+                    PVlv_Mng_HotVlv_Kp = data[0].PVlv_Mng_HotVlv_Kp;
+                    PVlv_Mng_HotVlv_Ti = data[0].PVlv_Mng_HotVlv_Ti;
+                    PVlv_Mng_HotVlv_Td = data[0].PVlv_Mng_HotVlv_Td;
+
+
                     High_Pressure = data[0].High_Pressure;
                     Low_Pressure = data[0].Low_Pressure;
 
@@ -163,10 +192,20 @@ function DiagramDataGrab(){
                     Master_Ctrl_Mng_Injec_ReStart_Delay = data[0].Master_Ctrl_Mng_Injec_ReStart_Delay;
 
 
-                    Flush_Valve_Flush_Week_Set = data[0].Flush_Valve_Flush_Week_Set
-                    Flush_Valve_Flush_Hour_Set = data[0].Flush_Valve_Flush_Hour_Set
-                    Flush_Valve_Flush_Minute_Set = data[0].Flush_Valve_Flush_Minute_Set
-                    Flush_Valve_Flush_Time = data[0].Flush_Valve_Flush_Time
+                    Flush_Valve_Flush_Week_Set = data[0].Flush_Valve_Flush_Week_Set;
+                    Flush_Valve_Flush_Hour_Set = data[0].Flush_Valve_Flush_Hour_Set;
+                    Flush_Valve_Flush_Minute_Set = data[0].Flush_Valve_Flush_Minute_Set;
+                    Flush_Valve_Flush_Time = data[0].Flush_Valve_Flush_Time;
+
+                    //fan stuff
+                    Master_Ctrl_Mng_Fan_Diff = data[0].Master_Ctrl_Mng_Fan_Diff;
+                    Master_Ctrl_Mng_Fan_Setp = data[0].Master_Ctrl_Mng_Fan_Setp;
+                    Master_Ctrl_Mng_Fan_HRT_Diff = data[0].Master_Ctrl_Mng_Fan_HRT_Diff;
+                    Master_Ctrl_Mng_Fan_CRT_Diff = data[0].Master_Ctrl_Mng_Fan_CRT_Diff;
+                    EleHeater_Mng_EleH_Setp = data[0].EleHeater_Mng_EleH_Setp;
+                    EleHeater_Mng_EBT_Ele_Setp = data[0].EleHeater_Mng_EBT_Ele_Setp;
+                    EleHeater_Mng_EleH_Offset = data[0].EleHeater_Mng_EleH_Offset;
+
                 }
                 else{
                     gotData = false;
@@ -795,13 +834,15 @@ var FlushControl = new Phaser.Class({
         Flush_Valve_Flush_Hour_Set_Text = this.add.text(255 , 217, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         Flush_Valve_Flush_Minute_Set_Text = this.add.text(255 , 267, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         Flush_Valve_Flush_Time_Text = this.add.text(255 , 316, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        //Flush = this.add.text(923 , 166, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
     },
 
     update: function (){
         Flush_Valve_Flush_Week_Set_Text.setText(Flush_Valve_Flush_Week_Set);
         Flush_Valve_Flush_Hour_Set_Text.setText(Flush_Valve_Flush_Hour_Set);
         Flush_Valve_Flush_Minute_Set_Text.setText(Flush_Valve_Flush_Minute_Set);
-        Flush_Valve_Flush_Time_Text.setText(Flush_Valve_Flush_Time);
+        Flush_Valve_Flush_Time_Text.setText(Flush_Valve_Flush_Time + "s");
+        //Flush_Valve_Manual_On_Flush_Text.setText(Flush_Valve_Manual_On_Flush + "s") wrong needs to be fixed;
     }
     });
 
@@ -826,15 +867,21 @@ var FanControl = new Phaser.Class({
     {
         this.add.image(600, 300, 'fancbackground');
         LoadMenuButtons(this);
-        Hot_Fan_Text = this.add.text(310 , 185, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Fan_Setp_Text = this.add.text(310 , 235, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Hot_Return_Temp_Text = this.add.text(310 , 285, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Hot_Supply_Temp_Text = this.add.text(310 , 335, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Fan_Diff_Text = this.add.text(1095 , 170, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
-        Master_Ctrl_Mng_Fan_CRT_Diff_Text = this.add.text(1095 , 200, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
-        Master_Ctrl_Mng_Fan_HRT_Diff_Text = this.add.text(760 , 200, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Hot_Fan_Text = this.add.text(310 , 150, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+        Hot_Return_Temp_Text = this.add.text(310 , 180, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Hot_Supply_Temp_Text = this.add.text(310 , 210, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
 
+        Master_Ctrl_Mng_Fan_Setp_Text = this.add.text(760 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_Diff_Text = this.add.text(1095 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+        Master_Ctrl_Mng_Fan_HRT_Diff_Text = this.add.text(180 , 338, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_CRT_Diff_Text = this.add.text(180 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
 
+        EleHeater_Mng_EleH_Setp_Text = this.add.text(760 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        EleHeater_Mng_EBT_Ele_Setp_Text = this.add.text(760 , 398, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        EleHeater_Mng_EleH_Offset_Text = this.add.text(1095 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
 
     },
 
@@ -844,7 +891,12 @@ var FanControl = new Phaser.Class({
         Master_Ctrl_Mng_Fan_Setp_Text.setText(Master_Ctrl_Mng_Fan_Setp + "°C");
         Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
         Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
-
+        Master_Ctrl_Mng_Fan_Diff_Text.setText(Master_Ctrl_Mng_Fan_Diff + "°C");
+        Master_Ctrl_Mng_Fan_HRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_HRT_Diff + "°C");
+        Master_Ctrl_Mng_Fan_CRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_CRT_Diff + "°C");
+        EleHeater_Mng_EleH_Setp_Text.setText(EleHeater_Mng_EleH_Setp + "°C");
+        EleHeater_Mng_EBT_Ele_Setp_Text.setText(EleHeater_Mng_EBT_Ele_Setp + "°C");
+        EleHeater_Mng_EleH_Offset_Text.setText(EleHeater_Mng_EleH_Offset + "°C");
     }
     });
 
@@ -1012,10 +1064,48 @@ var PumpControl = new Phaser.Class({
     {
         this.add.image(600, 300, 'pumpbackground');
         LoadMenuButtons(this);
+
+        //hot pumps
+        PVlv_Mng_HotVlv_Setp_Text = this.add.text(230 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Min_Op_Text = this.add.text(230 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Max_Op_Text = this.add.text(230 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Op_ProAl_Text = this.add.text(230 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
+        PVlv_Mng_HotVlv_DeadBand_Text = this.add.text(230 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Kp_Text = this.add.text(230 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Ti_Text = this.add.text(230 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Td_Text = this.add.text(230 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        //cold pumps
+        PVlv_Mng_ColdVlv_Setp_Text = this.add.text(850 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Min_Op_Text = this.add.text(850 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Max_Op_Text = this.add.text(850 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Op_ProAl_Text = this.add.text(850 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_DeadBand_Text = this.add.text(850 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Kp_Text = this.add.text(850 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Ti_Text = this.add.text(850 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Td_Text = this.add.text(850 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
     },
 
     update: function (){
 
+        PVlv_Mng_ColdVlv_Setp_Text.setText(PVlv_Mng_ColdVlv_Setp + "°C");
+        PVlv_Mng_Cold_Min_Op_Text.setText(PVlv_Mng_Cold_Min_Op + "%");
+        PVlv_Mng_Cold_Max_Op_Text.setText(PVlv_Mng_Cold_Max_Op + "%");
+        PVlv_Mng_Cold_Op_ProAl_Text.setText(PVlv_Mng_Cold_Op_ProAl + "%");
+        PVlv_Mng_ColdVlv_DeadBand_Text.setText(PVlv_Mng_ColdVlv_DeadBand);
+        PVlv_Mng_ColdVlv_Kp_Text.setText(PVlv_Mng_ColdVlv_Kp);
+        PVlv_Mng_ColdVlv_Ti_Text.setText(PVlv_Mng_ColdVlv_Ti);
+        PVlv_Mng_ColdVlv_Td_Text.setText(PVlv_Mng_ColdVlv_Td);
+
+        PVlv_Mng_HotVlv_Setp_Text.setText(PVlv_Mng_HotVlv_Setp + "°C");
+        PVlv_Mng_Hot_Min_Op_Text.setText(PVlv_Mng_Hot_Min_Op + "%");
+        PVlv_Mng_Hot_Max_Op_Text.setText(PVlv_Mng_Hot_Max_Op + "%");
+        PVlv_Mng_Hot_Op_ProAl_Text.setText(PVlv_Mng_Hot_Op_ProAl + "%");
+        PVlv_Mng_HotVlv_DeadBand_Text.setText(PVlv_Mng_HotVlv_DeadBand);
+        PVlv_Mng_HotVlv_Kp_Text.setText(PVlv_Mng_HotVlv_Kp);
+        PVlv_Mng_HotVlv_Ti_Text.setText(PVlv_Mng_HotVlv_Ti);
+        PVlv_Mng_HotVlv_Td_Text.setText(PVlv_Mng_HotVlv_Td);
     }
     });
 
