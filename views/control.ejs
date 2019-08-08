@@ -1155,7 +1155,7 @@ function UploadControlChangeToAPI(changeObject){
     Quantity: 2 */
     $.ajax({
         type: "POST",
-        url:  masterURL + '/legioguard/control/Quantum/55',
+        url:  masterURL + '/legioguard/control/Quantum/' + chosenDevice,
         data: JSON.stringify(changeObject),
         contentType: "application/json",
         crossDomain: true,
