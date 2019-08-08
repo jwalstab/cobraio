@@ -592,12 +592,12 @@ app.get("/phaser", function(req, res) {
 });
 
 app.get("/", function(req, res) {
-  if (req.session.user){
+/*   if (req.session.user){
   res.render('devices');
   }
-  else{
+  else{ */
     res.render('sign_in', { layout: 'emptylayout' });
-  }
+  //}
 });
 
 app.get("/sign_out", function(req, res) {
@@ -635,7 +635,7 @@ app.get("/devices", auth, function(req, res) {
   });
 });
 
-app.get("/data_charts", function(req, res) {
+app.get("/data_charts", auth, function(req, res) {
   res.render('data_charts', {
     loggedInUser: req.session.user,
     loggedInName: req.session.name,
@@ -862,16 +862,27 @@ var dataLabelsList = [];
 
 var testDataLabelsList = ["Random_Data_1", "Random_Data_2", "Random_Data_3"];
 
-var LGDataLabelsList = ["Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
+var LGDataLabelsList = ["Comp_On","Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
-                        "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp"]
+                        "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"]
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
+  console.log("5    " + req.body.holdingRegisters[5]);
+  console.log("6    " + req.body.holdingRegisters[6]);
+  console.log("7    " + req.body.holdingRegisters[7]);
+  console.log("8    " + req.body.holdingRegisters[8]);
+  console.log("9    " + req.body.holdingRegisters[9]);
+  
 
+  console.log("the value 67       " + ReverseduInt16ToFloat32([req.body.holdingRegisters[6],req.body.holdingRegisters[7]]));
+
+  console.log("the value 78      " + uInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]));
+  
   LegioGuardDataObject = {
 
     time: req.body.time,
 
+    
     
 
     //COILS
@@ -950,77 +961,77 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     HighP_SenserRead_Active: req.body.discreteInputs[63],
 
     //HOLDING REGISTERS
-    Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters[1]]),
+    Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[1],req.body.holdingRegisters[2]]),
     Master_Ctrl_Mng_Cl_HotMainVlv_Delay: req.body.holdingRegisters[5],
     Master_Ctrl_Mng_Hot_S2_OpenT: req.body.holdingRegisters[6],
-    Master_Ctrl_Mng_Comp_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]),
-    Master_Ctrl_Mng_Comp_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters[9],req.body.holdingRegisters[10]]),
-    Master_Ctrl_Mng_Comp_MinOn_T: req.body.holdingRegisters[11],
-    Master_Ctrl_Mng_Comp_MinOff_T: req.body.holdingRegisters[12],
-    Master_Ctrl_Mng_Comp_Start_Delay: req.body.holdingRegisters[14],
-    Master_Ctrl_Mng_BlanceVlv_Delay: req.body.holdingRegisters[16],
-    Master_Ctrl_Mng_InjecVlv_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[17],req.body.holdingRegisters[18]]),
-    Master_Ctrl_Mng_InjecVlv_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters[19],req.body.holdingRegisters[20]]),
-    Master_Ctrl_Mng_Injec_MaxTime: req.body.holdingRegisters[22],
-    Master_Ctrl_Mng_Injec_ReStart_Delay: req.body.holdingRegisters[24],
-    EleHeater_Mng_EleH_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[25],req.body.holdingRegisters[26]]),
-    EleHeater_Mng_EleH_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters[27],req.body.holdingRegisters[28]]),
-    PVlv_Mng_HotVlv_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[29],req.body.holdingRegisters[30]]),
-    PVlv_Mng_HotVlv_DeadBand: ReverseduInt16ToFloat32([req.body.holdingRegisters[31],req.body.holdingRegisters[32]]),
-    PVlv_Mng_Hot_Min_Op: ReverseduInt16ToFloat32([req.body.holdingRegisters[33],req.body.holdingRegisters[34]]),
-    PVlv_Mng_Hot_Max_Op: ReverseduInt16ToFloat32([req.body.holdingRegisters[35],req.body.holdingRegisters[36]]),
-    PVlv_Mng_Cold_Min_Op: ReverseduInt16ToFloat32([req.body.holdingRegisters[37],req.body.holdingRegisters[38]]),
-    PVlv_Mng_Cold_Max_Op: ReverseduInt16ToFloat32([req.body.holdingRegisters[39],req.body.holdingRegisters[40]]),
-    PVlv_Mng_Hot_Op_ProAl: ReverseduInt16ToFloat32([req.body.holdingRegisters[41],req.body.holdingRegisters[42]]),
-    PVlv_Mng_Cold_Op_ProAl: ReverseduInt16ToFloat32([req.body.holdingRegisters[43],req.body.holdingRegisters[44]]),
-    PVlv_Mng_ColdVlv_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[45],req.body.holdingRegisters[46]]),
-    PVlv_Mng_ColdVlv_DeadBand: ReverseduInt16ToFloat32([req.body.holdingRegisters[47],req.body.holdingRegisters[48]]),
+    Master_Ctrl_Mng_Comp_Setp: uInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]),
+    Master_Ctrl_Mng_Comp_Diff: uInt16ToFloat32([req.body.holdingRegisters[9],req.body.holdingRegisters[10]]),
+    Master_Ctrl_Mng_Comp_MinOn_T: req.body.holdingRegisters[12],
+    Master_Ctrl_Mng_Comp_MinOff_T: req.body.holdingRegisters[13],
+    Master_Ctrl_Mng_Comp_Start_Delay: req.body.holdingRegisters[15],
+    Master_Ctrl_Mng_BlanceVlv_Delay: req.body.holdingRegisters[14],
+    Master_Ctrl_Mng_InjecVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[17],req.body.holdingRegisters[18]]),
+    Master_Ctrl_Mng_InjecVlv_Offset: uInt16ToFloat32([req.body.holdingRegisters[19],req.body.holdingRegisters[20]]),
+    Master_Ctrl_Mng_Injec_MaxTime: req.body.holdingRegisters[23],
+    Master_Ctrl_Mng_Injec_ReStart_Delay: req.body.holdingRegisters[25],
+    EleHeater_Mng_EleH_Setp: uInt16ToFloat32([req.body.holdingRegisters[25],req.body.holdingRegisters[26]]),
+    EleHeater_Mng_EleH_Offset: uInt16ToFloat32([req.body.holdingRegisters[27],req.body.holdingRegisters[28]]),
+    PVlv_Mng_HotVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[29],req.body.holdingRegisters[30]]),
+    PVlv_Mng_HotVlv_DeadBand: uInt16ToFloat32([req.body.holdingRegisters[31],req.body.holdingRegisters[32]]),
+    PVlv_Mng_Hot_Min_Op: uInt16ToFloat32([req.body.holdingRegisters[33],req.body.holdingRegisters[34]]),
+    PVlv_Mng_Hot_Max_Op: uInt16ToFloat32([req.body.holdingRegisters[35],req.body.holdingRegisters[36]]),
+    PVlv_Mng_Cold_Min_Op: uInt16ToFloat32([req.body.holdingRegisters[37],req.body.holdingRegisters[38]]),
+    PVlv_Mng_Cold_Max_Op: uInt16ToFloat32([req.body.holdingRegisters[39],req.body.holdingRegisters[40]]),
+    PVlv_Mng_Hot_Op_ProAl: uInt16ToFloat32([req.body.holdingRegisters[41],req.body.holdingRegisters[42]]),
+    PVlv_Mng_Cold_Op_ProAl: uInt16ToFloat32([req.body.holdingRegisters[43],req.body.holdingRegisters[44]]),
+    PVlv_Mng_ColdVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[45],req.body.holdingRegisters[46]]),
+    PVlv_Mng_ColdVlv_DeadBand: uInt16ToFloat32([req.body.holdingRegisters[47],req.body.holdingRegisters[48]]),
     Master_Ctrl_Mng_Hot_S1_Inter: req.body.holdingRegisters[50],
-    AlarmMng_High_DiscT_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[51],req.body.holdingRegisters[52]]),
-    AlarmMng_High_DiscT_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters[53],req.body.holdingRegisters[54]]),
-    AlarmMng_Low_SuctT_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[55],req.body.holdingRegisters[56]]),
-    AlarmMng_Low_SuctT_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters[57],req.body.holdingRegisters[58]]),
+    AlarmMng_High_DiscT_Setp: uInt16ToFloat32([req.body.holdingRegisters[51],req.body.holdingRegisters[52]]),
+    AlarmMng_High_DiscT_Offset: uInt16ToFloat32([req.body.holdingRegisters[53],req.body.holdingRegisters[54]]),
+    AlarmMng_Low_SuctT_Setp: uInt16ToFloat32([req.body.holdingRegisters[55],req.body.holdingRegisters[56]]),
+    AlarmMng_Low_SuctT_Offset: uInt16ToFloat32([req.body.holdingRegisters[57],req.body.holdingRegisters[58]]),
     AlarmMng_High_DiscT_Delay: req.body.holdingRegisters[60],
     AlarmMng_Low_SuctT_Delay: req.body.holdingRegisters[62],
     Master_Ctrl_Mng_RunWFlow_Delay: req.body.holdingRegisters[64],
-    Flush_Valve_Flush_Week_Set: req.body.holdingRegisters[91],
-    Flush_Valve_Flush_Hour_Set: req.body.holdingRegisters[92],
-    Flush_Valve_Flush_Minute_Set: req.body.holdingRegisters[93],
-    Flush_Valve_Flush_Time: req.body.holdingRegisters[95],
-    Flow_Switch_Low_Level_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[97],req.body.holdingRegisters[98]]),
+    Flush_Valve_Flush_Week_Set: req.body.holdingRegisters[92],
+    Flush_Valve_Flush_Hour_Set: req.body.holdingRegisters[93],
+    Flush_Valve_Flush_Minute_Set: req.body.holdingRegisters[94],
+    Flush_Valve_Flush_Time: req.body.holdingRegisters[96],
+    Flow_Switch_Low_Level_Setp: uInt16ToFloat32([req.body.holdingRegisters[97],req.body.holdingRegisters[98]]),
 
     //holding registers 100 +
-    Flush_Valve_Cold_SupplyVlv_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters[99],req.body.holdingRegisters2[0]]),
-    PVlv_Mng_ColdVlv_Kp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[1],req.body.holdingRegisters2[2]]),
-    PVlv_Mng_ColdVlv_Ti: req.body.holdingRegisters2[3],
-    PVlv_Mng_ColdVlv_Td: req.body.holdingRegisters2[4],
-    PVlv_Mng_HotVlv_Kp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[5],req.body.holdingRegisters2[6]]),
-    PVlv_Mng_HotVlv_Ti: req.body.holdingRegisters2[7],
-    PVlv_Mng_HotVlv_Td: req.body.holdingRegisters2[8],
-    EleHeater_Mng_CRT_Ele_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[25],req.body.holdingRegisters2[26]]),
-    EleHeater_Mng_CRT_Ele_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters2[27],req.body.holdingRegisters2[28]]),
-    EleHeater_Mng_EBT_Ele_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[29],req.body.holdingRegisters2[30]]),
-    EleHeater_Mng_EBT_Ele_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters2[31],req.body.holdingRegisters2[32]]),
-    Flush_Valve_Hot_SupplyVlv_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    Flush_Valve_Hot_SupplyVlv_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters2[35],req.body.holdingRegisters2[36]]),
-    Flush_Valve_WSB_Supply_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[37],req.body.holdingRegisters2[38]]),
-    Flush_Valve_WSB_Supply_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters2[39],req.body.holdingRegisters2[40]]),
-    Flush_Valve_Cold_SupplyVlv_Offset: ReverseduInt16ToFloat32([req.body.holdingRegisters2[47],req.body.holdingRegisters2[48]]),
+    Flush_Valve_Cold_SupplyVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters2[1]]),
+    PVlv_Mng_ColdVlv_Kp: uInt16ToFloat32([req.body.holdingRegisters2[2],req.body.holdingRegisters2[3]]),
+    PVlv_Mng_ColdVlv_Ti: req.body.holdingRegisters2[4],
+    PVlv_Mng_ColdVlv_Td: req.body.holdingRegisters2[5],
+    PVlv_Mng_HotVlv_Kp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[6],req.body.holdingRegisters2[7]]),
+    PVlv_Mng_HotVlv_Ti: req.body.holdingRegisters2[8],
+    PVlv_Mng_HotVlv_Td: req.body.holdingRegisters2[9],
+    EleHeater_Mng_CRT_Ele_Setp: uInt16ToFloat32([req.body.holdingRegisters2[25],req.body.holdingRegisters2[26]]),
+    EleHeater_Mng_CRT_Ele_Offset: uInt16ToFloat32([req.body.holdingRegisters2[27],req.body.holdingRegisters2[28]]),
+    EleHeater_Mng_EBT_Ele_Setp: uInt16ToFloat32([req.body.holdingRegisters2[29],req.body.holdingRegisters2[30]]),
+    EleHeater_Mng_EBT_Ele_Diff: uInt16ToFloat32([req.body.holdingRegisters2[31],req.body.holdingRegisters2[32]]),
+    Flush_Valve_Hot_SupplyVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
+    Flush_Valve_Hot_SupplyVlv_Offset: uInt16ToFloat32([req.body.holdingRegisters2[35],req.body.holdingRegisters2[36]]),
+    Flush_Valve_WSB_Supply_Setp: uInt16ToFloat32([req.body.holdingRegisters2[37],req.body.holdingRegisters2[38]]),
+    Flush_Valve_WSB_Supply_Diff: uInt16ToFloat32([req.body.holdingRegisters2[39],req.body.holdingRegisters2[40]]),
+    Flush_Valve_Cold_SupplyVlv_Offset: uInt16ToFloat32([req.body.holdingRegisters2[47],req.body.holdingRegisters2[48]]),
     Input_Mng_Ain1_Type_Sel: req.body.holdingRegisters2[55],
+    
     //holding registers 200+
     
-
     Master_Ctrl_Mng_Rot_Type: req.body.holdingRegisters3[28],
-    Master_Ctrl_Mng_Fan_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    Master_Ctrl_Mng_Fan_HRT_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[35],req.body.holdingRegisters3[36]]),
-    Master_Ctrl_Mng_Fan_CRT_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[37],req.body.holdingRegisters3[38]]),
-    Master_Ctrl_Mng_Comp_CRT_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[39],req.body.holdingRegisters3[40]]),
-    Master_Ctrl_Mng_Comp_HRT_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[41],req.body.holdingRegisters3[42]]),
-    EVD_Emb_1_Min_OpPosc: ReverseduInt16ToFloat32([req.body.holdingRegisters3[43],req.body.holdingRegisters3[44]]),
-    AlarmMng_LP_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters3[45],req.body.holdingRegisters3[46]]),
-    AlarmMng_LP_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[47],req.body.holdingRegisters3[48]]),
-    AlarmMng_HP_Setp: ReverseduInt16ToFloat32([req.body.holdingRegisters3[49],req.body.holdingRegisters3[50]]),
-    AlarmMng_HP_Diff: ReverseduInt16ToFloat32([req.body.holdingRegisters3[51],req.body.holdingRegisters3[52]]),
+    Master_Ctrl_Mng_Fan_Diff: uInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
+    Master_Ctrl_Mng_Fan_HRT_Diff: uInt16ToFloat32([req.body.holdingRegisters3[35],req.body.holdingRegisters3[36]]),
+    Master_Ctrl_Mng_Fan_CRT_Diff: uInt16ToFloat32([req.body.holdingRegisters3[37],req.body.holdingRegisters3[38]]),
+    Master_Ctrl_Mng_Comp_CRT_Diff: uInt16ToFloat32([req.body.holdingRegisters3[39],req.body.holdingRegisters3[40]]),
+    Master_Ctrl_Mng_Comp_HRT_Diff: uInt16ToFloat32([req.body.holdingRegisters3[41],req.body.holdingRegisters3[42]]),
+    EVD_Emb_1_Min_OpPosc: uInt16ToFloat32([req.body.holdingRegisters3[43],req.body.holdingRegisters3[44]]),
+    AlarmMng_LP_Setp: uInt16ToFloat32([req.body.holdingRegisters3[45],req.body.holdingRegisters3[46]]),
+    AlarmMng_LP_Diff: uInt16ToFloat32([req.body.holdingRegisters3[47],req.body.holdingRegisters3[48]]),
+    AlarmMng_HP_Setp: uInt16ToFloat32([req.body.holdingRegisters3[49],req.body.holdingRegisters3[50]]),
+    AlarmMng_HP_Diff: uInt16ToFloat32([req.body.holdingRegisters3[51],req.body.holdingRegisters3[52]]),
 
     //eev holding registers
 
@@ -1116,7 +1127,7 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     Heat_Exchange_Cold: uInt16ToFloat32([req.body.inputRegisters2[21],req.body.inputRegisters2[22]]),
     Heat_Exchange_Hot: uInt16ToFloat32([req.body.inputRegisters2[23],req.body.inputRegisters2[24]]),
     EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val: req.body.inputRegisters2[25],
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val: uInt16ToFloat32([req.body.inputRegisters2[26],req.body.inputRegisters2[27]]),
+    EEV_Pos: uInt16ToFloat32([req.body.inputRegisters2[26],req.body.inputRegisters2[27]]),
     CP_Yout1_Act: uInt16ToFloat32([req.body.inputRegisters2[56],req.body.inputRegisters2[57]]),
     CP_Yout2_Act: uInt16ToFloat32([req.body.inputRegisters2[58],req.body.inputRegisters2[59]]),
     Flow_Switch_ColdFS2_Char: uInt16ToFloat32([req.body.inputRegisters2[62],req.body.inputRegisters2[63]]),
@@ -1191,6 +1202,7 @@ function ReverseduInt16ToFloat32(uint16array) {
   intView[1] = uint16array[1];
 
   //var realNumber = floatView[0].toFixed(2);
-  var realNumber = Math.round(floatView[0] * 1e2 ) / 1e2;
+  //var realNumber = Math.round(floatView[0] * 1e2 ) / 1e2;
+  realNumber = Math.round(floatView[0] * 10) / 10
   return realNumber;
 }

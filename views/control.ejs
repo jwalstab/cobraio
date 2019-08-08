@@ -115,6 +115,8 @@ function DiagramDataGrab(){
                     Ele_Boost_Temp = data[0].Ele_Boost_Temp;
                     Injection_Vlv = data[0].Injection_Vlv;
 
+                    Comp_On = data[0].Comp_On;
+
                     //pumps
                     Flow_Switch_ColdFS_Char = data[0].Flow_Switch_ColdFS_Char;
                     Flow_Switch_ColdFS2_Char = data[0].Flow_Switch_ColdFS2_Char;
@@ -122,7 +124,7 @@ function DiagramDataGrab(){
                     Flow_Switch_HotFS2_Char = data[0].Flow_Switch_HotFS2_Char;
                     CP_Yout2_Act = data[0].CP_Yout2_Act;
                     HP_Yout1_Act = data[0].HP_Yout1_Act;
-                    EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val = data[0].EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val;
+                    EEV_Pos = data[0].EEV_Pos;
 
                     //pump specific page
                     PVlv_Mng_ColdVlv_Setp = data[0].PVlv_Mng_ColdVlv_Setp;
@@ -174,6 +176,7 @@ function DiagramDataGrab(){
                     EleHeater_Mng_EBT_Ele_Setp = data[0].EleHeater_Mng_EBT_Ele_Setp;
                     EleHeater_Mng_EleH_Offset = data[0].EleHeater_Mng_EleH_Offset;
 
+                    EleHeater_Mng_EBT_Ele_Diff = data[0].EleHeater_Mng_EBT_Ele_Diff;
 
                     Warm_ToBuild_Temp = data[0].Warm_ToBuild_Temp;
                     Warm_ReturnBuild_Temp = data[0].Warm_ReturnBuild_Temp;
@@ -437,7 +440,7 @@ var MonitoringDiagramScreen = new Phaser.Class({
             HP_Yout1_Act_Text = this.add.text(780 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
 
             //eev
-            EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text = this.add.text(550 , 380, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            EEV_Pos_Text = this.add.text(550 , 380, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
 
 
             Injection_Vlv_Text = this.add.text(445 , 280, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
@@ -460,7 +463,7 @@ var MonitoringDiagramScreen = new Phaser.Class({
         else{
             Hot_Fan_Text.setText("OFF");
         }
-        if (EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val > 0)
+        if (EEV_Pos > 0)
         {
             eevValveLight.setVisible(true);
         }
@@ -501,14 +504,14 @@ var MonitoringDiagramScreen = new Phaser.Class({
         Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
         Ele_Boost_Temp_Text.setText(Ele_Boost_Temp + "°C");
         Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
-        Flow_Switch_ColdFS_Char_Text.setText(Math.round(Flow_Switch_ColdFS_Char) + " L/H");
-        Flow_Switch_ColdFS2_Char_Text.setText(Flow_Switch_ColdFS2_Char + " L/H");
-        CP_Yout2_Act_Text.setText(CP_Yout2_Act + "%");
-        Flow_Switch_HotFS1_Char_Text.setText(Math.round(Flow_Switch_HotFS1_Char) + " L/H");
-        Flow_Switch_HotFS2_Char_Text.setText(Math.round(Flow_Switch_HotFS2_Char) + " L/H");
-        HP_Yout1_Act_Text.setText(HP_Yout1_Act + "%");
+        Flow_Switch_ColdFS_Char_Text.setText(Math.round((Flow_Switch_ColdFS_Char / 10) / 60) + " LPM");
+        Flow_Switch_ColdFS2_Char_Text.setText(Math.round((Flow_Switch_ColdFS2_Char / 10) / 60) + " LPM");
+        CP_Yout2_Act_Text.setText(Math.round(CP_Yout2_Act) + "%");
+        Flow_Switch_HotFS1_Char_Text.setText(Math.round((Flow_Switch_HotFS1_Char / 10) / 60) + " LPM");
+        Flow_Switch_HotFS2_Char_Text.setText(Math.round((Flow_Switch_HotFS2_Char / 10) / 60) + " LPM");
+        HP_Yout1_Act_Text.setText(Math.round(HP_Yout1_Act) + "%");
 
-        EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text.setText(EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val + "%");
+        EEV_Pos_Text.setText(EEV_Pos + "%");
 
         if (Injection_Vlv === 0){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
         else{Injection_Vlv_Text.setText("Open"); injValveLight.setVisible(true);}
@@ -592,18 +595,40 @@ var CompControl = new Phaser.Class({
 
         
         Master_Ctrl_Mng_Comp_Setp_Text = this.add.text(790 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_Setp_Text.setInteractive();
+        Master_Ctrl_Mng_Comp_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Comp SetP",Master_Ctrl_Mng_Comp_Setp,7,2,false);});
+        
         Master_Ctrl_Mng_Comp_Diff_Text = this.add.text(1080 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_Diff_Text.setInteractive();
+        Master_Ctrl_Mng_Comp_Diff_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Comp Diff SetP",Master_Ctrl_Mng_Comp_Diff,9,2,false);});
 
         Master_Ctrl_Mng_Comp_MinOn_T_Text = this.add.text(790 , 182, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_MinOn_T_Text.setInteractive();
+        Master_Ctrl_Mng_Comp_MinOn_T_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Comp Min On",Master_Ctrl_Mng_Comp_MinOn_T,12,1,false);});
+
         Master_Ctrl_Mng_Comp_MinOff_T_Text = this.add.text(1080 , 182, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_MinOff_T_Text.setInteractive();
+        Master_Ctrl_Mng_Comp_MinOff_T_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Comp Min Off",Master_Ctrl_Mng_Comp_MinOff_T,13,1,false);});
 
         Master_Ctrl_Mng_Comp_Start_Delay_Text = this.add.text(790 , 212, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_Start_Delay_Text.setInteractive();
+        Master_Ctrl_Mng_Comp_Start_Delay_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Comp Start Delay",Master_Ctrl_Mng_Comp_Start_Delay,15,1,false);});
 
         Master_Ctrl_Mng_InjecVlv_Setp_Text = this.add.text(800 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_InjecVlv_Setp_Text.setInteractive();
+        Master_Ctrl_Mng_InjecVlv_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Injection Valve SetP",Master_Ctrl_Mng_InjecVlv_Setp,17,2,false);});
+
         Master_Ctrl_Mng_InjecVlv_Offset_Text = this.add.text(1080 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_InjecVlv_Offset_Text.setInteractive();
+        Master_Ctrl_Mng_InjecVlv_Offset_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Injection Valve Offset",Master_Ctrl_Mng_InjecVlv_Offset,19,2,false);});
+        
         Master_Ctrl_Mng_Injec_MaxTime_Text = this.add.text(800 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Injec_MaxTime_Text.setInteractive();
+        Master_Ctrl_Mng_Injec_MaxTime_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Injection Valve Max On Time",Master_Ctrl_Mng_Injec_MaxTime,23,1,false);});
         
         Master_Ctrl_Mng_Injec_ReStart_Delay_Text = this.add.text(1080 , 387, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Injec_ReStart_Delay_Text.setInteractive();
+        Master_Ctrl_Mng_Injec_ReStart_Delay_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Injection Restart Delay",Master_Ctrl_Mng_Injec_ReStart_Delay,25,1,false);});
         
 
 /*             var nextArrow = this.add.image(1125,279, 'arrowmask');
@@ -675,9 +700,21 @@ var FlushControl = new Phaser.Class({
         connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
 
         Flush_Valve_Flush_Week_Set_Text = this.add.text(255 , 170, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Week_Set_Text.setInteractive();
+        Flush_Valve_Flush_Week_Set_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Flush Day",Flush_Valve_Flush_Week_Set,92,1,false);});
+        
         Flush_Valve_Flush_Hour_Set_Text = this.add.text(255 , 217, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Hour_Set_Text.setInteractive();
+        Flush_Valve_Flush_Hour_Set_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Flush Hour",Flush_Valve_Flush_Hour_Set,93,1,false);});
+        
         Flush_Valve_Flush_Minute_Set_Text = this.add.text(255 , 267, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Minute_Set_Text.setInteractive();
+        Flush_Valve_Flush_Minute_Set_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Flush Minute",Flush_Valve_Flush_Minute_Set,94,1,false);});
+        
         Flush_Valve_Flush_Time_Text = this.add.text(255 , 316, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Time_Text.setInteractive();
+        Flush_Valve_Flush_Time_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Flush Time",Flush_Valve_Flush_Time,96,1,false);});
+        
         //Flush = this.add.text(923 , 166, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
     },
 
@@ -729,14 +766,29 @@ var FanControl = new Phaser.Class({
         Master_Ctrl_Mng_Fan_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Fan SetP",Master_Ctrl_Mng_Fan_Setp,1,2,false);});
 
         Master_Ctrl_Mng_Fan_Diff_Text = this.add.text(1095 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_Diff_Text.setInteractive();
+        Master_Ctrl_Mng_Fan_Diff_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Fan Diff",Master_Ctrl_Mng_Fan_Diff,233,2,false);});
         
         Master_Ctrl_Mng_Fan_HRT_Diff_Text = this.add.text(180 , 338, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_HRT_Diff_Text.setInteractive();
+        Master_Ctrl_Mng_Fan_HRT_Diff_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Fan HRT Diff",Master_Ctrl_Mng_Fan_HRT_Diff,235,2,false);});
+
         Master_Ctrl_Mng_Fan_CRT_Diff_Text = this.add.text(180 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_CRT_Diff_Text.setInteractive();
+        Master_Ctrl_Mng_Fan_CRT_Diff_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Fan CRT Diff",Master_Ctrl_Mng_Fan_CRT_Diff,237,2,false);});
 
         EleHeater_Mng_EleH_Setp_Text = this.add.text(760 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        EleHeater_Mng_EBT_Ele_Setp_Text = this.add.text(760 , 398, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        EleHeater_Mng_EleH_Setp_Text.setInteractive();
+        EleHeater_Mng_EleH_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"HRT Diff",EleHeater_Mng_EleH_Setp,25,2,false);});
 
-        EleHeater_Mng_EleH_Offset_Text = this.add.text(1095 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        EleHeater_Mng_EBT_Ele_Setp_Text = this.add.text(760 , 398, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        EleHeater_Mng_EBT_Ele_Setp_Text.setInteractive();
+        EleHeater_Mng_EBT_Ele_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"CRT Diff",EleHeater_Mng_EBT_Ele_Setp,129,2,false);});
+
+        EleHeater_Mng_EBT_Ele_Diff_Text = this.add.text(1095 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        EleHeater_Mng_EBT_Ele_Diff_Text.setInteractive();
+        EleHeater_Mng_EBT_Ele_Diff_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"EBT Diff",EleHeater_Mng_EBT_Ele_Diff,131,2,false);});
+
 
     },
 
@@ -753,7 +805,7 @@ var FanControl = new Phaser.Class({
         Master_Ctrl_Mng_Fan_CRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_CRT_Diff + "°C");
         EleHeater_Mng_EleH_Setp_Text.setText(EleHeater_Mng_EleH_Setp + "°C");
         EleHeater_Mng_EBT_Ele_Setp_Text.setText(EleHeater_Mng_EBT_Ele_Setp + "°C");
-        EleHeater_Mng_EleH_Offset_Text.setText(EleHeater_Mng_EleH_Offset + "°C");
+        EleHeater_Mng_EBT_Ele_Diff_Text.setText(EleHeater_Mng_EBT_Ele_Diff + "°C");
     }
     });
 
@@ -930,9 +982,6 @@ var PumpControl = new Phaser.Class({
     preload: function ()
     {
         this.load.image('pumpbackground', 'phaser/pumpcontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-        this.load.image('greenstatus', 'phaser/greenstatus.png')
-        this.load.image('bluestatus', 'phaser/bluestatus.png')
     },
 
     create: function ()
@@ -948,23 +997,69 @@ var PumpControl = new Phaser.Class({
 
         //hot pumps
         PVlv_Mng_HotVlv_Setp_Text = this.add.text(230 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Setp_Text.setInteractive();
+        PVlv_Mng_HotVlv_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Setp",PVlv_Mng_HotVlv_Setp,29,2,false);});
+
         PVlv_Mng_Hot_Min_Op_Text = this.add.text(230 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Min_Op_Text.setInteractive();
+        PVlv_Mng_Hot_Min_Op_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Min Open",PVlv_Mng_Hot_Min_Op,33,2,false);});
+
         PVlv_Mng_Hot_Max_Op_Text = this.add.text(230 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Max_Op_Text.setInteractive();
+        PVlv_Mng_Hot_Max_Op_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Max Open",PVlv_Mng_Hot_Max_Op,35,2,false);});
+
         PVlv_Mng_Hot_Op_ProAl_Text = this.add.text(230 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
+        PVlv_Mng_Hot_Op_ProAl_Text.setInteractive();
+        PVlv_Mng_Hot_Op_ProAl_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Open When",PVlv_Mng_Hot_Op_ProAl,41,2,false);});
+
         PVlv_Mng_HotVlv_DeadBand_Text = this.add.text(230 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_DeadBand_Text.setInteractive();
+        PVlv_Mng_HotVlv_DeadBand_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump DeadBand",PVlv_Mng_HotVlv_DeadBand,31,2,false);});
+
         PVlv_Mng_HotVlv_Kp_Text = this.add.text(230 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Kp_Text.setInteractive();
+        PVlv_Mng_HotVlv_Kp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Kp",PVlv_Mng_HotVlv_Kp,106,2,true);});
+
         PVlv_Mng_HotVlv_Ti_Text = this.add.text(230 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Ti_Text.setInteractive();
+        PVlv_Mng_HotVlv_Ti_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Ti",PVlv_Mng_HotVlv_Ti,108,1,false);});
+
         PVlv_Mng_HotVlv_Td_Text = this.add.text(230 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Td_Text.setInteractive();
+        PVlv_Mng_HotVlv_Td_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Td",PVlv_Mng_HotVlv_Td,109,1,false);});
 
         //cold pumps
         PVlv_Mng_ColdVlv_Setp_Text = this.add.text(850 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Setp_Text.setInteractive();
+        PVlv_Mng_ColdVlv_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Setp",PVlv_Mng_ColdVlv_Setp,45,2,false);});
+
         PVlv_Mng_Cold_Min_Op_Text = this.add.text(850 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Min_Op_Text.setInteractive();
+        PVlv_Mng_Cold_Min_Op_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Min Open",PVlv_Mng_Cold_Min_Op,37,2,false);});
+
         PVlv_Mng_Cold_Max_Op_Text = this.add.text(850 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Max_Op_Text.setInteractive();
+        PVlv_Mng_Cold_Max_Op_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Max Open",PVlv_Mng_Cold_Max_Op,39,2,false);});
+
         PVlv_Mng_Cold_Op_ProAl_Text = this.add.text(850 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Op_ProAl_Text.setInteractive();
+        PVlv_Mng_Cold_Op_ProAl_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Open When",PVlv_Mng_Cold_Op_ProAl,43,2,false);});
+
         PVlv_Mng_ColdVlv_DeadBand_Text = this.add.text(850 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_DeadBand_Text.setInteractive();
+        PVlv_Mng_ColdVlv_DeadBand_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump DeadBand",PVlv_Mng_ColdVlv_DeadBand,47,2,false);});
+
         PVlv_Mng_ColdVlv_Kp_Text = this.add.text(850 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Kp_Text.setInteractive();
+        PVlv_Mng_ColdVlv_Kp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Kp",PVlv_Mng_ColdVlv_Kp,102,2,true);});
+
         PVlv_Mng_ColdVlv_Ti_Text = this.add.text(850 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Ti_Text.setInteractive();
+        PVlv_Mng_ColdVlv_Ti_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Ti",PVlv_Mng_ColdVlv_Ti,104,1,false);});
+
         PVlv_Mng_ColdVlv_Td_Text = this.add.text(850 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Td_Text.setInteractive();
+        PVlv_Mng_ColdVlv_Td_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Td",PVlv_Mng_ColdVlv_Td,105,1,false);});
 
     },
 
@@ -1064,42 +1159,75 @@ var ChangeHoldingRegister = new Phaser.Class({
     create: function ()
     {
         this.add.image(600, 300, 'chrbackground');
+
         minus10Button = this.add.image(580,260, 'buttonmask');            
         minus10Button.setInteractive();
-        minus10Button.on('pointerdown', () => {newValue = newValue - 10});
+        minus10Button.on('pointerdown', () => {
+            newValue = newValue - 10;
+            newValue = Math.round(newValue * 10) / 10
+        });
 
         minus1Button = this.add.image(580,350, 'buttonmask');
         minus1Button.setInteractive();
-        minus1Button.on('pointerdown', () => {newValue = newValue - 1});
+        minus1Button.on('pointerdown', () => {
+            newValue = newValue - 1;
+            newValue = Math.round(newValue * 100) / 100
+        });
 
         minus01Button = this.add.image(580,440, 'buttonmask');
         minus01Button.setInteractive();
-        minus01Button.on('pointerdown', () => {newValue = newValue - 0.1});
+        minus01Button.on('pointerdown', () => {
+            newValue = newValue - 0.1;
+            newValue = Math.round(newValue * 10) / 10
+        });
 
         plus10Button = this.add.image(1075,260, 'buttonmask');            
         plus10Button.setInteractive();
-        plus10Button.on('pointerdown', () => {newValue = newValue + 10});
+        plus10Button.on('pointerdown', () => {
+            newValue = newValue + 10;
+            newValue = Math.round(newValue * 10) / 10
+        });
 
         plus1Button = this.add.image(1075,350, 'buttonmask');
         plus1Button.setInteractive();
-        plus1Button.on('pointerdown', () => {newValue = newValue + 1});
+        plus1Button.on('pointerdown', () => {
+            newValue = newValue + 1;
+            newValue = Math.round(newValue * 10) / 10
+        });
 
         plus01Button = this.add.image(1075,440, 'buttonmask');
         plus01Button.setInteractive();
-        plus01Button.on('pointerdown', () => {newValue = newValue + 0.1});
+        plus01Button.on('pointerdown', () => {
+            newValue = newValue + 0.1;
+            newValue = Math.round(newValue * 10) / 10
+        });
 
         setButton = this.add.image(820,545, 'buttonmask');
         setButton.setInteractive();
         setButton.on('pointerdown', () => 
         {
-            changeObject = {
-                Type: 16,
-                Address: savedModbusAddress,
-                Value: float32ToUint16(newValue),
-                Quantity: savedModbusQuantity
+            if (savedModbusReversed == false){
+                if (savedModbusQuantity == 2){
+                    changeObject = {Type: 16,Address: savedModbusAddress,Value: float32ToUint16(newValue),Quantity: savedModbusQuantity}
+                    UploadControlChangeToAPI(changeObject);
+                    this.scene.start(savedScene);
+                }
+                else{
+                    intvalue = Math.round(newValue);
+                    console.log(intvalue);
+                    changeObject = {Type: 6,Address: savedModbusAddress,Value: intvalue,Quantity: savedModbusQuantity}
+                    console.log(changeObject);
+                    UploadControlChangeToAPI(changeObject);
+                    this.scene.start(savedScene);
+                }
             }
-            UploadControlChangeToAPI(changeObject);
-            this.scene.start(savedScene);
+            else{
+                changeObject = {Type: 16,Address: savedModbusAddress,Value: float32ToUint16(newValue).reverse(),Quantity: savedModbusQuantity}
+                UploadControlChangeToAPI(changeObject);
+                this.scene.start(savedScene);
+            }
+
+
         });
 
         Setting_Name_Text = this.add.text(30 , 110, savedSettingToChangeName, {fontFamily: 'System', fontSize: 48, color: '#ffffff' });
@@ -1108,7 +1236,9 @@ var ChangeHoldingRegister = new Phaser.Class({
     },
 
     update: function (){
-        newValue = Math.round(newValue * 1e2 ) / 1e2;
+        
+        //newValue = Math.round(newValue * 100) / 100
+        //newValue = newValue.toPrecision(1);
         New_Value_Text.setText(newValue);
     }
     });
@@ -1149,10 +1279,6 @@ function LoadChangeHoldingRegisterScreen(currentScene, settingToChangeName, sett
 }
 
 function UploadControlChangeToAPI(changeObject){
-/*     Type: 16,
-    Address: 1,
-    Value: [0, 17014],
-    Quantity: 2 */
     $.ajax({
         type: "POST",
         url:  masterURL + '/legioguard/control/Quantum/' + chosenDevice,
@@ -1350,6 +1476,7 @@ function float32ToUint16(value) {
   var floatView = new Float32Array(buffer);
 
   floatView[0] = value;
+  console.log(intView[0] + ":::::"+ intView[1])
   return [intView[0], intView[1]];
 }
 /* console.log(game.scale);
@@ -1694,7 +1821,7 @@ var Ele_Boost_Temp = 0;
 var Heat_Exchange_Cold = 0;
 var Heat_Exchange_Hot = 0;
 var EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val = 0;
-var EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val = 0;
+var EEV_Pos = 0;
 var CP_Yout1_Act = 0;
 var CP_Yout2_Act = 0;
 var Flow_Switch_ColdFS2_Char = 0;
@@ -1737,7 +1864,7 @@ var Ele_Boost_Temp_Text;
 var Heat_Exchange_Cold_Text;
 var Heat_Exchange_Hot_Text;
 var EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosSteps_Val_Text;
-var EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text;
+var EEV_Pos_Text;
 var CP_Yout1_Act_Text;
 var CP_Yout2_Act_Text;
 var Flow_Switch_ColdFS2_Char_Text;
