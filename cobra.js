@@ -211,10 +211,48 @@ app.get("/:iotpool/lookup_devices_time", function(req, res) {
 app.post("/:deviceid", function(req, res) {
   iotdb.collection(req.params.deviceid).insertOne(req.body).then (function() {
     res.send("o");
-    AlarmProcessor(req.params.deviceid,req.body,"jwalstab");
+    AlarmProcessor(req.params.deviceid,req.body,"Quantum");
     res.end();
   });
 });
+
+
+//post a control change to legioguard device
+app.post("/legioguard/control/:iotpool/:deviceid", function(req, res) {
+  changeDB = outsideDatabase.db('control_' + req.params.iotpool);
+  changeDB.collection(req.params.deviceid).insertOne(req.body).then (function() {
+    res.send("ok");
+    res.end();
+  });
+});
+app.get("/legioguard/control/:iotpool/:deviceid", function(req, res) {
+  changeDB = outsideDatabase.db('control_' + req.params.iotpool);
+  //changeDB.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(1).toArray(function(err, docs){
+  changeDB.collection(req.params.deviceid).find({}).limit(1).toArray(function(err, docs){
+    if (docs[0] != null){
+      res.send(docs[0]);
+      recordid = docs[0]._id;
+      DeleteControlChange(req.params.iotpool,req.params.deviceid,recordid);
+      res.end();
+    }
+    else
+    {
+      res.send('n');
+      res.end();
+    }
+  });
+});
+function DeleteControlChange(iotpool,deviceid,recordid){
+  console.log(recordid);
+  var query = {
+    _id: recordid
+  };
+  console.log(query);
+  changeDB = outsideDatabase.db('control_' + iotpool);
+  changeDB.collection(deviceid).deleteOne(query).then(function(err, docs){
+  });
+}
+
 
 //get all data for this deviceID
 app.get("/:deviceid/get", function(req, res) {

@@ -77,8 +77,8 @@
 <script src="assets/bundles/libscripts.bundle.js"></script>
 <script src="assets/bundles/vendorscripts.bundle.js"></script> <!-- Lib Scripts Plugin Js -->
 
-<script src="../assets/plugins/particles-js/particles.min.js"></script>
-<script src="../assets/plugins/particles-js/particles.js"></script>
+<!-- <script src="../assets/plugins/particles-js/particles.min.js"></script>
+<script src="../assets/plugins/particles-js/particles.js"></script> -->
 </body>
 
 
@@ -137,6 +137,9 @@ function RunNumbers(uint16array) {
 }
 
 function RunNumbersReversed(uint16array) {
+
+  ChangeTest();
+
   uint16array.reverse();
   var buffer = new ArrayBuffer(4);
   var intView = new Uint16Array(buffer);
@@ -147,6 +150,33 @@ function RunNumbersReversed(uint16array) {
 
   var realNumber = floatView[0].toFixed(2);
   return realNumber;
+  
+}
+
+function floatToReal(){
+
+}
+
+function ChangeTest(){
+  var ChangeObject = {
+    Type: 16,
+    Address: 1,
+    Value: [0, 17014],
+    Quantity: 2
+  }
+  $.ajax({
+        type: "POST",
+        url:  masterURL + '/legioguard/control/Quantum/55',
+        data: JSON.stringify(ChangeObject),
+        contentType: "application/json",
+        crossDomain: true,
+        success: function (data, status, jqXHR) {
+          console.log("OK!");
+        },
+        error: function (jqXHR, status) {
+            console.log("ERROR" + jqXHR + " status: " + status);
+        }
+        });
 }
 
 

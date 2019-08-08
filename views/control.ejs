@@ -235,6 +235,7 @@ var cdmRedLights = [];
 var cdmGreenLights = [];
 var cdmCounter = 0;
 var pagenumber = 1;
+var cdmMenuFirstLoad = false;
 
 var ChooseDeviceMenu = new Phaser.Class({
 
@@ -253,6 +254,9 @@ var ChooseDeviceMenu = new Phaser.Class({
         this.load.image('longbutton', 'phaser/longbutton.png');
         this.load.image('greenlight', 'phaser/cdmlightgreen.png');
         this.load.image('redlight', 'phaser/cdmlightred.png');
+        this.load.image('greenstatus', 'phaser/greenstatus.png')
+        this.load.image('bluestatus', 'phaser/bluestatus.png')
+        //this.load.image('test1', 'phaser/longbutton.png');
     },
 
     create: function ()
@@ -334,8 +338,6 @@ var ChooseDeviceMenu = new Phaser.Class({
         cdmGreenLights.forEach(element => {
             element.setVisible(false);
         });
-
-        //DeviceMenuUpdate(this);
     },
 
     update: function (){
@@ -355,8 +357,867 @@ var ChooseDeviceMenu = new Phaser.Class({
     }
     });
 
-var cdmMenuFirstLoad = false;
+var MonitoringDiagramScreen = new Phaser.Class({
 
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function MonitoringDiagramScreen ()
+    {
+        Phaser.Scene.call(this, { key: 'MonitoringDiagramScreen' });
+    },
+
+    preload: function ()
+    {
+        
+        this.load.image('background', 'phaser/MainCanvas.png');
+        this.load.image('fansmallon', 'phaser/fansmallon.png');
+        this.load.image('lcdfan', 'phaser/lcdfan.png');
+        this.load.image('fansmalloff', 'phaser/fansmalloff.png');
+        this.load.image('greenstatus', 'phaser/greenstatus.png')
+        this.load.image('bluestatus', 'phaser/bluestatus.png')
+        this.load.image('arrows', 'phaser/arrows.png')
+        this.load.image('greenvalve', 'phaser/greenvalve.png')
+
+        this.load.image('buttonmask', 'phaser/buttonmask.png')
+    },
+
+    create: function ()
+    {       
+            
+
+            
+            LoadMenuButtons(this);
+            this.add.image(600, 300, 'background');
+            arrows = this.add.image(600, 300, 'arrows');
+            arrows.setVisible(false);
+            lcdFan = this.add.image(997, 301, 'lcdfan'); 
+            
+            eevValveLight = this.add.image(607, 367, 'greenvalve'); 
+            injValveLight = this.add.image(497, 273, 'greenvalve'); 
+            //this.add.image(690, 375, 'greenvalve');
+
+            blueStatusLight = this.add.image(100, 41, 'bluestatus');
+            greenStatusLight = this.add.image(100, 41, 'greenstatus');
+            greenStatusLight.setVisible(false);
+            blueStatusLight.setVisible(false);
+
+            eevValveLight.setVisible(false);
+            injValveLight.setVisible(false);
+
+            connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+            statusText = this.add.text(100, 50, "", { fontFamily: 'System', fontSize: 18, color: '#ffffff' })
+
+            Cold_Tank_Temp1_Text = this.add.text(55, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
+            Cold_Tank_Temp2_Text = this.add.text(55, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
+            Cold_Tank_Temp3_Text = this.add.text(55, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
+
+            Hot_Tank_Temp1_Text = this.add.text(1075, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
+            Hot_Tank_Temp2_Text = this.add.text(1075, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
+            Hot_Tank_Temp3_Text = this.add.text(1075, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }) 
+            
+
+            Cold_Return_Temp_Text = this.add.text(130, 170, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Cold_Supply_Temp_Text = this.add.text(210, 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Suct_Temp_Text = this.add.text(445 , 170, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Evap_Inlet_Temp_Text = this.add.text(443 , 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Disc_Temp_Text = this.add.text(645 , 169, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Hot_Return_Temp_Text = this.add.text(1016 , 402, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Ele_Boost_Temp_Text = this.add.text(1016 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Hot_Supply_Temp_Text = this.add.text(876 , 171, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Cond_Outlet_Temp_Text = this.add.text(660 , 410, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+            //pumps
+            Flow_Switch_ColdFS_Char_Text = this.add.text(320 , 160, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Flow_Switch_ColdFS2_Char_Text = this.add.text(320 , 180, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            CP_Yout2_Act_Text = this.add.text(320 , 198, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Flow_Switch_HotFS1_Char_Text = this.add.text(780 , 383, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            Flow_Switch_HotFS2_Char_Text = this.add.text(780 , 403, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            HP_Yout1_Act_Text = this.add.text(780 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+            //eev
+            EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text = this.add.text(550 , 380, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+
+            Injection_Vlv_Text = this.add.text(445 , 280, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+            EvapBypassValvePlaceHolderText = this.add.text(314 , 254, "Closed", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+            CondBypassValvePlaceHolderText = this.add.text(765 , 324, "Closed", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+
+            //fan
+            Hot_Fan_Text = this.add.text(895 , 302, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
+    },
+
+    update: function (time, delta)
+    {
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+        //lcdFan.angle+=5;
+        if (Hot_Fan == true){
+            Hot_Fan_Text.setText("ON");
+            lcdFan.angle+=5;
+        }
+        else{
+            Hot_Fan_Text.setText("OFF");
+        }
+        if (EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val > 0)
+        {
+            eevValveLight.setVisible(true);
+        }
+        else
+        {
+            eevValveLight.setVisible(false);
+        }
+
+        if (arrowsCounter < 75){
+            arrowsCounter++;
+        }
+        else{
+            arrowsCounter = 0;
+            arrowsVisible = !arrowsVisible;
+        }
+
+        if (arrowsVisible == true){
+            arrows.setVisible(true);
+        }
+        else{
+            arrows.setVisible(false);
+        }
+
+        
+        Cold_Tank_Temp1_Text.setText("T1: " + Cold_Tank_Temp1 + "°C");
+        Cold_Tank_Temp2_Text.setText("T2: " + Cold_Tank_Temp2 + "°C");
+        Cold_Tank_Temp3_Text.setText("T3: " + Cold_Tank_Temp3 + "°C");
+        Hot_Tank_Temp1_Text.setText("T1: " + Hot_Tank_Temp1 + "°C");
+        Hot_Tank_Temp2_Text.setText("T2: " + Hot_Tank_Temp2 + "°C");
+        Hot_Tank_Temp3_Text.setText("T3: " + Hot_Tank_Temp3 + "°C");
+        Cold_Return_Temp_Text.setText(Cold_Return_Temp + "°C");
+        Cold_Supply_Temp_Text.setText(Cold_Supply_Temp + "°C");
+        Suct_Temp_Text.setText(Suct_Temp + "°C");
+        Disc_Temp_Text.setText(Disc_Temp + "°C");
+        Cond_Outlet_Temp_Text.setText(Cond_Outlet_Temp + "°C");
+        
+        Evap_Inlet_Temp_Text.setText(Evap_Inlet_Temp + "°C");
+        Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
+        Ele_Boost_Temp_Text.setText(Ele_Boost_Temp + "°C");
+        Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
+        Flow_Switch_ColdFS_Char_Text.setText(Math.round(Flow_Switch_ColdFS_Char) + " L/H");
+        Flow_Switch_ColdFS2_Char_Text.setText(Flow_Switch_ColdFS2_Char + " L/H");
+        CP_Yout2_Act_Text.setText(CP_Yout2_Act + "%");
+        Flow_Switch_HotFS1_Char_Text.setText(Math.round(Flow_Switch_HotFS1_Char) + " L/H");
+        Flow_Switch_HotFS2_Char_Text.setText(Math.round(Flow_Switch_HotFS2_Char) + " L/H");
+        HP_Yout1_Act_Text.setText(HP_Yout1_Act + "%");
+
+        EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text.setText(EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val + "%");
+
+        if (Injection_Vlv === 0){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
+        else{Injection_Vlv_Text.setText("Open"); injValveLight.setVisible(true);}
+    }
+
+    });
+
+var SystemControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function SystemControl ()
+    {
+        Phaser.Scene.call(this, { key: 'SystemControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('scbackground', 'phaser/systemcontrol.png');
+        this.load.image('buttonmask', 'phaser/buttonmask.png')
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'scbackground');
+        LoadMenuButtons(this);
+
+        
+    },
+
+    update: function (){
+
+    }
+    });
+
+var CompControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function CompControl ()
+    {
+        Phaser.Scene.call(this, { key: 'CompControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('ccbackground', 'phaser/compcontrol.png');
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'ccbackground');
+        LoadMenuButtons(this);
+
+        blueStatusLight = this.add.image(100, 41, 'bluestatus');
+        greenStatusLight = this.add.image(100, 41, 'greenstatus');
+        greenStatusLight.setVisible(false);
+        blueStatusLight.setVisible(false);
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+
+        //text variable creators
+        Comp_On_Text = this.add.text(420 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Comp_On_Text.setInteractive();
+        Comp_On_Text.on('pointerdown', () => {console.log("PRESS!");});
+
+        Injection_Vlv_Text = this.add.text(420 , 185, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Injection_Vlv_Text.setInteractive();
+        Injection_Vlv_Text.on('pointerdown', () => {console.log("PRESS!");});
+
+        
+        Disc_Temp_Text = this.add.text(270 , 280, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Suct_Temp_Text = this.add.text(270 , 307, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Cold_Return_Temp_Text = this.add.text(270 , 334, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+        High_Pressure_Text = this.add.text(500 , 280, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Low_Pressure_Text = this.add.text(500 , 307, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        
+        Master_Ctrl_Mng_Comp_Setp_Text = this.add.text(790 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_Diff_Text = this.add.text(1080 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        Master_Ctrl_Mng_Comp_MinOn_T_Text = this.add.text(790 , 182, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Comp_MinOff_T_Text = this.add.text(1080 , 182, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        Master_Ctrl_Mng_Comp_Start_Delay_Text = this.add.text(790 , 212, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        Master_Ctrl_Mng_InjecVlv_Setp_Text = this.add.text(800 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_InjecVlv_Offset_Text = this.add.text(1080 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Injec_MaxTime_Text = this.add.text(800 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+        Master_Ctrl_Mng_Injec_ReStart_Delay_Text = this.add.text(1080 , 387, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+
+/*             var nextArrow = this.add.image(1125,279, 'arrowmask');
+        nextArrow.setInteractive();
+        nextArrow.on('pointerdown', () => { 
+        this.scene.start("SystemControl");
+        console.log("pressed!");
+        }); */
+
+    },
+
+    update: function (){
+        //comp on
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+        if (Comp_On === 0){Comp_On_Text.setText("OFF");}
+        else{Comp_On_Text.setText("ON");}
+
+        //inj valve
+        if (Injection_Vlv === 0){Injection_Vlv_Text.setText("OFF");}
+        else{Injection_Vlv_Text.setText("ON");}
+        
+        Suct_Temp_Text.setText(Suct_Temp + "°C");
+        Disc_Temp_Text.setText(Disc_Temp + "°C");
+
+        High_Pressure_Text.setText(High_Pressure + " bar");
+        Low_Pressure_Text.setText(Low_Pressure + " bar");
+
+        Cold_Return_Temp_Text.setText(Cold_Return_Temp + "°C");
+        Master_Ctrl_Mng_Comp_Setp_Text.setText(Master_Ctrl_Mng_Comp_Setp + "°C");
+        Master_Ctrl_Mng_Comp_Diff_Text.setText(Master_Ctrl_Mng_Comp_Diff + "°C");
+
+        Master_Ctrl_Mng_Comp_MinOn_T_Text.setText(Master_Ctrl_Mng_Comp_MinOn_T + "s");
+        Master_Ctrl_Mng_Comp_MinOff_T_Text.setText(Master_Ctrl_Mng_Comp_MinOff_T + "s");
+        Master_Ctrl_Mng_Comp_Start_Delay_Text.setText(Master_Ctrl_Mng_Comp_Start_Delay + "s");
+
+        Master_Ctrl_Mng_InjecVlv_Setp_Text.setText(Master_Ctrl_Mng_InjecVlv_Setp + "°C");
+        Master_Ctrl_Mng_InjecVlv_Offset_Text.setText(Master_Ctrl_Mng_InjecVlv_Offset + "°C");
+        Master_Ctrl_Mng_Injec_MaxTime_Text.setText(Master_Ctrl_Mng_Injec_MaxTime + "s");
+
+        Master_Ctrl_Mng_Injec_ReStart_Delay_Text.setText(Master_Ctrl_Mng_Injec_ReStart_Delay + "s");
+    }
+    });
+
+var FlushControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function CompControl ()
+    {
+        Phaser.Scene.call(this, { key: 'FlushControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('fcbackground', 'phaser/flushcontrol.png');
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'fcbackground');
+        LoadMenuButtons(this);
+
+        blueStatusLight = this.add.image(100, 41, 'bluestatus');
+        greenStatusLight = this.add.image(100, 41, 'greenstatus');
+        greenStatusLight.setVisible(false);
+        blueStatusLight.setVisible(false);
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+
+        Flush_Valve_Flush_Week_Set_Text = this.add.text(255 , 170, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Hour_Set_Text = this.add.text(255 , 217, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Minute_Set_Text = this.add.text(255 , 267, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Flush_Valve_Flush_Time_Text = this.add.text(255 , 316, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        //Flush = this.add.text(923 , 166, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+    },
+
+    update: function (){
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+
+        Flush_Valve_Flush_Week_Set_Text.setText(Flush_Valve_Flush_Week_Set);
+        Flush_Valve_Flush_Hour_Set_Text.setText(Flush_Valve_Flush_Hour_Set);
+        Flush_Valve_Flush_Minute_Set_Text.setText(Flush_Valve_Flush_Minute_Set);
+        Flush_Valve_Flush_Time_Text.setText(Flush_Valve_Flush_Time + "s");
+        //Flush_Valve_Manual_On_Flush_Text.setText(Flush_Valve_Manual_On_Flush + "s") wrong needs to be fixed;
+    }
+    });
+
+var FanControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function FanControl ()
+    {
+        Phaser.Scene.call(this, { key: 'FanControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('fancbackground', 'phaser/fancontrol.png');
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'fancbackground');
+        LoadMenuButtons(this);
+
+        blueStatusLight = this.add.image(100, 41, 'bluestatus');
+        greenStatusLight = this.add.image(100, 41, 'greenstatus');
+        greenStatusLight.setVisible(false);
+        blueStatusLight.setVisible(false);
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+
+        Hot_Fan_Text = this.add.text(310 , 150, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+        Hot_Return_Temp_Text = this.add.text(310 , 180, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Hot_Supply_Temp_Text = this.add.text(310 , 210, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        Master_Ctrl_Mng_Fan_Setp_Text = this.add.text(760 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_Setp_Text.setInteractive();
+        Master_Ctrl_Mng_Fan_Setp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Fan SetP",Master_Ctrl_Mng_Fan_Setp,1,2,false);});
+
+        Master_Ctrl_Mng_Fan_Diff_Text = this.add.text(1095 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        
+        Master_Ctrl_Mng_Fan_HRT_Diff_Text = this.add.text(180 , 338, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        Master_Ctrl_Mng_Fan_CRT_Diff_Text = this.add.text(180 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        EleHeater_Mng_EleH_Setp_Text = this.add.text(760 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        EleHeater_Mng_EBT_Ele_Setp_Text = this.add.text(760 , 398, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        EleHeater_Mng_EleH_Offset_Text = this.add.text(1095 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+    },
+
+    update: function (){
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+
+        if (Hot_Fan === 0){Hot_Fan_Text.setText("OFF");}
+        else{Hot_Fan_Text.setText("ON");}
+        Master_Ctrl_Mng_Fan_Setp_Text.setText(Master_Ctrl_Mng_Fan_Setp + "°C");
+        Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
+        Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
+        Master_Ctrl_Mng_Fan_Diff_Text.setText(Master_Ctrl_Mng_Fan_Diff + "°C");
+        Master_Ctrl_Mng_Fan_HRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_HRT_Diff + "°C");
+        Master_Ctrl_Mng_Fan_CRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_CRT_Diff + "°C");
+        EleHeater_Mng_EleH_Setp_Text.setText(EleHeater_Mng_EleH_Setp + "°C");
+        EleHeater_Mng_EBT_Ele_Setp_Text.setText(EleHeater_Mng_EBT_Ele_Setp + "°C");
+        EleHeater_Mng_EleH_Offset_Text.setText(EleHeater_Mng_EleH_Offset + "°C");
+    }
+    });
+
+var ProbeControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function ProbeControl ()
+    {
+        Phaser.Scene.call(this, { key: 'ProbeControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('pcbackground', 'phaser/probecontrol.png');
+        this.load.image('buttonmask', 'phaser/buttonmask.png')
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'pcbackground');
+        LoadMenuButtons(this);
+
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+        blueStatusLight = this.add.image(100, 41, 'bluestatus');
+        greenStatusLight = this.add.image(100, 41, 'greenstatus');
+        greenStatusLight.setVisible(false);
+        blueStatusLight.setVisible(false);
+    },
+
+    update: function (){
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+        
+    }
+    });
+
+var EEVControl = new Phaser.Class({
+
+Extends: Phaser.Scene,
+
+initialize:
+
+function EEVControl ()
+{
+    Phaser.Scene.call(this, { key: 'EEVControl' });
+},
+
+preload: function ()
+{
+    this.load.image('eevbackground', 'phaser/eevcontrol.png');
+},
+
+create: function ()
+{
+    this.add.image(600, 300, 'eevbackground');
+    LoadMenuButtons(this);
+
+    blueStatusLight = this.add.image(100, 41, 'bluestatus');
+    greenStatusLight = this.add.image(100, 41, 'greenstatus');
+    greenStatusLight.setVisible(false);
+    blueStatusLight.setVisible(false);
+    connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+
+/*     var nextArrow = this.add.image(1130,410, 'arrowmask');
+    nextArrow.setInteractive();
+    nextArrow.on('pointerdown', () => { 
+    this.scene.start("EEVControl2");
+    console.log("pressed!");
+    }); */
+},
+
+update: function (){
+    UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+}
+});
+
+var EEVControl2 = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function EEVControl2 ()
+    {
+        Phaser.Scene.call(this, { key: 'EEVControl2' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('eev2background', 'phaser/eevcontrol2.png');
+        this.load.image('buttonmask', 'phaser/buttonmask.png')
+        this.load.image('arrowmask', 'phaser/arrowmask.png')
+        this.load.image('greenstatus', 'phaser/greenstatus.png')
+        this.load.image('bluestatus', 'phaser/bluestatus.png')
+    },
+
+    create: function ()
+    {
+        var nextArrow = this.add.image(1130,410, 'arrowmask');
+        nextArrow.setInteractive();
+        nextArrow.on('pointerdown', () => { 
+        this.scene.start("EEVControl3");
+        console.log("pressed!");
+        });
+
+        var backArrow = this.add.image(70,410, 'arrowmask');
+        backArrow.setInteractive();
+        backArrow.on('pointerdown', () => { 
+        this.scene.start("EEVControl");
+        console.log("pressed!");
+        });
+
+        this.add.image(600, 300, 'eev2background');
+        LoadMenuButtons(this);
+    },
+
+    update: function (){
+
+    }
+    });
+
+var EEVControl3 = new Phaser.Class({
+
+Extends: Phaser.Scene,
+
+initialize:
+
+function EEVControl3 ()
+{
+    Phaser.Scene.call(this, { key: 'EEVControl3' });
+},
+
+preload: function ()
+{
+    this.load.image('eev3background', 'phaser/eevcontrol3.png');
+    this.load.image('buttonmask', 'phaser/buttonmask.png')
+    this.load.image('arrowmask', 'phaser/arrowmask.png')
+    this.load.image('greenstatus', 'phaser/greenstatus.png')
+    this.load.image('bluestatus', 'phaser/bluestatus.png')
+},
+
+create: function ()
+{
+    this.add.image(600, 300, 'eev3background');
+    LoadMenuButtons(this);
+    
+
+    var backArrow = this.add.image(70,410, 'arrowmask');
+    backArrow.setInteractive();
+    backArrow.on('pointerdown', () => { 
+    this.scene.start("EEVControl2");
+    console.log("pressed!");
+    });
+},
+
+update: function (){
+
+}
+});
+
+var PumpControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function PumpControl ()
+    {
+        Phaser.Scene.call(this, { key: 'PumpControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('pumpbackground', 'phaser/pumpcontrol.png');
+        this.load.image('buttonmask', 'phaser/buttonmask.png')
+        this.load.image('greenstatus', 'phaser/greenstatus.png')
+        this.load.image('bluestatus', 'phaser/bluestatus.png')
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'pumpbackground');
+        LoadMenuButtons(this);
+
+        blueStatusLight = this.add.image(100, 41, 'bluestatus');
+        greenStatusLight = this.add.image(100, 41, 'greenstatus');
+        greenStatusLight.setVisible(false);
+        blueStatusLight.setVisible(false);
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+
+        //hot pumps
+        PVlv_Mng_HotVlv_Setp_Text = this.add.text(230 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Min_Op_Text = this.add.text(230 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Max_Op_Text = this.add.text(230 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Hot_Op_ProAl_Text = this.add.text(230 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
+        PVlv_Mng_HotVlv_DeadBand_Text = this.add.text(230 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Kp_Text = this.add.text(230 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Ti_Text = this.add.text(230 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_HotVlv_Td_Text = this.add.text(230 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+        //cold pumps
+        PVlv_Mng_ColdVlv_Setp_Text = this.add.text(850 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Min_Op_Text = this.add.text(850 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Max_Op_Text = this.add.text(850 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_Cold_Op_ProAl_Text = this.add.text(850 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_DeadBand_Text = this.add.text(850 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Kp_Text = this.add.text(850 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Ti_Text = this.add.text(850 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        PVlv_Mng_ColdVlv_Td_Text = this.add.text(850 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+
+    },
+
+    update: function (){
+
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+
+        PVlv_Mng_ColdVlv_Setp_Text.setText(PVlv_Mng_ColdVlv_Setp + "°C");
+        PVlv_Mng_Cold_Min_Op_Text.setText(PVlv_Mng_Cold_Min_Op + "%");
+        PVlv_Mng_Cold_Max_Op_Text.setText(PVlv_Mng_Cold_Max_Op + "%");
+        PVlv_Mng_Cold_Op_ProAl_Text.setText(PVlv_Mng_Cold_Op_ProAl + "%");
+        PVlv_Mng_ColdVlv_DeadBand_Text.setText(PVlv_Mng_ColdVlv_DeadBand);
+        PVlv_Mng_ColdVlv_Kp_Text.setText(PVlv_Mng_ColdVlv_Kp);
+        PVlv_Mng_ColdVlv_Ti_Text.setText(PVlv_Mng_ColdVlv_Ti);
+        PVlv_Mng_ColdVlv_Td_Text.setText(PVlv_Mng_ColdVlv_Td);
+
+        PVlv_Mng_HotVlv_Setp_Text.setText(PVlv_Mng_HotVlv_Setp + "°C");
+        PVlv_Mng_Hot_Min_Op_Text.setText(PVlv_Mng_Hot_Min_Op + "%");
+        PVlv_Mng_Hot_Max_Op_Text.setText(PVlv_Mng_Hot_Max_Op + "%");
+        PVlv_Mng_Hot_Op_ProAl_Text.setText(PVlv_Mng_Hot_Op_ProAl + "%");
+        PVlv_Mng_HotVlv_DeadBand_Text.setText(PVlv_Mng_HotVlv_DeadBand);
+        PVlv_Mng_HotVlv_Kp_Text.setText(PVlv_Mng_HotVlv_Kp);
+        PVlv_Mng_HotVlv_Ti_Text.setText(PVlv_Mng_HotVlv_Ti);
+        PVlv_Mng_HotVlv_Td_Text.setText(PVlv_Mng_HotVlv_Td);
+    }
+    });
+
+var ValveControl = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function ValveControl ()
+    {
+        Phaser.Scene.call(this, { key: 'ValveControl' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('valvebackground', 'phaser/valvecontrol.png');
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'valvebackground');
+        LoadMenuButtons(this);
+
+        blueStatusLight = this.add.image(100, 41, 'bluestatus');
+        greenStatusLight = this.add.image(100, 41, 'greenstatus');
+        greenStatusLight.setVisible(false);
+        blueStatusLight.setVisible(false);
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
+
+        Cold_SupToVlv_Temp_Text = this.add.text(361 , 299, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Heat_Exchange_Cold_Text = this.add.text(361 , 196, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });  
+        Heat_Exchange_Hot_Text = this.add.text(797 , 300, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Hot_SupToVlv_Temp_Text = this.add.text(798 , 199, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Warm_ToBuild_Temp_Text = this.add.text(490 , 90, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+        Warm_ReturnBuild_Temp_Text = this.add.text(645 , 90, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+
+        connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
+        statusText = this.add.text(100, 50, "", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
+
+        //Heat_Exchange_Hot_Text = this.add.text(567 , 393, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' }); for last value
+
+    },
+
+    update: function (){
+        UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
+
+        Cold_SupToVlv_Temp_Text.setText(Cold_SupToVlv_Temp);
+        Heat_Exchange_Hot_Text.setText(Heat_Exchange_Hot);
+        Heat_Exchange_Cold_Text.setText(Heat_Exchange_Cold);
+        Hot_SupToVlv_Temp_Text.setText(Hot_SupToVlv_Temp);
+        Warm_ToBuild_Temp_Text.setText(Warm_ToBuild_Temp);
+        Warm_ReturnBuild_Temp_Text.setText(Warm_ReturnBuild_Temp);
+    }
+    });
+
+var ChangeHoldingRegister = new Phaser.Class({
+
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function ChangeHoldingRegister ()
+    {
+        Phaser.Scene.call(this, { key: 'ChangeHoldingRegister' });
+    },
+
+    preload: function ()
+    {
+        this.load.image('chrbackground', 'phaser/changeholdingregisterbackground.png');
+    },
+
+    create: function ()
+    {
+        this.add.image(600, 300, 'chrbackground');
+        minus10Button = this.add.image(580,260, 'buttonmask');            
+        minus10Button.setInteractive();
+        minus10Button.on('pointerdown', () => {newValue = newValue - 10});
+
+        minus1Button = this.add.image(580,350, 'buttonmask');
+        minus1Button.setInteractive();
+        minus1Button.on('pointerdown', () => {newValue = newValue - 1});
+
+        minus01Button = this.add.image(580,440, 'buttonmask');
+        minus01Button.setInteractive();
+        minus01Button.on('pointerdown', () => {newValue = newValue - 0.1});
+
+        plus10Button = this.add.image(1075,260, 'buttonmask');            
+        plus10Button.setInteractive();
+        plus10Button.on('pointerdown', () => {newValue = newValue + 10});
+
+        plus1Button = this.add.image(1075,350, 'buttonmask');
+        plus1Button.setInteractive();
+        plus1Button.on('pointerdown', () => {newValue = newValue + 1});
+
+        plus01Button = this.add.image(1075,440, 'buttonmask');
+        plus01Button.setInteractive();
+        plus01Button.on('pointerdown', () => {newValue = newValue + 0.1});
+
+        setButton = this.add.image(820,545, 'buttonmask');
+        setButton.setInteractive();
+        setButton.on('pointerdown', () => 
+        {
+            changeObject = {
+                Type: 16,
+                Address: savedModbusAddress,
+                Value: float32ToUint16(newValue),
+                Quantity: savedModbusQuantity
+            }
+            UploadControlChangeToAPI(changeObject);
+            this.scene.start(savedScene);
+        });
+
+        Setting_Name_Text = this.add.text(30 , 110, savedSettingToChangeName, {fontFamily: 'System', fontSize: 48, color: '#ffffff' });
+        Current_Value_Text = this.add.text(130 , 315, savedSettingToChangeLink, { fontFamily: 'System', fontSize: 56, color: '#ffffff' });
+        New_Value_Text = this.add.text(760 , 315, newValue, {fontFamily: 'System', fontSize: 48, color: '#ffffff' });
+    },
+
+    update: function (){
+        newValue = Math.round(newValue * 1e2 ) / 1e2;
+        New_Value_Text.setText(newValue);
+    }
+    });
+
+var config = {
+        type: Phaser.AUTO,
+        scale: {
+            parent: 'phaserdiv',
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            width: 1200,
+            height: 600
+        },
+        scene: [ChooseDeviceMenu, MonitoringDiagramScreen,SystemControl,CompControl,FlushControl,FanControl,
+        ProbeControl,EEVControl,EEVControl2,EEVControl3,PumpControl,ValveControl,ChangeHoldingRegister]
+    };
+
+var game = new Phaser.Game(config);
+
+
+var savedScene;
+var savedSettingToChangeName;
+var savedModbusAddress;
+var savedModbusQuantity;
+var savedModbusReversed
+var savedSettingToChangeLink;
+var newValue;
+
+function LoadChangeHoldingRegisterScreen(currentScene, settingToChangeName, settingToChangeLink, modbusAddress, modbusQuantity,modbusReversed){
+    savedScene = currentScene;
+    savedSettingToChangeName = settingToChangeName;
+    savedModbusAddress = modbusAddress;
+    savedModbusQuantity = modbusQuantity;
+    savedModbusReversed = modbusReversed;
+    savedSettingToChangeLink = settingToChangeLink;
+    newValue = settingToChangeLink;
+    currentScene.scene.start("ChangeHoldingRegister");
+}
+
+function UploadControlChangeToAPI(changeObject){
+/*     Type: 16,
+    Address: 1,
+    Value: [0, 17014],
+    Quantity: 2 */
+    $.ajax({
+        type: "POST",
+        url:  'http://127.0.0.1:3000' + '/legioguard/control/Quantum/55',
+        data: JSON.stringify(changeObject),
+        contentType: "application/json",
+        crossDomain: true,
+        success: function (data, status, jqXHR) {
+          console.log("OK!");
+        },
+        error: function (jqXHR, status) {
+            console.log("ERROR" + jqXHR + " status: " + status);
+        }
+    });
+}
+
+//UNIVERSAL FUNCTIONS
+
+//loads buttons for lower menu to change tab
+function LoadMenuButtons(sceneobj)
+{
+    if (userAccessLevel === 1){
+        var chooseDeviceMenuButton = sceneobj.add.image(40,30, 'buttonmask');
+        chooseDeviceMenuButton.setInteractive();
+        chooseDeviceMenuButton.on('pointerdown', () => {sceneobj.scene.start("ChooseDeviceMenu");
+        chosenDevice = null;
+        chosenDeviceName = null;
+        diagramTimeText = null;
+        diagramStatusText = null;
+    });
+
+        var diagramViewButton = sceneobj.add.image(90,545, 'buttonmask');
+            diagramViewButton.setInteractive();
+            diagramViewButton.on('pointerdown', () => {sceneobj.scene.start("MonitoringDiagramScreen");});
+            
+        var systemControlButton = sceneobj.add.image(1100,545, 'buttonmask');
+            systemControlButton.setInteractive();
+            systemControlButton.on('pointerdown', () => {sceneobj.scene.start("ValveControl");});
+
+        var compControlButton = sceneobj.add.image(240,545, 'buttonmask');
+            compControlButton.setInteractive();
+            compControlButton.on('pointerdown', () => { sceneobj.scene.start("CompControl");});
+
+        var flushControlButton = sceneobj.add.image(380,545, 'buttonmask');
+            flushControlButton.setInteractive();
+            flushControlButton.on('pointerdown', () => {sceneobj.scene.start("FlushControl");});
+
+        var fanControlButton = sceneobj.add.image(525,545, 'buttonmask');
+            fanControlButton.setInteractive();
+            fanControlButton.on('pointerdown', () => {sceneobj.scene.start("FanControl");});
+
+        var probeControlButton = sceneobj.add.image(675,545, 'buttonmask');
+            probeControlButton.setInteractive();
+            probeControlButton.on('pointerdown', () => {sceneobj.scene.start("ProbeControl");});
+
+        var eevControlButton = sceneobj.add.image(805,545, 'buttonmask');
+            eevControlButton.setInteractive();
+            eevControlButton.on('pointerdown', () => {sceneobj.scene.start("EEVControl");});
+
+        var pumpControlButton = sceneobj.add.image(960,545, 'buttonmask');
+            pumpControlButton.setInteractive();
+            pumpControlButton.on('pointerdown', () => {sceneobj.scene.start("PumpControl");});
+    }
+}
+
+//updates online and offline lights for devices on choose device menu
 function DeviceMenuUpdate(sceneObj){
     for (let j = 1 * pagenumber; j < 9; j++) {
             var i = j - 1;
@@ -383,7 +1244,7 @@ function DeviceMenuUpdate(sceneObj){
         }
 }
 
-
+//sets up buttons for choose device menu
 function SetupButtons(sceneObj){
     cdmButtons[0].setInteractive();
     cdmButtons[0].on('pointerdown', () => {
@@ -440,786 +1301,57 @@ function SetupButtons(sceneObj){
         chosenDeviceName = deviceList[7].deviceName;
     });
 }
-/* function LoadDeviceTimes(){
-            deviceList.forEach(element => {
-                var lastContactedURL = masterURL + "/" + element.deviceID + "/last/1";
-                $.ajax({type: "GET", url: lastContactedURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
-                success: function (data, status, jqXHR) {
-                    if (data[0] != null)
-                    {
-                        var timestamp = data[0]._id.toString().substring(0,8);
-                        var idTime = new Date( parseInt( timestamp, 16 ) * 1000 )
-                        var clientTime = Date.now();
-                        if (clientTime - 60000 < idTime){
-                            console.log('online');
-                            cdmStatusData.push
-                        }
-                        else{
-                            console.log('offline');
-                        }
-                    }
-                    else{
-                        console.log('offline');
-                    }
-                },
-                error: function (jqXHR, status) {
-                    console.log("ERROR");
-                }
-            });
-    });
-};
- */
-var MonitoringDiagramScreen = new Phaser.Class({
 
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function MonitoringDiagramScreen ()
-    {
-        Phaser.Scene.call(this, { key: 'MonitoringDiagramScreen' });
-    },
-
-    preload: function ()
-    {
-        
-        this.load.image('background', 'phaser/MainCanvas.png');
-        this.load.image('fansmallon', 'phaser/fansmallon.png');
-        this.load.image('lcdfan', 'phaser/lcdfan.png');
-        this.load.image('fansmalloff', 'phaser/fansmalloff.png');
-        this.load.image('greenstatus', 'phaser/greenstatus.png')
-        this.load.image('bluestatus', 'phaser/bluestatus.png')
-        this.load.image('arrows', 'phaser/arrows.png')
-        this.load.image('greenvalve', 'phaser/greenvalve.png')
-
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {       
-            
-            LoadMenuButtons(this);
-            this.add.image(600, 300, 'background');
-            arrows = this.add.image(600, 300, 'arrows');
-            arrows.setVisible(false);
-            lcdFan = this.add.image(997, 301, 'lcdfan'); 
-            greenStatusLight = this.add.image(100, 41, 'greenstatus');
-            blueStatusLight = this.add.image(100, 41, 'bluestatus');
-            eevValveLight = this.add.image(607, 367, 'greenvalve'); 
-            injValveLight = this.add.image(497, 273, 'greenvalve'); 
-            //this.add.image(690, 375, 'greenvalve');
-
-            eevValveLight.setVisible(false);
-            injValveLight.setVisible(false);
-            greenStatusLight.setVisible(false);
-            blueStatusLight.setVisible(false);
-
-            connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
-            statusText = this.add.text(100, 50, "", { fontFamily: 'System', fontSize: 18, color: '#ffffff' })
-
-            Cold_Tank_Temp1_Text = this.add.text(55, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
-            Cold_Tank_Temp2_Text = this.add.text(55, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
-            Cold_Tank_Temp3_Text = this.add.text(55, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
-
-            Hot_Tank_Temp1_Text = this.add.text(1075, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
-            Hot_Tank_Temp2_Text = this.add.text(1075, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
-            Hot_Tank_Temp3_Text = this.add.text(1075, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }) 
-            
-
-            Cold_Return_Temp_Text = this.add.text(130, 170, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Cold_Supply_Temp_Text = this.add.text(210, 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Suct_Temp_Text = this.add.text(445 , 170, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Evap_Inlet_Temp_Text = this.add.text(443 , 411, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Disc_Temp_Text = this.add.text(645 , 169, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Hot_Return_Temp_Text = this.add.text(1016 , 402, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Ele_Boost_Temp_Text = this.add.text(1016 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Hot_Supply_Temp_Text = this.add.text(876 , 171, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Cond_Outlet_Temp_Text = this.add.text(660 , 410, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-
-            //pumps
-            Flow_Switch_ColdFS_Char_Text = this.add.text(320 , 160, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Flow_Switch_ColdFS2_Char_Text = this.add.text(320 , 180, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            CP_Yout2_Act_Text = this.add.text(320 , 198, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Flow_Switch_HotFS1_Char_Text = this.add.text(780 , 383, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            Flow_Switch_HotFS2_Char_Text = this.add.text(780 , 403, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            HP_Yout1_Act_Text = this.add.text(780 , 420, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-
-            //eev
-            EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text = this.add.text(550 , 380, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-
-
-            Injection_Vlv_Text = this.add.text(445 , 280, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-
-            EvapBypassValvePlaceHolderText = this.add.text(314 , 254, "Closed", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-            CondBypassValvePlaceHolderText = this.add.text(765 , 324, "Closed", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-
-            //fan
-            Hot_Fan_Text = this.add.text(895 , 302, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' });
-    },
-
-    update: function (time, delta)
-    {
-        //lcdFan.angle+=5;
-        if (Hot_Fan == true){
-            Hot_Fan_Text.setText("ON");
-            lcdFan.angle+=5;
-        }
-        else{
-            Hot_Fan_Text.setText("OFF");
-        }
-        if (EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val > 0)
-        {
-            eevValveLight.setVisible(true);
-        }
-        else
-        {
-            eevValveLight.setVisible(false);
-        }
-        if (recieving == true){
+//updates the connection text and lights
+function UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText){
+    if (recieving == true){
             greenStatusLight.setVisible(true);
         }
         else{
             greenStatusLight.setVisible(false);
         }
-        if (arrowsCounter < 75){
-            arrowsCounter++;
-        }
-        else{
-            arrowsCounter = 0;
-            arrowsVisible = !arrowsVisible;
-        }
-
-        if (arrowsVisible == true){
-            arrows.setVisible(true);
-        }
-        else{
-            arrows.setVisible(false);
-        }
-
-        if (chosenDeviceName != null){
-            if (gotData == true){
-                if (diagramTimeText == null)
-                {
-                    connectionText.setText("Connecting to device " + chosenDeviceName);
-                    blueStatusLight.setVisible(false);
-                }
-                else{
-                    var clientTime = Date.now();
-                    if (clientTime - 60000 < idTime){
-                        connectionText.setText("Connected to device " + chosenDeviceName + ", last data recieved at: " + diagramTimeText);
-                        blueStatusLight.setVisible(true);
-                    }
-                    else{
-                        connectionText.setText("Device " + chosenDeviceName + " is offline, last data recieved at: " + diagramTimeText);
-                        blueStatusLight.setVisible(false);
-                    }
-                }
-            }
-            else{
-                if (diagramTimeText == null){
-                    connectionText.setText("Connecting to device " + chosenDeviceName);
-                    blueStatusLight.setVisible(false);
-                }
-                connectionText.setText("No data is available for the device " + chosenDeviceName);
+    if (chosenDeviceName != null){
+        if (gotData == true){
+            if (diagramTimeText == null)
+            {
+                connectionText.setText("Connecting to device " + chosenDeviceName);
                 blueStatusLight.setVisible(false);
             }
+            else{
+                var clientTime = Date.now();
+                if (clientTime - 60000 < idTime){
+                    connectionText.setText("Connected to device " + chosenDeviceName + ", last data recieved at: " + diagramTimeText);
+                    blueStatusLight.setVisible(true);
+                }
+                else{
+                    connectionText.setText("Device " + chosenDeviceName + " is offline, last data recieved at: " + diagramTimeText);
+                    blueStatusLight.setVisible(false);
+                }
+            }
         }
         else{
-            connectionText.setText("Select a device to start")
+            if (diagramTimeText == null){
+                connectionText.setText("Connecting to device " + chosenDeviceName);
+                blueStatusLight.setVisible(false);
+            }
+            connectionText.setText("No data is available for the device " + chosenDeviceName);
+            blueStatusLight.setVisible(false);
         }
-        
-        Cold_Tank_Temp1_Text.setText("T1: " + Cold_Tank_Temp1 + "°C");
-        Cold_Tank_Temp2_Text.setText("T2: " + Cold_Tank_Temp2 + "°C");
-        Cold_Tank_Temp3_Text.setText("T3: " + Cold_Tank_Temp3 + "°C");
-        Hot_Tank_Temp1_Text.setText("T1: " + Hot_Tank_Temp1 + "°C");
-        Hot_Tank_Temp2_Text.setText("T2: " + Hot_Tank_Temp2 + "°C");
-        Hot_Tank_Temp3_Text.setText("T3: " + Hot_Tank_Temp3 + "°C");
-        Cold_Return_Temp_Text.setText(Cold_Return_Temp + "°C");
-        Cold_Supply_Temp_Text.setText(Cold_Supply_Temp + "°C");
-        Suct_Temp_Text.setText(Suct_Temp + "°C");
-        Disc_Temp_Text.setText(Disc_Temp + "°C");
-        Cond_Outlet_Temp_Text.setText(Cond_Outlet_Temp + "°C");
-        
-        Evap_Inlet_Temp_Text.setText(Evap_Inlet_Temp + "°C");
-        Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
-        Ele_Boost_Temp_Text.setText(Ele_Boost_Temp + "°C");
-        Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
-        Flow_Switch_ColdFS_Char_Text.setText(Math.round(Flow_Switch_ColdFS_Char) + " L/H");
-        Flow_Switch_ColdFS2_Char_Text.setText(Flow_Switch_ColdFS2_Char + " L/H");
-        CP_Yout2_Act_Text.setText(CP_Yout2_Act + "%");
-        Flow_Switch_HotFS1_Char_Text.setText(Math.round(Flow_Switch_HotFS1_Char) + " L/H");
-        Flow_Switch_HotFS2_Char_Text.setText(Math.round(Flow_Switch_HotFS2_Char) + " L/H");
-        HP_Yout1_Act_Text.setText(HP_Yout1_Act + "%");
-
-        EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val_Text.setText(EVD_Emb_1_Params_EVDEMB_1_EVD_Variables_EEV_PosPercent_Val + "%");
-
-        if (Injection_Vlv === 0){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
-        else{Injection_Vlv_Text.setText("Open"); injValveLight.setVisible(true);}
     }
-
-    });
-
-var SystemControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function SystemControl ()
-    {
-        Phaser.Scene.call(this, { key: 'SystemControl' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('scbackground', 'phaser/systemcontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'scbackground');
-        LoadMenuButtons(this);
-    },
-
-    update: function (){
-
-    }
-    });
-
-var CompControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function CompControl ()
-    {
-        Phaser.Scene.call(this, { key: 'CompControl' });
-    },
-
-    preload: function ()
-    {
-        console.log("loading comp");
-        this.load.image('ccbackground', 'phaser/compcontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-        this.load.image('arrowmask', 'phaser/arrowmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'ccbackground');
-        LoadMenuButtons(this);
-
-        //text variable creators
-        Comp_On_Text = this.add.text(420 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Comp_On_Text.setInteractive();
-        Comp_On_Text.on('pointerdown', () => {console.log("PRESS!");});
-
-        Injection_Vlv_Text = this.add.text(420 , 185, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Injection_Vlv_Text.setInteractive();
-        Injection_Vlv_Text.on('pointerdown', () => {console.log("PRESS!");});
-
-        
-        Disc_Temp_Text = this.add.text(270 , 280, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Suct_Temp_Text = this.add.text(270 , 307, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Cold_Return_Temp_Text = this.add.text(270 , 334, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        
-        High_Pressure_Text = this.add.text(500 , 280, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Low_Pressure_Text = this.add.text(500 , 307, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        
-        Master_Ctrl_Mng_Comp_Setp_Text = this.add.text(790 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Comp_Diff_Text = this.add.text(1080 , 155, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        Master_Ctrl_Mng_Comp_MinOn_T_Text = this.add.text(790 , 182, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Comp_MinOff_T_Text = this.add.text(1080 , 182, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        Master_Ctrl_Mng_Comp_Start_Delay_Text = this.add.text(790 , 212, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        Master_Ctrl_Mng_InjecVlv_Setp_Text = this.add.text(800 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_InjecVlv_Offset_Text = this.add.text(1080 , 357, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Injec_MaxTime_Text = this.add.text(800 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        
-        Master_Ctrl_Mng_Injec_ReStart_Delay_Text = this.add.text(1080 , 387, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        
-
-/*             var nextArrow = this.add.image(1125,279, 'arrowmask');
-        nextArrow.setInteractive();
-        nextArrow.on('pointerdown', () => { 
-        this.scene.start("SystemControl");
-        console.log("pressed!");
-        }); */
-
-    },
-
-    update: function (){
-        //comp on
-        if (Comp_On === 0){Comp_On_Text.setText("OFF");}
-        else{Comp_On_Text.setText("ON");}
-
-        //inj valve
-        if (Injection_Vlv === 0){Injection_Vlv_Text.setText("OFF");}
-        else{Injection_Vlv_Text.setText("ON");}
-        
-        Suct_Temp_Text.setText(Suct_Temp + "°C");
-        Disc_Temp_Text.setText(Disc_Temp + "°C");
-
-        High_Pressure_Text.setText(High_Pressure + " bar");
-        Low_Pressure_Text.setText(Low_Pressure + " bar");
-
-        Cold_Return_Temp_Text.setText(Cold_Return_Temp + "°C");
-        Master_Ctrl_Mng_Comp_Setp_Text.setText(Master_Ctrl_Mng_Comp_Setp + "°C");
-        Master_Ctrl_Mng_Comp_Diff_Text.setText(Master_Ctrl_Mng_Comp_Diff + "°C");
-
-        Master_Ctrl_Mng_Comp_MinOn_T_Text.setText(Master_Ctrl_Mng_Comp_MinOn_T + "s");
-        Master_Ctrl_Mng_Comp_MinOff_T_Text.setText(Master_Ctrl_Mng_Comp_MinOff_T + "s");
-        Master_Ctrl_Mng_Comp_Start_Delay_Text.setText(Master_Ctrl_Mng_Comp_Start_Delay + "s");
-
-        Master_Ctrl_Mng_InjecVlv_Setp_Text.setText(Master_Ctrl_Mng_InjecVlv_Setp + "°C");
-        Master_Ctrl_Mng_InjecVlv_Offset_Text.setText(Master_Ctrl_Mng_InjecVlv_Offset + "°C");
-        Master_Ctrl_Mng_Injec_MaxTime_Text.setText(Master_Ctrl_Mng_Injec_MaxTime + "s");
-
-        Master_Ctrl_Mng_Injec_ReStart_Delay_Text.setText(Master_Ctrl_Mng_Injec_ReStart_Delay + "s");
-    }
-    });
-
-var FlushControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function CompControl ()
-    {
-        Phaser.Scene.call(this, { key: 'FlushControl' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('fcbackground', 'phaser/flushcontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'fcbackground');
-        LoadMenuButtons(this);
-
-        Flush_Valve_Flush_Week_Set_Text = this.add.text(255 , 170, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Flush_Valve_Flush_Hour_Set_Text = this.add.text(255 , 217, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Flush_Valve_Flush_Minute_Set_Text = this.add.text(255 , 267, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Flush_Valve_Flush_Time_Text = this.add.text(255 , 316, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        //Flush = this.add.text(923 , 166, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-    },
-
-    update: function (){
-        Flush_Valve_Flush_Week_Set_Text.setText(Flush_Valve_Flush_Week_Set);
-        Flush_Valve_Flush_Hour_Set_Text.setText(Flush_Valve_Flush_Hour_Set);
-        Flush_Valve_Flush_Minute_Set_Text.setText(Flush_Valve_Flush_Minute_Set);
-        Flush_Valve_Flush_Time_Text.setText(Flush_Valve_Flush_Time + "s");
-        //Flush_Valve_Manual_On_Flush_Text.setText(Flush_Valve_Manual_On_Flush + "s") wrong needs to be fixed;
-    }
-    });
-
-var FanControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function FanControl ()
-    {
-        Phaser.Scene.call(this, { key: 'FanControl' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('fancbackground', 'phaser/fancontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'fancbackground');
-        LoadMenuButtons(this);
-        Hot_Fan_Text = this.add.text(310 , 150, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        
-        Hot_Return_Temp_Text = this.add.text(310 , 180, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Hot_Supply_Temp_Text = this.add.text(310 , 210, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        Master_Ctrl_Mng_Fan_Setp_Text = this.add.text(760 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Fan_Diff_Text = this.add.text(1095 , 145, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        
-        Master_Ctrl_Mng_Fan_HRT_Diff_Text = this.add.text(180 , 338, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        Master_Ctrl_Mng_Fan_CRT_Diff_Text = this.add.text(180 , 388, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        EleHeater_Mng_EleH_Setp_Text = this.add.text(760 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        EleHeater_Mng_EBT_Ele_Setp_Text = this.add.text(760 , 398, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        EleHeater_Mng_EleH_Offset_Text = this.add.text(1095 , 342, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-    },
-
-    update: function (){
-        if (Hot_Fan === 0){Hot_Fan_Text.setText("OFF");}
-        else{Hot_Fan_Text.setText("ON");}
-        Master_Ctrl_Mng_Fan_Setp_Text.setText(Master_Ctrl_Mng_Fan_Setp + "°C");
-        Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
-        Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
-        Master_Ctrl_Mng_Fan_Diff_Text.setText(Master_Ctrl_Mng_Fan_Diff + "°C");
-        Master_Ctrl_Mng_Fan_HRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_HRT_Diff + "°C");
-        Master_Ctrl_Mng_Fan_CRT_Diff_Text.setText(Master_Ctrl_Mng_Fan_CRT_Diff + "°C");
-        EleHeater_Mng_EleH_Setp_Text.setText(EleHeater_Mng_EleH_Setp + "°C");
-        EleHeater_Mng_EBT_Ele_Setp_Text.setText(EleHeater_Mng_EBT_Ele_Setp + "°C");
-        EleHeater_Mng_EleH_Offset_Text.setText(EleHeater_Mng_EleH_Offset + "°C");
-    }
-    });
-
-var ProbeControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function ProbeControl ()
-    {
-        Phaser.Scene.call(this, { key: 'ProbeControl' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('pcbackground', 'phaser/probecontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'pcbackground');
-        LoadMenuButtons(this);
-    },
-
-    update: function (){
-
-    }
-    });
-
-var EEVControl = new Phaser.Class({
-
-Extends: Phaser.Scene,
-
-initialize:
-
-function EEVControl ()
-{
-    Phaser.Scene.call(this, { key: 'EEVControl' });
-},
-
-preload: function ()
-{
-    this.load.image('eevbackground', 'phaser/eevcontrol.png');
-    this.load.image('buttonmask', 'phaser/buttonmask.png')
-    this.load.image('arrowmask', 'phaser/arrowmask.png')
-},
-
-create: function ()
-{
-    this.add.image(600, 300, 'eevbackground');
-    LoadMenuButtons(this);
-    var nextArrow = this.add.image(1130,410, 'arrowmask');
-    nextArrow.setInteractive();
-    nextArrow.on('pointerdown', () => { 
-    this.scene.start("EEVControl2");
-    console.log("pressed!");
-    });
-},
-
-update: function (){
-
-}
-});
-
-var EEVControl2 = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function EEVControl2 ()
-    {
-        Phaser.Scene.call(this, { key: 'EEVControl2' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('eev2background', 'phaser/eevcontrol2.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-        this.load.image('arrowmask', 'phaser/arrowmask.png')
-    },
-
-    create: function ()
-    {
-        var nextArrow = this.add.image(1130,410, 'arrowmask');
-        nextArrow.setInteractive();
-        nextArrow.on('pointerdown', () => { 
-        this.scene.start("EEVControl3");
-        console.log("pressed!");
-        });
-
-        var backArrow = this.add.image(70,410, 'arrowmask');
-        backArrow.setInteractive();
-        backArrow.on('pointerdown', () => { 
-        this.scene.start("EEVControl");
-        console.log("pressed!");
-        });
-
-        this.add.image(600, 300, 'eev2background');
-        LoadMenuButtons(this);
-    },
-
-    update: function (){
-
-    }
-    });
-
-var EEVControl3 = new Phaser.Class({
-
-Extends: Phaser.Scene,
-
-initialize:
-
-function EEVControl3 ()
-{
-    Phaser.Scene.call(this, { key: 'EEVControl3' });
-},
-
-preload: function ()
-{
-    this.load.image('eev3background', 'phaser/eevcontrol3.png');
-    this.load.image('buttonmask', 'phaser/buttonmask.png')
-    this.load.image('arrowmask', 'phaser/arrowmask.png')
-},
-
-create: function ()
-{
-    this.add.image(600, 300, 'eev3background');
-    LoadMenuButtons(this);
-    
-
-    var backArrow = this.add.image(70,410, 'arrowmask');
-    backArrow.setInteractive();
-    backArrow.on('pointerdown', () => { 
-    this.scene.start("EEVControl2");
-    console.log("pressed!");
-    });
-},
-
-update: function (){
-
-}
-});
-
-var PumpControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function PumpControl ()
-    {
-        Phaser.Scene.call(this, { key: 'PumpControl' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('pumpbackground', 'phaser/pumpcontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'pumpbackground');
-        LoadMenuButtons(this);
-
-        //hot pumps
-        PVlv_Mng_HotVlv_Setp_Text = this.add.text(230 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_Hot_Min_Op_Text = this.add.text(230 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_Hot_Max_Op_Text = this.add.text(230 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_Hot_Op_ProAl_Text = this.add.text(230 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' }); 
-        PVlv_Mng_HotVlv_DeadBand_Text = this.add.text(230 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_HotVlv_Kp_Text = this.add.text(230 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_HotVlv_Ti_Text = this.add.text(230 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_HotVlv_Td_Text = this.add.text(230 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-        //cold pumps
-        PVlv_Mng_ColdVlv_Setp_Text = this.add.text(850 , 165, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_Cold_Min_Op_Text = this.add.text(850 , 195, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_Cold_Max_Op_Text = this.add.text(850 , 223, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_Cold_Op_ProAl_Text = this.add.text(850 , 250, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_ColdVlv_DeadBand_Text = this.add.text(850 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_ColdVlv_Kp_Text = this.add.text(850 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_ColdVlv_Ti_Text = this.add.text(850 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-        PVlv_Mng_ColdVlv_Td_Text = this.add.text(850 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
-
-    },
-
-    update: function (){
-
-        PVlv_Mng_ColdVlv_Setp_Text.setText(PVlv_Mng_ColdVlv_Setp + "°C");
-        PVlv_Mng_Cold_Min_Op_Text.setText(PVlv_Mng_Cold_Min_Op + "%");
-        PVlv_Mng_Cold_Max_Op_Text.setText(PVlv_Mng_Cold_Max_Op + "%");
-        PVlv_Mng_Cold_Op_ProAl_Text.setText(PVlv_Mng_Cold_Op_ProAl + "%");
-        PVlv_Mng_ColdVlv_DeadBand_Text.setText(PVlv_Mng_ColdVlv_DeadBand);
-        PVlv_Mng_ColdVlv_Kp_Text.setText(PVlv_Mng_ColdVlv_Kp);
-        PVlv_Mng_ColdVlv_Ti_Text.setText(PVlv_Mng_ColdVlv_Ti);
-        PVlv_Mng_ColdVlv_Td_Text.setText(PVlv_Mng_ColdVlv_Td);
-
-        PVlv_Mng_HotVlv_Setp_Text.setText(PVlv_Mng_HotVlv_Setp + "°C");
-        PVlv_Mng_Hot_Min_Op_Text.setText(PVlv_Mng_Hot_Min_Op + "%");
-        PVlv_Mng_Hot_Max_Op_Text.setText(PVlv_Mng_Hot_Max_Op + "%");
-        PVlv_Mng_Hot_Op_ProAl_Text.setText(PVlv_Mng_Hot_Op_ProAl + "%");
-        PVlv_Mng_HotVlv_DeadBand_Text.setText(PVlv_Mng_HotVlv_DeadBand);
-        PVlv_Mng_HotVlv_Kp_Text.setText(PVlv_Mng_HotVlv_Kp);
-        PVlv_Mng_HotVlv_Ti_Text.setText(PVlv_Mng_HotVlv_Ti);
-        PVlv_Mng_HotVlv_Td_Text.setText(PVlv_Mng_HotVlv_Td);
-    }
-    });
-
-var ValveControl = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function ValveControl ()
-    {
-        Phaser.Scene.call(this, { key: 'ValveControl' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('valvebackground', 'phaser/valvecontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'valvebackground');
-        LoadMenuButtons(this);
-
-        Cold_SupToVlv_Temp_Text = this.add.text(361 , 299, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
-        Heat_Exchange_Cold_Text = this.add.text(361 , 196, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });  
-        Heat_Exchange_Hot_Text = this.add.text(797 , 300, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
-        Hot_SupToVlv_Temp_Text = this.add.text(798 , 199, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
-        Warm_ToBuild_Temp_Text = this.add.text(490 , 90, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
-        Warm_ReturnBuild_Temp_Text = this.add.text(645 , 90, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' });
-
-        //Heat_Exchange_Hot_Text = this.add.text(567 , 393, " ", { fontFamily: 'System', fontSize: 18, color: '#ffffff' }); for last value
-
-    },
-
-    update: function (){
-        Cold_SupToVlv_Temp_Text.setText(Cold_SupToVlv_Temp);
-        Heat_Exchange_Hot_Text.setText(Heat_Exchange_Hot);
-        Heat_Exchange_Cold_Text.setText(Heat_Exchange_Cold);
-        Hot_SupToVlv_Temp_Text.setText(Hot_SupToVlv_Temp);
-        Warm_ToBuild_Temp_Text.setText(Warm_ToBuild_Temp);
-        Warm_ReturnBuild_Temp_Text.setText(Warm_ReturnBuild_Temp);
-    }
-    });
-
-var ChangeBool = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function ChangeBool ()
-    {
-        Phaser.Scene.call(this, { key: 'ChangeBool' });
-    },
-
-    preload: function ()
-    {
-        this.load.image('pumpbackground', 'phaser/pumpcontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-    },
-
-    create: function ()
-    {
-        this.add.image(600, 300, 'pumpbackground');
-        LoadMenuButtons(this);
-    },
-
-    update: function (){
-
-    }
-    });
-
-var config = {
-        type: Phaser.AUTO,
-        scale: {
-            parent: 'phaserdiv',
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
-            width: 1200,
-            height: 600
-        },
-        scene: [ChooseDeviceMenu, MonitoringDiagramScreen,SystemControl,CompControl,FlushControl,FanControl,
-        ProbeControl,EEVControl,EEVControl2,EEVControl3,PumpControl,ValveControl]
-    };
-
-var game = new Phaser.Game(config);
-
-function LoadMenuButtons(sceneobj)
-{
-    if (userAccessLevel === 1){
-        var chooseDeviceMenuButton = sceneobj.add.image(40,30, 'buttonmask');
-        chooseDeviceMenuButton.setInteractive();
-        chooseDeviceMenuButton.on('pointerdown', () => {sceneobj.scene.start("ChooseDeviceMenu");
-        chosenDevice = null;
-        chosenDeviceName = null;
-        diagramTimeText = null;
-        diagramStatusText = null;
-    });
-
-        var diagramViewButton = sceneobj.add.image(90,545, 'buttonmask');
-            diagramViewButton.setInteractive();
-            diagramViewButton.on('pointerdown', () => {sceneobj.scene.start("MonitoringDiagramScreen");});
-            
-        var systemControlButton = sceneobj.add.image(1100,545, 'buttonmask');
-            systemControlButton.setInteractive();
-            systemControlButton.on('pointerdown', () => {sceneobj.scene.start("ValveControl");});
-
-        var compControlButton = sceneobj.add.image(240,545, 'buttonmask');
-            compControlButton.setInteractive();
-            compControlButton.on('pointerdown', () => { sceneobj.scene.start("CompControl");});
-
-        var flushControlButton = sceneobj.add.image(380,545, 'buttonmask');
-            flushControlButton.setInteractive();
-            flushControlButton.on('pointerdown', () => {sceneobj.scene.start("FlushControl");});
-
-        var fanControlButton = sceneobj.add.image(525,545, 'buttonmask');
-            fanControlButton.setInteractive();
-            fanControlButton.on('pointerdown', () => {sceneobj.scene.start("FanControl");});
-
-        var probeControlButton = sceneobj.add.image(675,545, 'buttonmask');
-            probeControlButton.setInteractive();
-            probeControlButton.on('pointerdown', () => {sceneobj.scene.start("ProbeControl");});
-
-        var eevControlButton = sceneobj.add.image(805,545, 'buttonmask');
-            eevControlButton.setInteractive();
-            eevControlButton.on('pointerdown', () => {sceneobj.scene.start("EEVControl");});
-
-        var pumpControlButton = sceneobj.add.image(960,545, 'buttonmask');
-            pumpControlButton.setInteractive();
-            pumpControlButton.on('pointerdown', () => {sceneobj.scene.start("PumpControl");});
+    else{
+        connectionText.setText("Select a device to start")
     }
 }
 
 
+function float32ToUint16(value) {
+  var buffer = new ArrayBuffer(4);
+  var intView = new Uint16Array(buffer);
+  var floatView = new Float32Array(buffer);
 
-
+  floatView[0] = value;
+  return [intView[0], intView[1]];
+}
 /* console.log(game.scale);
         game.scale.updateCenter();
         game.scale.setGameSize(1200,600);
