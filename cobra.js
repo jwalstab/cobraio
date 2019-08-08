@@ -237,7 +237,10 @@ app.get("/legioguard/control/:iotpool/:deviceid", function(req, res) {
     }
     else
     {
-      res.send('n');
+      obj = {
+        Type: 55
+      }
+      res.send(obj);
       res.end();
     }
   });
