@@ -420,7 +420,7 @@ function AlarmProcessor(deviceID, deviceData, iotpool){
       alarmsList.forEach(alarm => {
         if (alarm.alarmValue == deviceValue)
         {
-          console.log("alarmvalue: " + alarm.alarmValue + "  DeviceValue: " + deviceValue)
+          //console.log("alarmvalue: " + alarm.alarmValue + "  DeviceValue: " + deviceValue)
           if (alarm.alarmOperator == "Greater than")
           {
             if (deviceData[deviceValue] > alarm.alarmNumber)
@@ -867,7 +867,7 @@ var LGDataLabelsList = ["Comp_On","Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"]
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
-  console.log("5    " + req.body.holdingRegisters[5]);
+/*   console.log("5    " + req.body.holdingRegisters[5]);
   console.log("6    " + req.body.holdingRegisters[6]);
   console.log("7    " + req.body.holdingRegisters[7]);
   console.log("8    " + req.body.holdingRegisters[8]);
@@ -877,7 +877,7 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
   console.log("the value 67       " + ReverseduInt16ToFloat32([req.body.holdingRegisters[6],req.body.holdingRegisters[7]]));
 
   console.log("the value 78      " + uInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]));
-  
+   */
   LegioGuardDataObject = {
 
     time: req.body.time,
