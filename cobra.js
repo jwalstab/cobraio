@@ -649,7 +649,7 @@ app.get("/calc", function(req, res) {
   res.render('calc', { layout: 'emptylayout' });
 });
 
-app.get("/control", function(req, res) {
+app.get("/control", auth, function(req, res) {
   res.render('control', {
     loggedInUser: req.session.user,
     loggedInName: req.session.name,
@@ -659,7 +659,7 @@ app.get("/control", function(req, res) {
   });
 });
 
-app.get("/alarms", function(req, res) {
+app.get("/alarms",auth, function(req, res) {
   res.render('alarms', {
     loggedInUser: req.session.user,
     loggedInName: req.session.name,
