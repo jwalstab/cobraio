@@ -1,7 +1,8 @@
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
 <link href="assets/scroll.css" rel="stylesheet">
+<!-- 
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 
 <script type="text/javascript" src="assets/highcharts.js"></script>
 
@@ -12,10 +13,10 @@
                 <div class="card">
                     <div class="body block-header">
                         <div class="row">
-                            <div class="col-lg-6 col-md-8 col-sm-12">
-                                <h2>Data Charts Historic Lookup</h2>
-                                <ul class="breadcrumb p-l-0 p-b-0 ">
-                                    <li class="breadcrumb-item active"> </li>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <h2>Real Time IoT Device Monitor</h2>
+                                <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
+                                    <li class="breadcrumb-item active">Select an IoT device to monitor incoming data in real time</li>
                                 </ul>
                             </div>
                         </div>
@@ -23,37 +24,30 @@
                 </div>
             </div>
         </div>
-        <div class="row clearfix">
-            <div class="col-lg-3 col-md-12 col-sm-12">
-                <div class="card">
-                    <div class="body">
-                        <b>From</b>
-                        <input type="text" class="form-control datetime" id="dateFrom">
-                        <b>To</b>
-                        <input type="text" class="form-control datetime" id="dateTo">
-                        <br />
-                        <div class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                  Select Device
-                                  <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="dropper">
-                                </ul>
-                        </div>
-                        <button class="btn btn-success" id="myButton" onclick="GetAPIData()">Load data table</button>
-                        <br />
-                        </div>
-                </div>
-            </div>
-            <div class="col-lg-9 col-md-12">
+            <div class="col-lg-12 col-md-12">
                     <div class="card">
-                        <div class="header" id="rheader">
-                            <h2><strong>Historic Chart</strong></h2>
-                        </div>
+<!--                         <div class="header" id="rheader">
+                            <h2><strong>Loading chart...</strong></h2>
+
+                            </div>
+                        </div> -->
                         <div class="body">
-                            <div id="chart2">
-                                <div id="container" style="width:100%; height:400px;"></div>
+                                <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                          Select Device
+                                          <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenu">
+                                        </ul>
+                                </div>
+                                <div id="chart2">
+                                        <div id="container" style="width:100%; height:600px;"></div>
+                                </div>
+                                
                         </div>
+                    </div>
+                    <div class="card">
+                        <div class="body" id="phaserdiv">
                         </div>
                     </div>
             </div>
@@ -62,117 +56,158 @@
 
 </section>
 
-<script type="text/javascript">
-    //global variables and function loaders
-    LoadDropDownBox();
-    LoadDatePickers();
+<script>
+
+    LoadDeviceSelectBox();
+    var chosenDeviceBox;
     var chosenDevice;
     var chosenDeviceName;
-    var deviceList = [];
+    var chart;
+    var firstChartLoad = true;
+    var pullAmount;
+    var deviceChanged;
+    var sizer;
+    var magicNumber = 20;
+    var countingMagic = 0;
 
-    var GlobalData = [];
-    var DataKeysToDisplay = [];
+    var dataUpdateTimeout;
 
-    //////////////////////////////////////////////////////////////////////drop down box area
-    function LoadDropDownBox(){
-        var res3 = masterURL + "/<%= loggedInPool %>/lookup_devices/";
-        $.ajax({
+    function LoadDeviceSelectBox(){
+        var dropboxURL = masterURL + "/<%= loggedInPool %>/lookup_devices/";
+        console.log(dropboxURL);
+        $.ajax({type: "GET", url: dropboxURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
+            success: function (data, status, jqXHR) {
+                //creates the links in the dropdown menu and populates device list
+                deviceList = [];
+                data.forEach(element => {
+                    var newlink = $('<li><a href="#" data-value="action">' + element.devicename + '</a></li>');
+                    $('#deviceSelectMenu').append(newlink);
+                    deviceList.push(element);
+                });
+
+                //adds code to change when device selected
+                $("#deviceSelectMenu li a").click(function(){
+                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    deviceList.forEach(element => {
+                        if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
+                        {
+                            chosenDeviceBox = element.deviceID;
+                            chosenDeviceName = element.devicename;
+                        }
+                    });
+                    console.log(chosenDeviceBox);
+                    deviceChanged = true;
+                    DataUpdate();
+                    });
+            },
+            error: function (jqXHR, status) {
+                console.log("ERROR");
+            }
+        });
+    }    
+    function GetFirstData(){
+            var lastDataURL = masterURL + "/" + chosenDevice + "/dualgraphstart/" + magicNumber;
+            $.ajax({
             type: "GET",
-            url: res3,
+            url: lastDataURL,
+            contentType: "application/json; charset=utf-8",
+            crossDomain: true,
+            //dataType: "json",
+            success: function (data, status, jqXHR) {
+                if (data == "Null"){
+                    chart1.setTitle({text: "The device " + chosenDeviceName + " has not sent any data to the system."});
+                    return;
+                }
+                sizer = data.length;
+                console.log(data);
+                data.forEach(element => {
+                    chart1.addSeries(element);
+                });
+                magicNumber = magicNumber - 1;
+                DataUpdate();
+            },
+            error: function (jqXHR, status) {
+                console.log("jqXHYR:" + jqXHR + "status:" + status)
+            }
+        });
+    }
+    function DataUpdate(){
+            if (deviceChanged == true)
+            {
+                chosenDevice = chosenDeviceBox;
+                clearTimeout(dataUpdateTimeout);
+                countingMagic = 0;
+                deviceChanged = false;
+                magicNumber = 20;
+                while (sizer > 0) {
+                    chart1.series[0].remove();
+                    sizer--;
+                }
+                GetFirstData();
+                return;
+            }
+            
+            var lastDataURL = masterURL + "/" + chosenDevice + "/dualgraphupdate/" + magicNumber;
+            $.ajax({
+            type: "GET",
+            url: lastDataURL,
             contentType: "application/json; charset=utf-8",
             crossDomain: true,
             dataType: "json",
             success: function (data, status, jqXHR) {
-                //creates the links in the dropdown menu
-                data.forEach(element => {
-                    var newlink = $('<li><a href="#" data-value="action">' + element.devicename + '</a></li>');
-                    $('#dropper').append(newlink);
-                    deviceList.push(element);
-                });
-                //adds code to change when device selected
-                $(".dropdown-menu li a").click(function(){
-                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    
-
-                    while(chart1.series.length > 0){
-                    chart1.series[0].remove();
-                    }
-
-                    deviceList.forEach(element => {
-                        if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
-                        {
-                            chosenDevice = element.deviceID;
-                            chosenDeviceName = element.devicename;
-                        }
-                    });
-                    chart1.setTitle({text: "You have selected the IoT device " + chosenDeviceName + ", please select dates to search between to continue."});
-                    console.log(chosenDevice);
-                    });
+                console.log(data);
+                if (magicNumber === 1)
+                {
+                    var dt = new Date();
+                    var dtl = dt.toLocaleString();
+                    chart1.setTitle({text: "Now monitoring " + chosenDeviceName + ". Last data recieved at :" + dtl});
+                    dataUpdateTimeout = setTimeout(DataUpdate, 5000);
+                    console.log("data update magic number complete!");
+                }
+                else{
+                    countingMagic++;
+                    var magicPercentage = countingMagic / 20 * 100;
+                    var betterMagicPercentage = magicPercentage.toFixed(0);
+                    chart1.setTitle({text: "Loading data for " + chosenDeviceName + " - %" + betterMagicPercentage});
+                    magicNumber = magicNumber - 1;
+                    DataUpdate();
+                }
+                for (let index = 0; index < sizer; index++) {
+                    chart1.series[index].addPoint(data[index]);
+                }
             },
             error: function (jqXHR, status) {
-                console.log("ERROR" + jqXHR + " status: " + status);
+                console.log("jqXHYR:" + jqXHR + "status:" + status)
             }
         });
     }
+    var change = {
+    0: 'Very Low',
+    5: 'Low',
+    10: 'Medium',
+    15: 'High',
+    20: 'Very High'
+};
 
-    //////////////////////////////////////////////////////////////////////////////////////////////load data to table from api area
-    function GetAPIData() {
-      
-        var packetsToDisplay = 10;
-        var fromVal = new Date(document.getElementById("dateFrom").value);
-        console.log(fromVal);
-        var fromValSeconds = fromVal.getTime();
-        var toVal = new Date(document.getElementById("dateTo").value);
-        console.log(toVal);
-        var toValSeconds = toVal.getTime();
-        var findString = "{time:{$gt:" + fromValSeconds +",$lt:"+ toValSeconds +"}}";
-        var res3 = masterURL + "/" + chosenDevice + "/betweendates";
-        chart1.setTitle({text: "Now loading data for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
-        $.ajax({
-            type: "POST",
-            url: res3,
-            data: JSON.stringify(findString),
-            //processData: false,
-            contentType: "application/javascript",
-            crossDomain: true,
-            //dataType: "json",
-            success: function (data, status, jqXHR) {
-              if (data == "No Data"){
-                chart1.setTitle({text: "No data found for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
-              }
-              else{
-                data.forEach(element => {
-                    chart1.addSeries(element);
-                });
-                
-              chart1.setTitle({text: "Now viewing chart for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
-              }
-              
-            },
-            error: function (jqXHR, status) {
-              console.log("ERROR" + jqXHR + " status: " + status);
-            }
-        });
-
-/*         fetch(res3, {
-          method: 'post',
-          body: dates
-        }).then(function(response) {
-          
-        }).catch(function(err) {
-          // Error :(
-        }); */
+    var checker = function(ba){
+        if (ba > 0){
+            return 'On';
+        }
+        else
+        {
+            return 'Off';
+        }
     }
-
     var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]
     var chart1 = Highcharts.chart('container', {
             chart: {
-                zoomType: 'x'
+                zoomType: 'x',
+                /* marginBottom: 180 */
             },
             title: {
-                text: 'Select an IoT device from the menu to load data'
+                text: 'Select an IoT device from the menu to begin monitoring'
             },
             subtitle: {
                 text: document.ontouchstart === undefined ?
@@ -187,12 +222,28 @@
                 }
             },
             legend: {
-                align: 'right',
-                verticalAlign: 'top',
-                layout: 'vertical',
-                //symbolRadius: 0,
+/*                 align: 'center',
+                verticalAlign: 'bottom',
                 x: 0,
-                y: 100
+                y: 3, */
+                labelFormatter: function() {
+                    //console.log(this.userOptions.type);
+                    if (this.userOptions.type == "line"){ 
+                        var lastVal = this.yData[this.yData.length - 1];
+                        return '<span>' + this.name + ':</span> <b>' + lastVal + '</b> </n>';
+                    }
+                    else{
+                        var lastVal = this.yData[this.yData.length - 1];
+                        if (lastVal > 0){
+                            return '<span>' + this.name + ':</span> <b> On </b> <span style="color: #ADFF2F"> ▲ </span> </n>';
+                        }
+                        else{
+                            return '<span>' + this.name + ':</span> <b> Off </b> <span style="color: #FF0000"> ▼ </span> </n>';
+                        }
+                        //▼▲♦
+                    }
+                    
+                }
             },
             tooltip: {
                     xDateFormat: '%d/%m/%Y',
@@ -224,19 +275,5 @@
         });
 
     chart1.series[0].remove();
-    
-    //////////////////////////////////////////////////////////////////////////////////////////////load date pickers
-    function LoadDatePickers(){
-        var fpfrom = flatpickr(document.getElementById('dateFrom'), {
-    enableTime: true,
-    time_24hr: true,
-    dateFormat: "Y-m-d H:i",
-});
-
-    var fpto = flatpickr(document.getElementById('dateTo'), {
-    enableTime: true,
-    time_24hr: true,
-    dateFormat: "Y-m-d H:i",
-});
-    }
 </script>
+

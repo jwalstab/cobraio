@@ -615,6 +615,16 @@ app.get("/live_charts", auth, function(req, res) {
   });
 });
 
+app.get("/dual_live_charts", auth, function(req, res) {
+  res.render('dual_live_charts', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool,
+  });
+});
+
 app.get("/data_tables", auth, function(req, res) {
   res.render('data_tables', {
     loggedInUser: req.session.user,
@@ -700,9 +710,6 @@ app.get("/:deviceid/getmonitorlabels", function(req, res) {
 //retrieve last known data with a packet amount
 app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
   dataLabelsList = LGDataLabelsList;
-  if (req.params.deviceid == 10555){
-    dataLabelsList = testDataLabelsList;
-  }
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
   var objectArray = [];
@@ -781,6 +788,150 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
     });
   res.send(returnArray);
   res.end();
+  });
+});
+
+
+app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  var getAmount = parseInt(req.params.number);
+  var limitAmount = getAmount - 1;
+  var objectArray = [];
+  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+      console.log("was undefined");
+      res.send("Null");
+      res.end();
+      return;
+    }
+    dataLabelsList.forEach(propname => {
+      var isABool = false;
+      if (typeof docs[limitAmount][propname] === "boolean")
+      {
+        isABool = true;
+      }
+      if (isABool == false){
+        var returnData = {
+          type: 'line',
+          name: propname,
+          data: null,
+          marker: {symbol : 'square', radius : 2 },
+          visible: false};
+          objectArray.push(returnData);
+        }
+      else{
+        var returnData = {
+          type: 'column',
+          name: propname,
+          data: null,
+          marker: {symbol : 'square', radius : 2 },
+          visible: false};
+          objectArray.push(returnData);
+        }
+    });
+    iotdb.collection(req.params.deviceid + 1).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+      if (err){console.log(err);}
+      if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+        console.log("was undefined");
+        res.send("Null");
+        res.end();
+        return;
+      }
+      dataLabelsList.forEach(propname => {
+        var isABool = false;
+        if (typeof docs[limitAmount][propname] === "boolean")
+        {
+          isABool = true;
+        }
+        if (isABool == false){
+          var returnData = {
+            type: 'line',
+            name: propname + " U2",
+            data: null,
+            marker: {symbol : 'square', radius : 2 },
+            visible: false};
+            objectArray.push(returnData);
+          }
+        else{
+          var returnData = {
+            type: 'column',
+            name: propname + " U2",
+            data: null,
+            marker: {symbol : 'square', radius : 2 },
+            visible: false};
+            objectArray.push(returnData);
+          }
+
+      });
+    res.send(objectArray);
+    res.end();
+    });
+  });
+});
+
+//retrieve last known data with a packet amount
+app.get("/:deviceid/dualgraphupdate/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  var getAmount = parseInt(req.params.number);
+  var limitAmount = getAmount - 1;
+  var returnArray = [];
+  iotdb.collection(req.params.deviceid + 1).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+      res.send("Null");
+      res.end();
+      return;
+    }
+    
+    dataLabelsList.forEach(propname => {
+      if (typeof docs[limitAmount][propname] === "boolean")
+      {
+        
+        if (docs[limitAmount][propname] == true)
+        {
+            docs[limitAmount][propname] = 20;
+        }
+        else
+        {
+            (docs[limitAmount][propname] = -20);
+        }
+      }
+      var miniArray = [];
+      var timeS = new Date(docs[limitAmount].time);
+      var timeSR = timeS.getTime();
+      miniArray.push(timeSR, docs[limitAmount][propname]);
+      returnArray.push(miniArray);
+    });
+    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+      if (err){console.log(err);}
+      if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+        res.send("Null");
+        res.end();
+        return;
+      }
+      dataLabelsList.forEach(propname => {
+        if (typeof docs[limitAmount][propname] === "boolean")
+        {
+          
+          if (docs[limitAmount][propname] == true)
+          {
+              docs[limitAmount][propname] = 20;
+          }
+          else
+          {
+              (docs[limitAmount][propname] = -20);
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(docs[limitAmount].time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, docs[limitAmount][propname]);
+        returnArray.push(miniArray);
+      });
+      res.send(returnArray);
+      res.end();
+    });
   });
 });
 
@@ -867,23 +1018,11 @@ var LGDataLabelsList = ["Comp_On","Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"]
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
-/*   console.log("5    " + req.body.holdingRegisters[5]);
-  console.log("6    " + req.body.holdingRegisters[6]);
-  console.log("7    " + req.body.holdingRegisters[7]);
-  console.log("8    " + req.body.holdingRegisters[8]);
-  console.log("9    " + req.body.holdingRegisters[9]);
-  
-
-  console.log("the value 67       " + ReverseduInt16ToFloat32([req.body.holdingRegisters[6],req.body.holdingRegisters[7]]));
-
-  console.log("the value 78      " + uInt16ToFloat32([req.body.holdingRegisters[7],req.body.holdingRegisters[8]]));
-   */
+    
   LegioGuardDataObject = {
 
+    status: req.body.status,
     time: req.body.time,
-
-    
-    
 
     //COILS
     EleHeater_Mng_Hot_Ele_Man_Msk: req.body.coils[7],
@@ -1033,57 +1172,6 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     AlarmMng_HP_Setp: uInt16ToFloat32([req.body.holdingRegisters3[49],req.body.holdingRegisters3[50]]),
     AlarmMng_HP_Diff: uInt16ToFloat32([req.body.holdingRegisters3[51],req.body.holdingRegisters3[52]]),
 
-    //eev holding registers
-
-/* 
-    EVD_Emb_1_Params_EVDEMB_1_Superparameters_EEVtype_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_Superparameters_MainRegulation_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_Superparameters_AuxRegulationCom_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_GasTyp_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Configuration_GasTypAux_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_SH_Set_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_StartEEV_OpRatio_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_SH_WaitDT_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_StandByEEV_OpEn_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_StandByEEV_OpPos_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_CtrlRevTempSet_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_CtrlRevP_Set_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[33],req.body.holdingRegisters2[34]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_CtrlDirP_Set_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[71],req.body.holdingRegisters2[72]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_CtrlLiqdSet_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[73],req.body.holdingRegisters2[74]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_PID_Kp_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[75],req.body.holdingRegisters2[76]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_PID_Ti_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[77],req.body.holdingRegisters2[78]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_PID_Td_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[79],req.body.holdingRegisters2[80]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_LowSH_Thrsh_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[81],req.body.holdingRegisters2[82]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_LowSH_Ti_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[83],req.body.holdingRegisters2[84]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_LowSH_AlrmDT_Val: req.body.holdingRegisters2[85],
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_LOP_Thrsh_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[86],req.body.holdingRegisters2[87]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_LOP_Ti_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[88],req.body.holdingRegisters2[89]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_LOP_AlrmDT_Val: req.body.holdingRegisters2[90],
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_MOP_Thrsh_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[91],req.body.holdingRegisters2[92]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_MainRegulation_MOP_Ti_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[93],req.body.holdingRegisters2[94]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_MOP_AlrmDT_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[95],req.body.holdingRegisters2[96]]),
-    EVD_Emb_1_Params_EVDEMB_1_EVD_Manual_ManPositSteps_Val: req.body.holdingRegisters2[97],
-    EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_HiTempCondThrsh_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters2[98],req.body.holdingRegisters2[99]]),
- */
-    /*200EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_HiTempCondTi_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    202EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_HiTempCondAlrmDT_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    203EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_ModThermSet_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    205EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_ModThermDiff_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    207EVD_Emb_1_Params_EVDEMB_1_EVD_AuxRegulation_ModThermSH_Offset_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    209EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_CO2_A_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    211EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_CO2_B_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    213EVD_Emb_1_Params_EVDEMB_1_EVD_SelfTuning_SelfTuningMethod_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    214EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_LowSuctAlrmThrsh_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    216EVD_Emb_1_Params_EVDEMB_1_EVD_Regulation_LowSuctAlrmDT_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    217EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_RegMinPos_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    218EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_RegMaxPos_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    219EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_FullClosSteps_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    220EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_MoveRate_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    221EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_FastClosMoveRate_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    222EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_MoveDuty_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    223EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_MoveCurr_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]),
-    224EVD_Emb_1_Params_EVDEMB_1_EVD_EEV_Config_HoldCurr_Val: ReverseduInt16ToFloat32([req.body.holdingRegisters3[33],req.body.holdingRegisters3[34]]), */
-
     //INPUT REGISTERS
     Suct_Temp: uInt16ToFloat32([req.body.inputRegisters[0],req.body.inputRegisters[1]]),
     Evap_Inlet_Temp: uInt16ToFloat32([req.body.inputRegisters[2],req.body.inputRegisters[3]]),
@@ -1135,10 +1223,6 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     High_Pressure: uInt16ToFloat32([req.body.inputRegisters2[66],req.body.inputRegisters2[67]])
   }
 
-/*   var dataValues = Object.keys(LegioGuardDataObject);
-  dataValues.forEach(element => {
-    console.log(element);
-  }); */
 
   var hardcodedIoTPool = 'Quantum'
   AlarmProcessor(req.params.deviceid,LegioGuardDataObject,hardcodedIoTPool);

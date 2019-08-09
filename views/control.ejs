@@ -257,8 +257,8 @@ var ChooseDeviceMenu = new Phaser.Class({
         this.load.image('longbutton', 'phaser/longbutton.png');
         this.load.image('greenlight', 'phaser/cdmlightgreen.png');
         this.load.image('redlight', 'phaser/cdmlightred.png');
-        this.load.image('greenstatus', 'phaser/greenstatus.png')
-        this.load.image('bluestatus', 'phaser/bluestatus.png')
+/*         this.load.image('greenstatus', 'phaser/greenstatus.png')
+        this.load.image('bluestatus', 'phaser/bluestatus.png') */
         //this.load.image('test1', 'phaser/longbutton.png');
     },
 
@@ -648,11 +648,12 @@ var CompControl = new Phaser.Class({
     update: function (){
         //comp on
         UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
-        if (Comp_On === 0){Comp_On_Text.setText("OFF");}
+        console.log(Comp_On);
+        if (Comp_On === false){Comp_On_Text.setText("OFF");}
         else{Comp_On_Text.setText("ON");}
 
         //inj valve
-        if (Injection_Vlv === 0){Injection_Vlv_Text.setText("OFF");}
+        if (Injection_Vlv === false){Injection_Vlv_Text.setText("OFF");}
         else{Injection_Vlv_Text.setText("ON");}
         
         Suct_Temp_Text.setText(Suct_Temp + "°C");
