@@ -793,6 +793,10 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
 
 
 app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
+  var x = Number(req.params.deviceid);
+  var y = x + 1;
+  var device2id = y.toString();
+
   dataLabelsList = LGDataLabelsList;
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
@@ -830,7 +834,7 @@ app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
           objectArray.push(returnData);
         }
     });
-    iotdb.collection(req.params.deviceid + 1).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    iotdb.collection(device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
       if (err){console.log(err);}
       if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
         console.log("was undefined");
@@ -872,11 +876,16 @@ app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
 
 //retrieve last known data with a packet amount
 app.get("/:deviceid/dualgraphupdate/:number", function(req, res) {
+
+  var x = Number(req.params.deviceid);
+  var y = x + 1;
+  var device2id = y.toString();
+
   dataLabelsList = LGDataLabelsList;
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
   var returnArray = [];
-  iotdb.collection(req.params.deviceid + 1).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
@@ -903,7 +912,8 @@ app.get("/:deviceid/dualgraphupdate/:number", function(req, res) {
       miniArray.push(timeSR, docs[limitAmount][propname]);
       returnArray.push(miniArray);
     });
-    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    
+    iotdb.collection(device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
       if (err){console.log(err);}
       if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
         res.send("Null");
