@@ -1,0 +1,242 @@
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<link href="assets/scroll.css" rel="stylesheet">
+
+<script type="text/javascript" src="assets/highcharts.js"></script>
+
+<section class="content">
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="body block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-8 col-sm-12">
+                                <h2>Data Charts Historic Lookup</h2>
+                                <ul class="breadcrumb p-l-0 p-b-0 ">
+                                    <li class="breadcrumb-item active"> </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-3 col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="body">
+                        <b>From</b>
+                        <input type="text" class="form-control datetime" id="dateFrom">
+                        <b>To</b>
+                        <input type="text" class="form-control datetime" id="dateTo">
+                        <br />
+                        <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                  Select Device
+                                  <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="dropper">
+                                </ul>
+                        </div>
+                        <button class="btn btn-success" id="myButton" onclick="GetAPIData()">Load data table</button>
+                        <br />
+                        </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12">
+                    <div class="card">
+                        <div class="header" id="rheader">
+                            <h2><strong>Historic Chart</strong></h2>
+                        </div>
+                        <div class="body">
+                            <div id="chart2">
+                                <div id="container" style="width:100%; height:400px;"></div>
+                        </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    //global variables and function loaders
+    LoadDropDownBox();
+    LoadDatePickers();
+    var chosenDevice;
+    var chosenDeviceName;
+    var deviceList = [];
+
+    var GlobalData = [];
+    var DataKeysToDisplay = [];
+
+    //////////////////////////////////////////////////////////////////////drop down box area
+    function LoadDropDownBox(){
+        var res3 = masterURL + "/<%= loggedInPool %>/lookup_devices/";
+        $.ajax({
+            type: "GET",
+            url: res3,
+            contentType: "application/json; charset=utf-8",
+            crossDomain: true,
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+                //creates the links in the dropdown menu
+                data.forEach(element => {
+                    var newlink = $('<li><a href="#" data-value="action">' + element.devicename + '</a></li>');
+                    $('#dropper').append(newlink);
+                    deviceList.push(element);
+                });
+                //adds code to change when device selected
+                $(".dropdown-menu li a").click(function(){
+                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    
+
+                    while(chart1.series.length > 0){
+                    chart1.series[0].remove();
+                    }
+
+                    deviceList.forEach(element => {
+                        if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
+                        {
+                            chosenDevice = element.deviceID;
+                            chosenDeviceName = element.devicename;
+                        }
+                    });
+                    chart1.setTitle({text: "You have selected the IoT device " + chosenDeviceName + ", please select dates to search between to continue."});
+                    console.log(chosenDevice);
+                    });
+            },
+            error: function (jqXHR, status) {
+                console.log("ERROR" + jqXHR + " status: " + status);
+            }
+        });
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////load data to table from api area
+    function GetAPIData() {
+      
+        var packetsToDisplay = 10;
+        var fromVal = new Date(document.getElementById("dateFrom").value);
+        console.log(fromVal);
+        var fromValSeconds = fromVal.getTime();
+        var toVal = new Date(document.getElementById("dateTo").value);
+        console.log(toVal);
+        var toValSeconds = toVal.getTime();
+        var findString = "{time:{$gt:" + fromValSeconds +",$lt:"+ toValSeconds +"}}";
+        var res3 = masterURL + "/" + chosenDevice + "/betweendates";
+        chart1.setTitle({text: "Now loading data for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
+        $.ajax({
+            type: "POST",
+            url: res3,
+            data: JSON.stringify(findString),
+            //processData: false,
+            contentType: "application/javascript",
+            crossDomain: true,
+            //dataType: "json",
+            success: function (data, status, jqXHR) {
+              if (data == "No Data"){
+                chart1.setTitle({text: "No data found for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
+              }
+              else{
+                data.forEach(element => {
+                    chart1.addSeries(element);
+                });
+                
+              chart1.setTitle({text: "Now viewing chart for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
+              }
+              
+            },
+            error: function (jqXHR, status) {
+              console.log("ERROR" + jqXHR + " status: " + status);
+            }
+        });
+
+/*         fetch(res3, {
+          method: 'post',
+          body: dates
+        }).then(function(response) {
+          
+        }).catch(function(err) {
+          // Error :(
+        }); */
+    }
+
+    var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]
+    var chart1 = Highcharts.chart('container', {
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Select an IoT device from the menu to load data'
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Quantum Data Technologies'
+                }
+            },
+            legend: {
+                align: 'right',
+                verticalAlign: 'top',
+                layout: 'vertical',
+                //symbolRadius: 0,
+                x: 0,
+                y: 100
+            },
+            tooltip: {
+                    xDateFormat: '%d/%m/%Y',
+                    shared: true,
+                    split: false,
+                    enabled: true,
+                },
+            plotOptions: {
+                column : {
+                        tooltip: {
+                            pointFormatter: function() {
+                                var symbol = '●';
+                                if (this.y > 0){
+                                    //return "" + this.series.name + " On";
+                                    return '<span style="color:' + this.series.color + '">' + symbol + '</span> <span>' + this.series.name + ': On </span><span style="color: #ADFF2F"> ▲ </span> <br/>'
+                                }
+                                else{
+                                    return '<span style="color:' + this.series.color + '">' + symbol + '</span> <span>' + this.series.name + ': Off </span><span style="color: #FF0000"> ▼ </span> <br/>'
+                                }
+                            }
+                        }
+                },
+            },
+            series: [{
+                type: 'area',
+                name: 'USD to EUR',
+                data: datat
+            }]
+        });
+
+    chart1.series[0].remove();
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////load date pickers
+    function LoadDatePickers(){
+        var fpfrom = flatpickr(document.getElementById('dateFrom'), {
+    enableTime: true,
+    time_24hr: true,
+    dateFormat: "Y-m-d H:i",
+});
+
+    var fpto = flatpickr(document.getElementById('dateTo'), {
+    enableTime: true,
+    time_24hr: true,
+    dateFormat: "Y-m-d H:i",
+});
+    }
+</script>

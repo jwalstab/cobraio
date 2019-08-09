@@ -1002,7 +1002,7 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
 
     //holding registers 100 +
     Flush_Valve_Cold_SupplyVlv_Setp: uInt16ToFloat32([req.body.holdingRegisters[0],req.body.holdingRegisters2[1]]),
-    PVlv_Mng_ColdVlv_Kp: uInt16ToFloat32([req.body.holdingRegisters2[2],req.body.holdingRegisters2[3]]),
+    PVlv_Mng_ColdVlv_Kp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[2],req.body.holdingRegisters2[3]]),
     PVlv_Mng_ColdVlv_Ti: req.body.holdingRegisters2[4],
     PVlv_Mng_ColdVlv_Td: req.body.holdingRegisters2[5],
     PVlv_Mng_HotVlv_Kp: ReverseduInt16ToFloat32([req.body.holdingRegisters2[6],req.body.holdingRegisters2[7]]),

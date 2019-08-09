@@ -416,6 +416,10 @@ var MonitoringDiagramScreen = new Phaser.Class({
             Cold_Tank_Temp2_Text = this.add.text(55, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
             Cold_Tank_Temp3_Text = this.add.text(55, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
 
+            
+            Master_Ctrl_Mng_Comp_Setp_Text = this.add.text(1074, 210, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' })
+            Master_Ctrl_Mng_Fan_Setp_Text = this.add.text(1074, 230, " ", { fontFamily: 'Arial', fontSize: 12, color: '#ffffff' })
+
             Hot_Tank_Temp1_Text = this.add.text(1075, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
             Hot_Tank_Temp2_Text = this.add.text(1075, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
             Hot_Tank_Temp3_Text = this.add.text(1075, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }) 
@@ -487,7 +491,8 @@ var MonitoringDiagramScreen = new Phaser.Class({
             arrows.setVisible(false);
         }
 
-        
+        Master_Ctrl_Mng_Fan_Setp_Text.setText("FSP: " + Master_Ctrl_Mng_Fan_Setp + "°C");
+        Master_Ctrl_Mng_Comp_Setp_Text.setText("CSP: " + Master_Ctrl_Mng_Comp_Setp + "°C");
         Cold_Tank_Temp1_Text.setText("T1: " + Cold_Tank_Temp1 + "°C");
         Cold_Tank_Temp2_Text.setText("T2: " + Cold_Tank_Temp2 + "°C");
         Cold_Tank_Temp3_Text.setText("T3: " + Cold_Tank_Temp3 + "°C");
@@ -699,6 +704,13 @@ var FlushControl = new Phaser.Class({
         blueStatusLight.setVisible(false);
         connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
 
+        manualFlushButton = this.add.image(1044,400, 'buttonmask');            
+        manualFlushButton.setInteractive();
+        manualFlushButton.on('pointerdown', () => {
+            changeObject = {Type: 5,Address: 52 ,Value: 1, Quantity: 1}
+            UploadControlChangeToAPI(changeObject);
+        });
+
         Flush_Valve_Flush_Week_Set_Text = this.add.text(255 , 170, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         Flush_Valve_Flush_Week_Set_Text.setInteractive();
         Flush_Valve_Flush_Week_Set_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Flush Day",Flush_Valve_Flush_Week_Set,92,1,false);});
@@ -718,6 +730,7 @@ var FlushControl = new Phaser.Class({
         //Flush = this.add.text(923 , 166, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
     },
 
+    
     update: function (){
         UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
 
@@ -823,7 +836,6 @@ var ProbeControl = new Phaser.Class({
     preload: function ()
     {
         this.load.image('pcbackground', 'phaser/probecontrol.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
     },
 
     create: function ()
@@ -898,10 +910,6 @@ var EEVControl2 = new Phaser.Class({
     preload: function ()
     {
         this.load.image('eev2background', 'phaser/eevcontrol2.png');
-        this.load.image('buttonmask', 'phaser/buttonmask.png')
-        this.load.image('arrowmask', 'phaser/arrowmask.png')
-        this.load.image('greenstatus', 'phaser/greenstatus.png')
-        this.load.image('bluestatus', 'phaser/bluestatus.png')
     },
 
     create: function ()
@@ -943,10 +951,6 @@ function EEVControl3 ()
 preload: function ()
 {
     this.load.image('eev3background', 'phaser/eevcontrol3.png');
-    this.load.image('buttonmask', 'phaser/buttonmask.png')
-    this.load.image('arrowmask', 'phaser/arrowmask.png')
-    this.load.image('greenstatus', 'phaser/greenstatus.png')
-    this.load.image('bluestatus', 'phaser/bluestatus.png')
 },
 
 create: function ()
@@ -1047,19 +1051,19 @@ var PumpControl = new Phaser.Class({
 
         PVlv_Mng_ColdVlv_DeadBand_Text = this.add.text(850 , 278, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         PVlv_Mng_ColdVlv_DeadBand_Text.setInteractive();
-        PVlv_Mng_ColdVlv_DeadBand_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump DeadBand",PVlv_Mng_ColdVlv_DeadBand,47,2,false);});
+        PVlv_Mng_ColdVlv_DeadBand_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump DeadBand",PVlv_Mng_ColdVlv_DeadBand,47,2,false);});
 
         PVlv_Mng_ColdVlv_Kp_Text = this.add.text(850 , 305, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         PVlv_Mng_ColdVlv_Kp_Text.setInteractive();
-        PVlv_Mng_ColdVlv_Kp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Kp",PVlv_Mng_ColdVlv_Kp,102,2,true);});
+        PVlv_Mng_ColdVlv_Kp_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Kp",PVlv_Mng_ColdVlv_Kp,102,2,true);});
 
         PVlv_Mng_ColdVlv_Ti_Text = this.add.text(850 , 332, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         PVlv_Mng_ColdVlv_Ti_Text.setInteractive();
-        PVlv_Mng_ColdVlv_Ti_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Ti",PVlv_Mng_ColdVlv_Ti,104,1,false);});
+        PVlv_Mng_ColdVlv_Ti_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Ti",PVlv_Mng_ColdVlv_Ti,104,1,false);});
 
         PVlv_Mng_ColdVlv_Td_Text = this.add.text(850 , 360, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' });
         PVlv_Mng_ColdVlv_Td_Text.setInteractive();
-        PVlv_Mng_ColdVlv_Td_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Hot Pump Td",PVlv_Mng_ColdVlv_Td,105,1,false);});
+        PVlv_Mng_ColdVlv_Td_Text.on('pointerdown', () => {LoadChangeHoldingRegisterScreen(this,"Cold Pump Td",PVlv_Mng_ColdVlv_Td,105,1,false);});
 
     },
 
