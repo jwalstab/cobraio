@@ -625,6 +625,16 @@ app.get("/dual_live_charts", auth, function(req, res) {
   });
 });
 
+app.get("/live_charts_multi", auth, function(req, res) {
+  res.render('live_charts_multi', {
+    loggedInUser: req.session.user,
+    loggedInName: req.session.name,
+    loggedInLevel: req.session.level,
+    loggedInTag: req.session.tag,
+    loggedInPool: req.session.pool,
+  });
+});
+
 app.get("/data_tables", auth, function(req, res) {
   res.render('data_tables', {
     loggedInUser: req.session.user,
@@ -754,9 +764,6 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
 //retrieve last known data with a packet amount
 app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
   dataLabelsList = LGDataLabelsList;
-  if (req.params.deviceid == 10555){
-    dataLabelsList = testDataLabelsList;
-  }
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
   iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
@@ -792,7 +799,7 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
 });
 
 
-app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
+app.get("/:deviceid/:device2id/dualgraphstart/:number", function(req, res) {
   var x = Number(req.params.deviceid);
   var y = x + 1;
   var device2id = y.toString();
@@ -834,7 +841,7 @@ app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
           objectArray.push(returnData);
         }
     });
-    iotdb.collection(device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    iotdb.collection(req.params.device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
       if (err){console.log(err);}
       if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
         console.log("was undefined");
@@ -866,7 +873,6 @@ app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
             visible: false};
             objectArray.push(returnData);
           }
-
       });
     res.send(objectArray);
     res.end();
@@ -875,7 +881,7 @@ app.get("/:deviceid/dualgraphstart/:number", function(req, res) {
 });
 
 //retrieve last known data with a packet amount
-app.get("/:deviceid/dualgraphupdate/:number", function(req, res) {
+app.get("/:deviceid/:device2id/dualgraphupdate/:number", function(req, res) {
 
   var x = Number(req.params.deviceid);
   var y = x + 1;
@@ -913,7 +919,7 @@ app.get("/:deviceid/dualgraphupdate/:number", function(req, res) {
       returnArray.push(miniArray);
     });
     
-    iotdb.collection(device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    iotdb.collection(req.params.device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
       if (err){console.log(err);}
       if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
         res.send("Null");

@@ -518,7 +518,7 @@ var MonitoringDiagramScreen = new Phaser.Class({
 
         EEV_Pos_Text.setText(EEV_Pos + "%");
 
-        if (Injection_Vlv === 0){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
+        if (Injection_Vlv === false){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
         else{Injection_Vlv_Text.setText("Open"); injValveLight.setVisible(true);}
     }
 

@@ -1,0 +1,219 @@
+
+    LoadDeviceSelectBox();
+    var chosenDeviceBox;
+    var chosenDevice;
+    var chosenDeviceName;
+    var chart;
+    var firstChartLoad = true;
+    var pullAmount;
+    var deviceChanged;
+    var sizer;
+    var magicNumber = 20;
+    var countingMagic = 0;
+
+    var dataUpdateTimeout;
+
+    function LoadDeviceSelectBox(){
+        var dropboxURL = masterURL + "/<%= loggedInPool %>/lookup_devices/";
+        console.log(dropboxURL);
+        $.ajax({type: "GET", url: dropboxURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
+            success: function (data, status, jqXHR) {
+                //creates the links in the dropdown menu and populates device list
+                deviceList = [];
+                data.forEach(element => {
+                    var newlink = $('<li><a href="#" data-value="action">' + element.devicename + '</a></li>');
+                    $('#deviceSelectMenu').append(newlink);
+                    deviceList.push(element);
+                });
+
+                //adds code to change when device selected
+                $("#deviceSelectMenu li a").click(function(){
+                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    deviceList.forEach(element => {
+                        if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
+                        {
+                            chosenDeviceBox = element.deviceID;
+                            chosenDeviceName = element.devicename;
+                        }
+                    });
+                    console.log(chosenDeviceBox);
+                    deviceChanged = true;
+                    DataUpdate();
+                    });
+            },
+            error: function (jqXHR, status) {
+                console.log("ERROR");
+            }
+        });
+    }    
+    function GetFirstData(){
+            var lastDataURL = masterURL + "/" + chosenDevice + "/dualgraphstart/" + magicNumber;
+            $.ajax({
+            type: "GET",
+            url: lastDataURL,
+            contentType: "application/json; charset=utf-8",
+            crossDomain: true,
+            //dataType: "json",
+            success: function (data, status, jqXHR) {
+                if (data == "Null"){
+                    chart1.setTitle({text: "The device " + chosenDeviceName + " has not sent any data to the system."});
+                    return;
+                }
+                sizer = data.length;
+                console.log(data);
+                data.forEach(element => {
+                    chart1.addSeries(element);
+                });
+                magicNumber = magicNumber - 1;
+                DataUpdate();
+            },
+            error: function (jqXHR, status) {
+                console.log("jqXHYR:" + jqXHR + "status:" + status)
+            }
+        });
+    }
+    function DataUpdate(){
+            if (deviceChanged == true)
+            {
+                chosenDevice = chosenDeviceBox;
+                clearTimeout(dataUpdateTimeout);
+                countingMagic = 0;
+                deviceChanged = false;
+                magicNumber = 20;
+                while (sizer > 0) {
+                    chart1.series[0].remove();
+                    sizer--;
+                }
+                GetFirstData();
+                return;
+            }
+            
+            var lastDataURL = masterURL + "/" + chosenDevice + "/dualgraphupdate/" + magicNumber;
+            $.ajax({
+            type: "GET",
+            url: lastDataURL,
+            contentType: "application/json; charset=utf-8",
+            crossDomain: true,
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+                console.log(data);
+                if (magicNumber === 1)
+                {
+                    var dt = new Date();
+                    var dtl = dt.toLocaleString();
+                    chart1.setTitle({text: "Now monitoring " + chosenDeviceName + ". Last data recieved at :" + dtl});
+                    dataUpdateTimeout = setTimeout(DataUpdate, 5000);
+                    console.log("data update magic number complete!");
+                }
+                else{
+                    countingMagic++;
+                    var magicPercentage = countingMagic / 20 * 100;
+                    var betterMagicPercentage = magicPercentage.toFixed(0);
+                    chart1.setTitle({text: "Loading data for " + chosenDeviceName + " - %" + betterMagicPercentage});
+                    magicNumber = magicNumber - 1;
+                    DataUpdate();
+                }
+                for (let index = 0; index < sizer; index++) {
+                    chart1.series[index].addPoint(data[index]);
+                }
+            },
+            error: function (jqXHR, status) {
+                console.log("jqXHYR:" + jqXHR + "status:" + status)
+            }
+        });
+    }
+    var change = {
+    0: 'Very Low',
+    5: 'Low',
+    10: 'Medium',
+    15: 'High',
+    20: 'Very High'
+};
+
+    var checker = function(ba){
+        if (ba > 0){
+            return 'On';
+        }
+        else
+        {
+            return 'Off';
+        }
+    }
+    var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]
+    var chart1 = Highcharts.chart('container', {
+            chart: {
+                zoomType: 'x',
+                /* marginBottom: 180 */
+            },
+            title: {
+                text: 'Select an IoT device from the menu to begin monitoring'
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Quantum Data Technologies'
+                }
+            },
+            legend: {
+/*                 align: 'center',
+                verticalAlign: 'bottom',
+                x: 0,
+                y: 3, */
+                labelFormatter: function() {
+                    //console.log(this.userOptions.type);
+                    if (this.userOptions.type == "line"){ 
+                        var lastVal = this.yData[this.yData.length - 1];
+                        return '<span>' + this.name + ':</span> <b>' + lastVal + '</b> </n>';
+                    }
+                    else{
+                        var lastVal = this.yData[this.yData.length - 1];
+                        if (lastVal > 0){
+                            return '<span>' + this.name + ':</span> <b> On </b> <span style="color: #ADFF2F"> ▲ </span> </n>';
+                        }
+                        else{
+                            return '<span>' + this.name + ':</span> <b> Off </b> <span style="color: #FF0000"> ▼ </span> </n>';
+                        }
+                        //▼▲♦
+                    }
+                    
+                }
+            },
+            tooltip: {
+                    xDateFormat: '%d/%m/%Y',
+                    shared: true,
+                    split: false,
+                    enabled: true,
+                },
+            plotOptions: {
+                column : {
+                        tooltip: {
+                            pointFormatter: function() {
+                                var symbol = '●';
+                                if (this.y > 0){
+                                    //return "" + this.series.name + " On";
+                                    return '<span style="color:' + this.series.color + '">' + symbol + '</span> <span>' + this.series.name + ': On </span><span style="color: #ADFF2F"> ▲ </span> <br/>'
+                                }
+                                else{
+                                    return '<span style="color:' + this.series.color + '">' + symbol + '</span> <span>' + this.series.name + ': Off </span><span style="color: #FF0000"> ▼ </span> <br/>'
+                                }
+                            }
+                        }
+                },
+            },
+            series: [{
+                type: 'area',
+                name: 'USD to EUR',
+                data: datat
+            }]
+        });
+
+    chart1.series[0].remove();
+</script>

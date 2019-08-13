@@ -14,9 +14,9 @@
                     <div class="body block-header">
                         <div class="row">
                             <div class="col-lg-12 col-md-12 col-sm-12">
-                                <h2>Real Time IoT Device Monitor</h2>
+                                <h2>Dual Charts Live Graph</h2>
                                 <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
-                                    <li class="breadcrumb-item active">Select an IoT device to monitor incoming data in real time</li>
+                                    <li class="breadcrumb-item active">Select a unit from the list to begin, must be linked to another unit for graph to load</li>
                                 </ul>
                             </div>
                         </div>
@@ -40,31 +40,27 @@
                                         <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenu">
                                         </ul>
                                 </div>
-                                <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                          Select Device
-                                          <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenuDEVICE2">
-                                        </ul>
-                                </div>
                                 <div id="chart2">
                                         <div id="container" style="width:100%; height:600px;"></div>
                                 </div>
+                                
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="body" id="phaserdiv">
                         </div>
                     </div>
             </div>
         </div>
     </div>
+
 </section>
 
 <script>
 
     LoadDeviceSelectBox();
-    DEVICE2_LoadDeviceSelectBox();
-    
     var chosenDeviceBox;
-    var chosenDevice = 0;
+    var chosenDevice;
     var chosenDeviceName;
     var chart;
     var firstChartLoad = true;
@@ -73,19 +69,6 @@
     var sizer;
     var magicNumber = 20;
     var countingMagic = 0;
-
-    var firstChoice = 0;
-    var firstChoiceDevice2 = 0;
-
-    var DEVICE2chosenDeviceBox;
-    var DEVICE2_chosenDevice = 0;
-    var DEVICE2_chosenDeviceName;
-    var DEVICE2_firstChartLoad = true;
-    var DEVICE2_pullAmount;
-    var DEVICE2_deviceChanged;
-    var DEVICE2_sizer;
-    var DEVICE2_magicNumber = 20;
-    var DEVICE2_countingMagic = 0;
 
     var dataUpdateTimeout;
 
@@ -116,7 +99,6 @@
                     });
                     console.log(chosenDeviceBox);
                     deviceChanged = true;
-                    firstChoice = 1;
                     DataUpdate();
                     });
             },
@@ -125,45 +107,8 @@
             }
         });
     }    
-    function DEVICE2_LoadDeviceSelectBox(){
-        var dropboxURL = masterURL + "/<%= loggedInPool %>/lookup_devices/";
-        console.log(dropboxURL);
-        $.ajax({type: "GET", url: dropboxURL, contentType: "application/json; charset=utf-8", crossDomain: true,  dataType: "json",
-            success: function (data, status, jqXHR) {
-                //creates the links in the dropdown menu and populates device list
-                DEVICE2_deviceList = [];
-                data.forEach(element => {
-                    var newlink = $('<li><a href="#" data-value="action">' + element.devicename + '</a></li>');
-                    $('#deviceSelectMenuDEVICE2').append(newlink);
-                    DEVICE2_deviceList.push(element);
-                });
-
-                //adds code to change when device selected
-                $("#deviceSelectMenuDEVICE2 li a").click(function(){
-                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    DEVICE2_deviceList.forEach(element => {
-                        if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
-                        {
-                            DEVICE2_chosenDeviceBox = element.deviceID;
-                            DEVICE2_chosenDeviceName = element.devicename;
-                        }
-                    });
-                    console.log(DEVICE2_chosenDeviceBox);
-                    DEVICE2_deviceChanged = true;
-                    firstChoiceDevice2 = 1;
-                    DataUpdate();
-                    });
-            },
-            error: function (jqXHR, status) {
-                console.log("ERROR");
-            }
-        });
-    }    
-    
     function GetFirstData(){
-            var lastDataURL = masterURL + "/" + chosenDevice + "/" + DEVICE2_chosenDevice + "/dualgraphstart/" + magicNumber;
+            var lastDataURL = masterURL + "/" + chosenDevice + "/dualgraphstart/" + magicNumber;
             $.ajax({
             type: "GET",
             url: lastDataURL,
@@ -176,10 +121,10 @@
                     return;
                 }
                 sizer = data.length;
+                console.log(data);
                 data.forEach(element => {
                     chart1.addSeries(element);
                 });
-                console.log(data);
                 magicNumber = magicNumber - 1;
                 DataUpdate();
             },
@@ -189,62 +134,62 @@
         });
     }
     function DataUpdate(){
-        console.log("data update");
-        if (firstChoice == 0 || firstChoiceDevice2 == 0){
-            return;
-        }
-        if (deviceChanged || DEVICE2_deviceChanged == true)
-        {
-            console.log(DEVICE2_chosenDeviceBox);
-            chosenDevice = chosenDeviceBox;
-            DEVICE2_chosenDevice = DEVICE2_chosenDeviceBox;
-            clearTimeout(dataUpdateTimeout);
-            countingMagic = 0;
-            deviceChanged = false;
-            DEVICE2_deviceChanged = false;
-            magicNumber = 20;
-            while (sizer > 0) {
-                chart1.series[0].remove();
-                sizer--;
-            }
-            GetFirstData();
-            return;
-        }
-            
-        var lastDataURL = masterURL + "/" + chosenDevice + "/" + DEVICE2_chosenDevice +"/dualgraphupdate/" + magicNumber;
-        $.ajax({
-        type: "GET",
-        url: lastDataURL,
-        contentType: "application/json; charset=utf-8",
-        crossDomain: true,
-        dataType: "json",
-        success: function (data, status, jqXHR) {
-            console.log(data);
-            if (magicNumber === 1)
+            if (deviceChanged == true)
             {
-                var dt = new Date();
-                var dtl = dt.toLocaleString();
-                chart1.setTitle({text: "Now monitoring " + chosenDeviceName + " and " + DEVICE2_chosenDeviceName + ". Last data recieved at :" + dtl});
-                dataUpdateTimeout = setTimeout(DataUpdate, 5000);
-                console.log("data update magic number complete!");
+                chosenDevice = chosenDeviceBox;
+                clearTimeout(dataUpdateTimeout);
+                countingMagic = 0;
+                deviceChanged = false;
+                magicNumber = 20;
+                while (sizer > 0) {
+                    chart1.series[0].remove();
+                    sizer--;
+                }
+                GetFirstData();
+                return;
             }
-            else{
-                countingMagic++;
-                var magicPercentage = countingMagic / 20 * 100;
-                var betterMagicPercentage = magicPercentage.toFixed(0);
-                chart1.setTitle({text: "Loading data for " + chosenDeviceName + "and " + DEVICE2_chosenDeviceName +" - %" + betterMagicPercentage});
-                magicNumber = magicNumber - 1;
-                DataUpdate();
+            
+            var lastDataURL = masterURL + "/" + chosenDevice + "/dualgraphupdate/" + magicNumber;
+            $.ajax({
+            type: "GET",
+            url: lastDataURL,
+            contentType: "application/json; charset=utf-8",
+            crossDomain: true,
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+                console.log(data);
+                if (magicNumber === 1)
+                {
+                    var dt = new Date();
+                    var dtl = dt.toLocaleString();
+                    chart1.setTitle({text: "Now monitoring " + chosenDeviceName + ". Last data recieved at :" + dtl});
+                    dataUpdateTimeout = setTimeout(DataUpdate, 5000);
+                    console.log("data update magic number complete!");
+                }
+                else{
+                    countingMagic++;
+                    var magicPercentage = countingMagic / 20 * 100;
+                    var betterMagicPercentage = magicPercentage.toFixed(0);
+                    chart1.setTitle({text: "Loading data for " + chosenDeviceName + " - %" + betterMagicPercentage});
+                    magicNumber = magicNumber - 1;
+                    DataUpdate();
+                }
+                for (let index = 0; index < sizer; index++) {
+                    chart1.series[index].addPoint(data[index]);
+                }
+            },
+            error: function (jqXHR, status) {
+                console.log("jqXHYR:" + jqXHR + "status:" + status)
             }
-            for (let index = 0; index < sizer; index++) {
-                chart1.series[index].addPoint(data[index]);
-            }
-        },
-        error: function (jqXHR, status) {
-            console.log("jqXHYR:" + jqXHR + "status:" + status)
-        }
-    });
-}
+        });
+    }
+    var change = {
+    0: 'Very Low',
+    5: 'Low',
+    10: 'Medium',
+    15: 'High',
+    20: 'Very High'
+};
 
     var checker = function(ba){
         if (ba > 0){
