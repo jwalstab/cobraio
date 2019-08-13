@@ -799,6 +799,48 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
 });
 
 
+//large first update
+app.get("/:deviceid/monitorgraphbigupdate/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  var getAmount = parseInt(req.params.number);
+  returnArray = [];
+  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(1000).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+      res.send("Null");
+      res.end();
+      return;
+    }
+    console.log(docs.length);
+    docs.forEach(record => {
+      var recordArray = [];
+      dataLabelsList.forEach(propname => {
+        if (typeof record[propname] === "boolean")
+        {
+          
+          if (record[propname] == true)
+          {
+            record[propname] = 20;
+          }
+          else
+          {
+              (record[propname] = -20);
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(record.time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, record[propname]);
+        recordArray.push(miniArray);
+      });
+      returnArray.push(recordArray);
+    });
+  console.log(returnArray.length);
+  res.send(returnArray);
+  res.end();
+  });
+});
+
 app.get("/:deviceid/:device2id/dualgraphstart/:number", function(req, res) {
   var x = Number(req.params.deviceid);
   var y = x + 1;
