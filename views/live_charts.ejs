@@ -46,10 +46,6 @@
                                 
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="body" id="phaserdiv">
-                        </div>
-                    </div>
             </div>
         </div>
     </div>
@@ -166,7 +162,13 @@
                         chart1.series[index].addPoint(element[index], false);
                     }
                 });
+/*                 for (let index = 0; index < data[0].length; index++) {
+                    chart1.series[index].setVisible(true);
+                } */
                 chart1.redraw();
+                if (pullAmount === 100){
+                    chart1.series[11].setVisible(true);
+                }
                 dataUpdateTimeout = setTimeout(DataUpdate, 5000);
                 pullAmount = 1;
             },
