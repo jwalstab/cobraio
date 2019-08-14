@@ -67,9 +67,8 @@
     var pullAmount;
     var deviceChanged;
     var sizer;
-    var magicNumber = 20;
     var countingMagic = 0;
-    var pullAmount = 3000;
+    var pullAmount = 100;
 
     var dataUpdateTimeout;
 
@@ -100,6 +99,7 @@
                     });
                     console.log(chosenDeviceBox);
                     deviceChanged = true;
+                    chart1.setTitle({text: "Connecting to device: " + chosenDeviceName});
                     DataUpdate();
                     });
             },
@@ -109,7 +109,7 @@
         });
     }    
     function GetFirstData(){
-            var lastDataURL = masterURL + "/" + chosenDevice + "/monitorgraphstart/" + magicNumber;
+            var lastDataURL = masterURL + "/" + chosenDevice + "/monitorgraphstart/" + 1;
             $.ajax({
             type: "GET",
             url: lastDataURL,
@@ -125,7 +125,6 @@
                 data.forEach(element => {
                     chart1.addSeries(element);
                 });
-                magicNumber = magicNumber - 1;
                 DataUpdate();
             },
             error: function (jqXHR, status) {
@@ -138,9 +137,7 @@
             {
                 chosenDevice = chosenDeviceBox;
                 clearTimeout(dataUpdateTimeout);
-                countingMagic = 0;
                 deviceChanged = false;
-                magicNumber = 20;
                 while (sizer > 0) {
                     chart1.series[0].remove();
                     sizer--;
@@ -158,32 +155,19 @@
             crossDomain: true,
             dataType: "json",
             success: function (data, status, jqXHR) {
-/*                 if (magicNumber === 1)
+                if (pullAmount === 1)
                 {
                     var dt = new Date();
                     var dtl = dt.toLocaleString();
                     chart1.setTitle({text: "Now monitoring " + chosenDeviceName + ". Last data recieved at :" + dtl});
-                    dataUpdateTimeout = setTimeout(DataUpdate, 5000);
-                    console.log("data update magic number complete!");
                 }
-                else{
-                    countingMagic++;
-                    var magicPercentage = countingMagic / 20 * 100;
-                    var betterMagicPercentage = magicPercentage.toFixed(0);
-                    chart1.setTitle({text: "Loading data for " + chosenDeviceName + " - %" + betterMagicPercentage});
-                    magicNumber = magicNumber - 1;
-                    DataUpdate();
-                } */
-                var countd = 0;
                 data.forEach(element => {
                     for (let index = 0; index < sizer; index++) {
                         chart1.series[index].addPoint(element[index], false);
                     }
-                    console.log(countd++);
                 });
-                console.log("LOOPED~");
                 chart1.redraw();
-                //dataUpdateTimeout = setTimeout(DataUpdate, 5000);
+                dataUpdateTimeout = setTimeout(DataUpdate, 5000);
                 pullAmount = 1;
             },
             error: function (jqXHR, status) {
@@ -191,13 +175,6 @@
             }
         });
     }
-    var change = {
-    0: 'Very Low',
-    5: 'Low',
-    10: 'Medium',
-    15: 'High',
-    20: 'Very High'
-};
 
     var checker = function(ba){
         if (ba > 0){
@@ -254,13 +231,13 @@
                 }
             },
             tooltip: {
-                    xDateFormat: '%d/%m/%Y',
+                    xDateFormat: '%d/%m/%Y %H:%M:%S',
                     shared: true,
                     split: false,
                     enabled: true,
                 },
             plotOptions: {
-                column : {
+                area : {
                         tooltip: {
                             pointFormatter: function() {
                                 var symbol = '●';

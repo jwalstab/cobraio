@@ -71,6 +71,8 @@
     var pullAmount;
     var deviceChanged;
     var sizer;
+    var magicNumber = 20;
+    var countingMagic = 0;
 
     var firstChoice = 0;
     var firstChoiceDevice2 = 0;
@@ -82,6 +84,8 @@
     var DEVICE2_pullAmount;
     var DEVICE2_deviceChanged;
     var DEVICE2_sizer;
+    var DEVICE2_magicNumber = 20;
+    var DEVICE2_countingMagic = 0;
 
     var dataUpdateTimeout;
 
@@ -159,7 +163,7 @@
     }    
     
     function GetFirstData(){
-            var lastDataURL = masterURL + "/" + chosenDevice + "/" + DEVICE2_chosenDevice + "/dualgraphstart/" + 1;
+            var lastDataURL = masterURL + "/" + chosenDevice + "/" + DEVICE2_chosenDevice + "/dualgraphstart/" + magicNumber;
             $.ajax({
             type: "GET",
             url: lastDataURL,
@@ -175,6 +179,8 @@
                 data.forEach(element => {
                     chart1.addSeries(element);
                 });
+                console.log(data);
+                magicNumber = magicNumber - 1;
                 DataUpdate();
             },
             error: function (jqXHR, status) {
@@ -189,14 +195,14 @@
         }
         if (deviceChanged || DEVICE2_deviceChanged == true)
         {
-            chart1.setTitle({text: "Now connecting to " + chosenDeviceName + " and " + DEVICE2_chosenDeviceName});
             console.log(DEVICE2_chosenDeviceBox);
             chosenDevice = chosenDeviceBox;
             DEVICE2_chosenDevice = DEVICE2_chosenDeviceBox;
             clearTimeout(dataUpdateTimeout);
+            countingMagic = 0;
             deviceChanged = false;
             DEVICE2_deviceChanged = false;
-            pullAmount = 100;
+            magicNumber = 20;
             while (sizer > 0) {
                 chart1.series[0].remove();
                 sizer--;
@@ -204,7 +210,8 @@
             GetFirstData();
             return;
         }
-        var lastDataURL = masterURL + "/" + chosenDevice + "/" + DEVICE2_chosenDevice + "/duallivechartupdate/" + pullAmount;
+            
+        var lastDataURL = masterURL + "/" + chosenDevice + "/" + DEVICE2_chosenDevice +"/dualgraphupdate/" + magicNumber;
         $.ajax({
         type: "GET",
         url: lastDataURL,
@@ -212,24 +219,26 @@
         crossDomain: true,
         dataType: "json",
         success: function (data, status, jqXHR) {
-
-        if (pullAmount == 1){
-            var dt = new Date();
-            var dtl = dt.toLocaleString();
-            chart1.setTitle({text: "Now monitoring " + chosenDeviceName + " and " + DEVICE2_chosenDeviceName + ". Last data recieved at :" + dtl});
-        }
-        
-        data.forEach(element => {
-            for (let index = 0; index < sizer; index++) {
-                console.log(element[index] + "          at pos"  +index)
-                chart1.series[index].addPoint(element[index], false);
+            console.log(data);
+            if (magicNumber === 1)
+            {
+                var dt = new Date();
+                var dtl = dt.toLocaleString();
+                chart1.setTitle({text: "Now monitoring " + chosenDeviceName + " and " + DEVICE2_chosenDeviceName + ". Last data recieved at :" + dtl});
+                dataUpdateTimeout = setTimeout(DataUpdate, 5000);
+                console.log("data update magic number complete!");
             }
-        });
-        console.log(chart1.series);
-        pullAmount = 1;
-        chart1.redraw();
-        dataUpdateTimeout = setTimeout(DataUpdate, 5000);
-        
+            else{
+                countingMagic++;
+                var magicPercentage = countingMagic / 20 * 100;
+                var betterMagicPercentage = magicPercentage.toFixed(0);
+                chart1.setTitle({text: "Loading data for " + chosenDeviceName + "and " + DEVICE2_chosenDeviceName +" - %" + betterMagicPercentage});
+                magicNumber = magicNumber - 1;
+                DataUpdate();
+            }
+            for (let index = 0; index < sizer; index++) {
+                chart1.series[index].addPoint(data[index]);
+            }
         },
         error: function (jqXHR, status) {
             console.log("jqXHYR:" + jqXHR + "status:" + status)
@@ -271,8 +280,7 @@
 /*                 align: 'center',
                 verticalAlign: 'bottom',
                 x: 0,
-                y: 40, */
-                maxHeight: 100,
+                y: 3, */
                 labelFormatter: function() {
                     //console.log(this.userOptions.type);
                     if (this.userOptions.type == "line"){ 
@@ -299,7 +307,7 @@
                     enabled: true,
                 },
             plotOptions: {
-                area : {
+                column : {
                         tooltip: {
                             pointFormatter: function() {
                                 var symbol = '●';
@@ -320,6 +328,7 @@
                 data: datat
             }]
         });
+
     chart1.series[0].remove();
 </script>
 

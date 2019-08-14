@@ -748,7 +748,7 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
         }
       else{
         var returnData = {
-          type: 'column',
+          type: 'area',
           name: propname,
           data: null,
           marker: {symbol : 'square', radius : 2 },
@@ -761,7 +761,7 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
   });
 });
 
-//retrieve last known data with a packet amount
+/* //retrieve last known data with a packet amount
 app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
   dataLabelsList = LGDataLabelsList;
   var getAmount = parseInt(req.params.number);
@@ -796,22 +796,20 @@ app.get("/:deviceid/monitorgraphupdate/:number", function(req, res) {
   res.send(returnArray);
   res.end();
   });
-});
+}); */
 
-
-//large first update
+//new graph update style for one device, allows more packets
 app.get("/:deviceid/monitorgraphbigupdate/:number", function(req, res) {
   dataLabelsList = LGDataLabelsList;
   var getAmount = parseInt(req.params.number);
   returnArray = [];
-  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(1000).toArray(function(err, docs){
+  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
       res.end();
       return;
     }
-    console.log(docs.length);
     docs.forEach(record => {
       var recordArray = [];
       dataLabelsList.forEach(propname => {
@@ -820,11 +818,11 @@ app.get("/:deviceid/monitorgraphbigupdate/:number", function(req, res) {
           
           if (record[propname] == true)
           {
-            record[propname] = 20;
+            record[propname] = 10;
           }
           else
           {
-              (record[propname] = -20);
+              (record[propname] = 0);
           }
         }
         var miniArray = [];
@@ -835,9 +833,166 @@ app.get("/:deviceid/monitorgraphbigupdate/:number", function(req, res) {
       });
       returnArray.push(recordArray);
     });
-  console.log(returnArray.length);
   res.send(returnArray);
   res.end();
+  });
+});
+
+//new graph update style for two devices, allows more packets
+/* app.get("/:deviceid/:device2id/duallivechartupdate/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  var getAmount = parseInt(req.params.number);
+  returnArray = [];
+  docs = [];
+  searchArray = [req.params.deviceid, req.params.device2id];
+  searchArray.forEach(search => {
+    iotdb.collection(search).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, rr){
+      docs.push(rr);
+      if (err){console.log(err);}
+      joinedDocs = docs[0].concat(docs[1]);
+     console.log ((docs.length + "    rr" + rr.length) + "    sa" + searchArray.length + "    * " + (rr.length * searchArray.length));
+     if (docs.length == searchArray.length){
+       console.log(bla[0]);
+      res.send(bla);
+      res.end(); 
+       console.log("REACHED!");
+      if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+        res.send("Null");
+        console.log("NO DATA");
+        res.end();
+        return;
+      }
+      var recordArray = [];
+      dataLabelsList.forEach(propname => {
+        if (typeof joinedDocs[0][propname] === "boolean")
+        {
+          if (joinedDocs[0][propname] == true)
+          {
+            joinedDocs[0][propname] = 20;
+          }
+          else
+          {
+              (joinedDocs[0][propname] = -20);
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(joinedDocs[0].time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, joinedDocs[0][propname]);
+        recordArray.push(miniArray);
+      });
+      dataLabelsList.forEach(propname => {
+
+        if (typeof joinedDocs[1][propname] === "boolean")
+        {
+          if (joinedDocs[1][propname] == true)
+          {
+            joinedDocs[1][propname] = 20;
+          }
+          else
+          {
+              (joinedDocs[1][propname] = -20);
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(docs[1].time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, docs[1][propname]);
+        recordArray.push(miniArray);
+      });
+      returnArray.push(recordArray);
+      console.log(returnArray.length + "     " + docs.length);
+      //if (returnArray.length == docs.length){
+        console.log("SENT!");
+        res.send(returnArray);
+        res.end();
+      //}
+     }
+    });
+  });
+}); */
+
+app.get("/:deviceid/:device2id/duallivechartupdate/:number", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  var getAmount = parseInt(req.params.number);
+  returnArray = [];
+  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+      res.send("Null");
+      res.end();
+      return;
+    }
+    docs.forEach(record => {
+      var recordArray = [];
+      dataLabelsList.forEach(propname => {
+        if (typeof record[propname] === "boolean")
+        {
+          if (record[propname] == true)
+          {
+            record[propname] = 10;
+          }
+          else
+          {
+              (record[propname] = 0);
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(record.time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, record[propname]);
+        recordArray.push(miniArray);
+      });
+      returnArray.push(recordArray);
+      //console.log(returnArray.length + "    1");
+    });
+    
+    iotdb.collection(req.params.device2id).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+      if (err){console.log(err);}
+      if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+        res.send("Null");
+        res.end();
+        return;
+      }
+      docs.forEach(record => {
+        var recordArray = [];
+        dataLabelsList.forEach(propname => {
+          if (typeof record[propname] === "boolean")
+          {
+            
+            if (record[propname] == true)
+            {
+              record[propname] = 10;
+            }
+            else
+            {
+                (record[propname] = 0);
+            }
+          }
+          var miniArray = [];
+          var timeS = new Date(record.time);
+          var timeSR = timeS.getTime();
+          miniArray.push(timeSR, record[propname]);
+          recordArray.push(miniArray);
+        });
+        returnArray.push(recordArray);
+        //console.log(returnArray.length);
+        //console.log(returnArray.length + "    2");
+      });
+      
+      var joinedDocs = [];
+      for (let index = 0; index < returnArray.length / 2; index++) {
+        var half = (returnArray.length / 2);
+        if (index != 0){half = half -1;}
+        joinedDocs.push(returnArray[index].concat(returnArray[index + half]));
+      }
+      //joinedDocs = docs[0].concat(docs[1]);
+      
+      //console.log(returnArray.length);
+      res.send(joinedDocs);
+      res.end();
+    });
+
   });
 });
 
@@ -875,7 +1030,7 @@ app.get("/:deviceid/:device2id/dualgraphstart/:number", function(req, res) {
         }
       else{
         var returnData = {
-          type: 'column',
+          type: 'area',
           name: propname,
           data: null,
           marker: {symbol : 'square', radius : 2 },
@@ -908,7 +1063,7 @@ app.get("/:deviceid/:device2id/dualgraphstart/:number", function(req, res) {
           }
         else{
           var returnData = {
-            type: 'column',
+            type: 'area',
             name: propname + " U2",
             data: null,
             marker: {symbol : 'square', radius : 2 },
@@ -923,7 +1078,7 @@ app.get("/:deviceid/:device2id/dualgraphstart/:number", function(req, res) {
 });
 
 //retrieve last known data with a packet amount
-app.get("/:deviceid/:device2id/dualgraphupdate/:number", function(req, res) {
+/* app.get("/:deviceid/:device2id/dualgraphupdate/:number", function(req, res) {
 
   var x = Number(req.params.deviceid);
   var y = x + 1;
@@ -991,14 +1146,10 @@ app.get("/:deviceid/:device2id/dualgraphupdate/:number", function(req, res) {
       res.end();
     });
   });
-});
-
+}); */
 
 app.post("/:deviceid/betweendates", function(req, res) {
   dataLabelsList = LGDataLabelsList;
-  if (req.params.deviceid == 10555){
-    dataLabelsList = testDataLabelsList;
-  }
   console.log("Between dates fired!");
   var objectArray = [];
   iotdb.collection(req.params.deviceid).find(req.body).toArray(function(err, docs){
@@ -1069,9 +1220,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
 
 var dataLabelsList = [];
 
-var testDataLabelsList = ["Random_Data_1", "Random_Data_2", "Random_Data_3"];
-
-var LGDataLabelsList = ["Comp_On","Hot_Fan","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
+var LGDataLabelsList = ["Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"]
 
@@ -1110,41 +1259,41 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     Comp_Overload: req.body.discreteInputs[15],
     Master_Slave: req.body.discreteInputs[16],
     Cold_P_Switch: req.body.discreteInputs[17],
-    Al_retain_Active: req.body.discreteInputs[18],
-    Al_Err_retain_write_Active: req.body.discreteInputs[19],
-    Alrm_Prob1_Active: req.body.discreteInputs[20],
-    Alrm_Prob2_Active: req.body.discreteInputs[21],
-    Alrm_Prob3_Active: req.body.discreteInputs[22],
-    Alrm_Prob4_Active: req.body.discreteInputs[23],
-    Alrm_Prob5_Active: req.body.discreteInputs[24],
-    Alrm_Prob6_Active: req.body.discreteInputs[25],
-    Alrm_Prob7_Active: req.body.discreteInputs[26],
-    Alrm_Prob8_Active: req.body.discreteInputs[27],
-    Alrm_Prob9_Active: req.body.discreteInputs[28],
-    Alrm_Prob10_Active: req.body.discreteInputs[29],
-    Hot1_Flow_Al_Active: req.body.discreteInputs[30],
-    Hot2_Flow_Al_Active: req.body.discreteInputs[31],
-    ColdFlow_Al_Active: req.body.discreteInputs[32],
-    HP_Al_Active: req.body.discreteInputs[33],
-    LP_Al_Active: req.body.discreteInputs[34],
-    Comp_Oload_Al_Active: req.body.discreteInputs[35],
-    High_DiscT_Al_Active: req.body.discreteInputs[36],
-    Fan_Over_Al_Active: req.body.discreteInputs[37],
-    Low_SuctT_Al_Active: req.body.discreteInputs[38],
-    Board2_Offline: req.body.discreteInputs[39],
-    Comp_On: req.body.discreteInputs[40],
-    Flush_Valve_Flush_Valve_On: req.body.discreteInputs[41],
-    Flush_Valve_Cold_SuplyW_Vlv: req.body.discreteInputs[42],
-    Alrm_Prob11_Active: req.body.discreteInputs[43],
-    Alrm_Prob12_Active: req.body.discreteInputs[44],
-    Alrm_Master_Unit_Active: req.body.discreteInputs[45],
-    Alrm_Slave_Unit_Active: req.body.discreteInputs[46],
-    Alrm_Low_EvapInT_Active: req.body.discreteInputs[47],
-    Alrm_Low_HT1_Active: req.body.discreteInputs[48],
-    Alrm_High_CT1_Active: req.body.discreteInputs[49],
-    Al_Warm_Supply_Low_Active: req.body.discreteInputs[50],
-    Al_Warm_Supply_High_Active: req.body.discreteInputs[51],
-    AlarmMng_Read_Ain1_Al: req.body.discreteInputs[52],
+    Al_retain_Active: req.body.discreteInputs[20],
+    Al_Err_retain_write_Active: req.body.discreteInputs[21],
+    Alrm_Prob1_Active: req.body.discreteInputs[22],
+    Alrm_Prob2_Active: req.body.discreteInputs[23],
+    Alrm_Prob3_Active: req.body.discreteInputs[24],
+    Alrm_Prob4_Active: req.body.discreteInputs[25],
+    Alrm_Prob5_Active: req.body.discreteInputs[26],
+    Alrm_Prob6_Active: req.body.discreteInputs[27],
+    Alrm_Prob7_Active: req.body.discreteInputs[28],
+    Alrm_Prob8_Active: req.body.discreteInputs[29],
+    Alrm_Prob9_Active: req.body.discreteInputs[30],
+    Alrm_Prob10_Active: req.body.discreteInputs[31],
+    Hot1_Flow_Al_Active: req.body.discreteInputs[32],
+    Hot2_Flow_Al_Active: req.body.discreteInputs[33],
+    ColdFlow_Al_Active: req.body.discreteInputs[34],
+    HP_Al_Active: req.body.discreteInputs[35],
+    LP_Al_Active: req.body.discreteInputs[36],
+    Comp_Oload_Al_Active: req.body.discreteInputs[37],
+    High_DiscT_Al_Active: req.body.discreteInputs[38],
+    Fan_Over_Al_Active: req.body.discreteInputs[39],
+    Low_SuctT_Al_Active: req.body.discreteInputs[40],
+    Board2_Offline: req.body.discreteInputs[41],
+    Comp_On: req.body.discreteInputs[42],
+    Flush_Valve_Flush_Valve_On: req.body.discreteInputs[43],
+    Flush_Valve_Cold_SuplyW_Vlv: req.body.discreteInputs[44],
+    Alrm_Prob11_Active: req.body.discreteInputs[45],
+    Alrm_Prob12_Active: req.body.discreteInputs[46],
+    Alrm_Master_Unit_Active: req.body.discreteInputs[47],
+    Alrm_Slave_Unit_Active: req.body.discreteInputs[48],
+    Alrm_Low_EvapInT_Active: req.body.discreteInputs[49],
+    Alrm_Low_HT1_Active: req.body.discreteInputs[50],
+    Alrm_High_CT1_Active: req.body.discreteInputs[51],
+    Al_Warm_Supply_Low_Active: req.body.discreteInputs[52],
+    Al_Warm_Supply_High_Active: req.body.discreteInputs[53],
+    AlarmMng_Read_Ain1_Al: req.body.discreteInputs[54],
     AlarmMng_Read_Ain2_Al: req.body.discreteInputs[53],
     AlarmMng_Read_Ain3_Al: req.body.discreteInputs[54],
     Read_Ain4_Al: req.body.discreteInputs[55],
