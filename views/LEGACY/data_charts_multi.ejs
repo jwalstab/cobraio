@@ -23,51 +23,39 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-12 col-md-12">
-                <div class="card">
-                    <div class="header" id="rheader">
-                        <h2><strong>Historic Chart</strong></h2>
-                    </div>
-                    <div class="body">
-                        <div id="chart2">
-                            <div id="container" style="width:100%; height:600px;"></div>
-                    </div>
-                    </div>
-                </div>
-        </div>
         <div class="row clearfix">
-            <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="col-lg-3 col-md-12 col-sm-12">
                 <div class="card">
                     <div class="body">
-                        <div class="row clearfix">
-                            <div class="col-lg-3 col-md-3 col-sm-6">
-                                <b>From</b>
-                                <input type="text" class="form-control datetime" id="dateFrom">
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6">
-                                <b>To</b>
-                                <input type="text" class="form-control datetime" id="dateTo">
-                            </div>
-                            <br>
+                        <b>From</b>
+                        <input type="text" class="form-control datetime" id="dateFrom">
+                        <b>To</b>
+                        <input type="text" class="form-control datetime" id="dateTo">
+                        <br />
+                        <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                  Select Device
+                                  <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="dropper">
+                                </ul>
                         </div>
-                        <div class="row clearfix">
-                            <div class="col-md-12 content-center">
-                                <br>
-                                <div class="dropdown">
-                                        <button class="btn btn-primary btn-round dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                          Select Device
-                                          <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="dropper">
-                                        </ul>
-                                        
-                                </div>
-                                <button class="btn btn-success btn-simple btn-round" id="myButton" onclick="GetAPIData()">Load Data</button>
-                                <button class="btn btn-danger btn-simple btn-round" id="myButton" onclick="ClearChart()">Clear Chart</button>
-                            </div>
+                        <button class="btn btn-success" id="myButton" onclick="GetAPIData()">Load data table</button>
+                        <br />
+                        </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12">
+                    <div class="card">
+                        <div class="header" id="rheader">
+                            <h2><strong>Historic Chart</strong></h2>
+                        </div>
+                        <div class="body">
+                            <div id="chart2">
+                                <div id="container" style="width:100%; height:400px;"></div>
+                        </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>
@@ -81,7 +69,9 @@
     var chosenDevice;
     var chosenDeviceName;
     var deviceList = [];
-    var grabCount = 1;
+
+    var GlobalData = [];
+    var DataKeysToDisplay = [];
 
     //////////////////////////////////////////////////////////////////////drop down box area
     function LoadDropDownBox(){
@@ -106,9 +96,9 @@
                     var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
                     
 
-/*                     while(chart1.series.length > 0){
+                    while(chart1.series.length > 0){
                     chart1.series[0].remove();
-                    } */
+                    }
 
                     deviceList.forEach(element => {
                         if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
@@ -130,17 +120,24 @@
     //////////////////////////////////////////////////////////////////////////////////////////////load data to table from api area
     function GetAPIData() {
       
+        var packetsToDisplay = 10;
         var fromVal = new Date(document.getElementById("dateFrom").value);
+        console.log(fromVal);
         var fromValSeconds = fromVal.getTime();
         var toVal = new Date(document.getElementById("dateTo").value);
+        console.log(toVal);
         var toValSeconds = toVal.getTime();
-        var res3 = masterURL + "/" + chosenDevice + "/betweendates/" + fromValSeconds + "/" + toValSeconds + "/" + grabCount;
-        
+        var findString = "{time:{$gt:" + fromValSeconds +",$lt:"+ toValSeconds +"}}";
+        var res3 = masterURL + "/" + chosenDevice + "/betweendates";
         chart1.setTitle({text: "Now loading data for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: res3,
+            data: JSON.stringify(findString),
+            //processData: false,
+            contentType: "application/javascript",
             crossDomain: true,
+            //dataType: "json",
             success: function (data, status, jqXHR) {
               if (data == "No Data"){
                 chart1.setTitle({text: "No data found for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
@@ -150,22 +147,23 @@
                     chart1.addSeries(element);
                 });
                 
-              chart1.setTitle({text: "Chart data for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString() + " has loaded sucessfully"});
-              grabCount++;
-                }
+              chart1.setTitle({text: "Now viewing chart for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
+              }
               
             },
             error: function (jqXHR, status) {
               console.log("ERROR" + jqXHR + " status: " + status);
             }
         });
-    }
 
-    function ClearChart(){
-        grabCount = 1;
-        while(chart1.series.length > 0){
-                    chart1.series[0].remove();
-                    }
+/*         fetch(res3, {
+          method: 'post',
+          body: dates
+        }).then(function(response) {
+          
+        }).catch(function(err) {
+          // Error :(
+        }); */
     }
 
     var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]
@@ -189,7 +187,6 @@
                 }
             },
             legend: {
-                maxHeight: 100,
 /*                 align: 'right',
                 verticalAlign: 'top',
                 layout: 'vertical', */
@@ -198,7 +195,7 @@
                 y: 100 */
             },
             tooltip: {
-                    xDateFormat: '%d/%m/%Y %H:%M:%S',
+                    xDateFormat: '%d/%m/%Y',
                     shared: true,
                     split: false,
                     enabled: true,

@@ -34,29 +34,7 @@ var auth = function(req, res, next) {
     return res.render('sign_in', { layout: 'emptylayout' });
 };
 
-app.post('/logincheck', function (req, res) {
-  usersdb.collection('users').find({}).toArray(function(err, docs){
-    loggedIn = false;
-    docs.forEach(element => {
-      if (element.user === req.body.user){
-        if (element.pass === req.body.pass){
-          req.session.user = element.user;
-          req.session.name = element.name;
-          req.session.level = element.level;
-          req.session.tag = element.tag;
-          req.session.pool = element.pool;
-          loggedIn = true;
-        }
-      }
-    });
-    if (loggedIn == true){
-      res.send("OK");
-    }
-    else{
-      res.send("NO ACCESS!");
-    }
-  });
-});
+
 
 
 
@@ -131,6 +109,41 @@ app.use(function(req, res, next) {
 
 //users and devices api stuff/////////////////////////////////////////////////////
 
+
+app.post('/logincheck', function (req, res) {
+  usersdb.collection('users').find({}).toArray(function(err, docs){
+    loggedIn = false;
+    docs.forEach(element => {
+      if (element.user === req.body.user){
+        if (element.pass === req.body.pass){
+          req.session.user = element.user;
+          req.session.name = element.name;
+          req.session.level = element.level;
+          req.session.tag = element.tag;
+          req.session.pool = element.pool;
+          loggedIn = true;
+        }
+      }
+    });
+    if (loggedIn == true){
+      if (req.session.user != 'jay'){
+        time = new Date();
+        var chinaTime = new Date();
+        chinaTime.setHours(chinaTime.getHours() + 8);
+        loginObj = {
+          user: req.session.user,
+          time: time,
+          chinaTime: chinaTime
+        }
+        usersdb.collection('LoginLog').insertOne(loginObj).then (function() {});
+      }
+      res.send("OK");
+    }
+    else{
+      res.send("NO ACCESS!");
+    }
+  });
+});
 
 //registers a new device
 app.post("/:iotpool/register_device", function(req, res) {
@@ -276,7 +289,7 @@ app.get("/:deviceid/last/:amount", function(req, res) {
 });
 
 //retrieve data from a device between two dates LEGACY
-app.post("/:deviceid/betweendatesLEGACY", function(req, res) {
+/* app.post("/:deviceid/betweendatesLEGACY", function(req, res) {
   iotdb.collection(req.params.deviceid).find({}).toArray(function(err, docs){
     arrayResult = [];
     console.log(req.body);
@@ -294,7 +307,7 @@ app.post("/:deviceid/betweendatesLEGACY", function(req, res) {
     res.send(arrayResult);
     res.end();
   });
-});
+}); */
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -1152,7 +1165,12 @@ app.post("/:deviceid/betweendates", function(req, res) {
   dataLabelsList = LGDataLabelsList;
   console.log("Between dates fired!");
   var objectArray = [];
-  iotdb.collection(req.params.deviceid).find(req.body).toArray(function(err, docs){
+  console.log(req.body.query);
+  var query = {
+    time: req.body.query
+  };
+  iotdb.collection(req.params.deviceid).find(query).toArray(function(err, docs){
+    if (err){console.log(err);}
     if (docs[0] == null)
     {
       console.log("no data");
@@ -1160,6 +1178,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
       res.end();
       return;
     }
+    console.log(docs.length);
     keyNames = [];
     var getLabelsSmall = Object.keys(docs[0]);
     getLabelsSmall.forEach(element => { //gets labels for buttons
@@ -1183,7 +1202,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
           }
           else
           {
-              dataPiece[propname] = -20;
+              dataPiece[propname] = 0;
           }
         }
         var miniArray = [];
@@ -1203,7 +1222,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
         }
       else{
         var returnData = {
-          type: 'column',
+          type: 'area',
           name: propname,
           data: keyArray,
           marker: {symbol : 'square', radius : 2 },
@@ -1215,14 +1234,98 @@ app.post("/:deviceid/betweendates", function(req, res) {
     res.end();
     console.log("Finished!");
   });
-
 });
+
+
+app.get("/:deviceid/betweendates/:from/:to/:getCount", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  console.log("Between dates fired!");
+  var innerquery = {
+    $gt: parseInt(req.params.from),
+    $lt: parseInt(req.params.to)
+  };
+  var query = {
+    time: innerquery
+  };
+  //var testString = "{time:{$gt:" + req.params.from +",$lt:"+ req.params.to +"}}";
+  var objectArray = [];
+  iotdb.collection(req.params.deviceid).find(query).toArray(function(err, docs){
+    console.log(docs.length);
+    if (err){console.log(err);}
+    if (docs[0] == null)
+    {
+      console.log("no data");
+      res.send("No Data");
+      res.end();
+      return;
+    }
+    console.log(docs.length);
+    keyNames = [];
+    var getLabelsSmall = Object.keys(docs[0]);
+    getLabelsSmall.forEach(element => { //gets labels for buttons
+        if (element == "time" || element == "_id"){//makes sure not to add buttons for time or datapacket ID
+        }
+        else
+        {
+        keyNames.push(element);
+        }
+    });
+    dataLabelsList.forEach(propname => {
+      var keyArray = [];
+      var isABool = false;
+      docs.forEach(dataPiece => {
+        if (typeof dataPiece[propname] === "boolean")
+        {
+          isABool = true;
+          if (dataPiece[propname] == true)
+          {
+            dataPiece[propname] = 10;
+          }
+          else
+          {
+              dataPiece[propname] = 0;
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(dataPiece.time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, dataPiece[propname]);
+        keyArray.push(miniArray);
+      });
+      if (isABool == false){
+        var returnData = {
+          type: 'line',
+          name: propname + " L" + req.params.getCount,
+          data: keyArray,
+          marker: {symbol : 'square', radius : 2 },
+          visible: false};
+          objectArray.push(returnData);
+        }
+      else{
+        var returnData = {
+          type: 'area',
+          name: propname + " L" + req.params.getCount,
+          data: keyArray,
+          marker: {symbol : 'square', radius : 2 },
+          visible: false};
+          objectArray.push(returnData);
+        }
+    });
+    res.send(objectArray);
+    res.end();
+    console.log("Finished!");
+  });
+});
+
+
 
 var dataLabelsList = [];
 
 var LGDataLabelsList = ["Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
-                        "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"]
+                        "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"];
+
+
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     
@@ -1241,70 +1344,70 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
     Master_Ctrl_Mng_Rot_HP: req.body.coils[60],
 
     //DISCRETE INPUT
-    Cold_EleHeater: req.body.discreteInputs[0],
-    Hot_P1: req.body.discreteInputs[1],
-    Hot_Solend1: req.body.discreteInputs[2],
-    Hot_EleHeater: req.body.discreteInputs[3],
-    Glob_Al: req.body.discreteInputs[4],
-    Hot_P2: req.body.discreteInputs[5],
-    Hot_Fan: req.body.discreteInputs[6],
-    Blance_Vlv: req.body.discreteInputs[7],
-    Injection_Vlv: req.body.discreteInputs[8],
-    Hot_Solend2: req.body.discreteInputs[9],
-    Cold_P1: req.body.discreteInputs[10],
-    HotW_FlowS1: req.body.discreteInputs[11],
-    ColdW_FlowS: req.body.discreteInputs[12],
-    High_P: req.body.discreteInputs[13],
-    Low_P: req.body.discreteInputs[14],
-    Comp_Overload: req.body.discreteInputs[15],
-    Master_Slave: req.body.discreteInputs[16],
-    Cold_P_Switch: req.body.discreteInputs[17],
-    Al_retain_Active: req.body.discreteInputs[20],
-    Al_Err_retain_write_Active: req.body.discreteInputs[21],
-    Alrm_Prob1_Active: req.body.discreteInputs[22],
-    Alrm_Prob2_Active: req.body.discreteInputs[23],
-    Alrm_Prob3_Active: req.body.discreteInputs[24],
-    Alrm_Prob4_Active: req.body.discreteInputs[25],
-    Alrm_Prob5_Active: req.body.discreteInputs[26],
-    Alrm_Prob6_Active: req.body.discreteInputs[27],
-    Alrm_Prob7_Active: req.body.discreteInputs[28],
-    Alrm_Prob8_Active: req.body.discreteInputs[29],
-    Alrm_Prob9_Active: req.body.discreteInputs[30],
-    Alrm_Prob10_Active: req.body.discreteInputs[31],
-    Hot1_Flow_Al_Active: req.body.discreteInputs[32],
-    Hot2_Flow_Al_Active: req.body.discreteInputs[33],
-    ColdFlow_Al_Active: req.body.discreteInputs[34],
-    HP_Al_Active: req.body.discreteInputs[35],
-    LP_Al_Active: req.body.discreteInputs[36],
-    Comp_Oload_Al_Active: req.body.discreteInputs[37],
-    High_DiscT_Al_Active: req.body.discreteInputs[38],
-    Fan_Over_Al_Active: req.body.discreteInputs[39],
-    Low_SuctT_Al_Active: req.body.discreteInputs[40],
-    Board2_Offline: req.body.discreteInputs[41],
-    Comp_On: req.body.discreteInputs[42],
-    Flush_Valve_Flush_Valve_On: req.body.discreteInputs[43],
-    Flush_Valve_Cold_SuplyW_Vlv: req.body.discreteInputs[44],
-    Alrm_Prob11_Active: req.body.discreteInputs[45],
-    Alrm_Prob12_Active: req.body.discreteInputs[46],
-    Alrm_Master_Unit_Active: req.body.discreteInputs[47],
-    Alrm_Slave_Unit_Active: req.body.discreteInputs[48],
-    Alrm_Low_EvapInT_Active: req.body.discreteInputs[49],
-    Alrm_Low_HT1_Active: req.body.discreteInputs[50],
-    Alrm_High_CT1_Active: req.body.discreteInputs[51],
-    Al_Warm_Supply_Low_Active: req.body.discreteInputs[52],
-    Al_Warm_Supply_High_Active: req.body.discreteInputs[53],
-    AlarmMng_Read_Ain1_Al: req.body.discreteInputs[54],
-    AlarmMng_Read_Ain2_Al: req.body.discreteInputs[53],
-    AlarmMng_Read_Ain3_Al: req.body.discreteInputs[54],
-    Read_Ain4_Al: req.body.discreteInputs[55],
-    Read_Ain5_Al: req.body.discreteInputs[56],
-    Read_Ain6_Al: req.body.discreteInputs[57],
-    AlarmMng_Read_Ain11_Al: req.body.discreteInputs[58],
-    AlarmMng_Read_Ain8_Al: req.body.discreteInputs[59],
-    AlarmMng_Read_Ain9_Al: req.body.discreteInputs[60],
-    Cold_P2: req.body.discreteInputs[61],
-    LowP_SenserRead_Active: req.body.discreteInputs[62],
-    HighP_SenserRead_Active: req.body.discreteInputs[63],
+    Cold_EleHeater: req.body.discreteInputs[1],
+    Hot_P1: req.body.discreteInputs[2],
+    Hot_Solend1: req.body.discreteInputs[3],
+    Hot_EleHeater: req.body.discreteInputs[4],
+    Glob_Al: req.body.discreteInputs[5],
+    Hot_P2: req.body.discreteInputs[6],
+    Hot_Fan: req.body.discreteInputs[7],
+    Blance_Vlv: req.body.discreteInputs[8],
+    Injection_Vlv: req.body.discreteInputs[9],
+    Hot_Solend2: req.body.discreteInputs[10],
+    Cold_P1: req.body.discreteInputs[11],
+    HotW_FlowS1: req.body.discreteInputs[12],
+    ColdW_FlowS: req.body.discreteInputs[13],
+    High_P: req.body.discreteInputs[14],
+    Low_P: req.body.discreteInputs[15],
+    Comp_Overload: req.body.discreteInputs[16],
+    Master_Slave: req.body.discreteInputs[17],
+    Cold_P_Switch: req.body.discreteInputs[18],
+    Al_retain_Active: req.body.discreteInputs[21],
+    Al_Err_retain_write_Active: req.body.discreteInputs[22],
+    Alrm_Prob1_Active: req.body.discreteInputs[23],
+    Alrm_Prob2_Active: req.body.discreteInputs[24],
+    Alrm_Prob3_Active: req.body.discreteInputs[25],
+    Alrm_Prob4_Active: req.body.discreteInputs[26],
+    Alrm_Prob5_Active: req.body.discreteInputs[27],
+    Alrm_Prob6_Active: req.body.discreteInputs[28],
+    Alrm_Prob7_Active: req.body.discreteInputs[29],
+    Alrm_Prob8_Active: req.body.discreteInputs[30],
+    Alrm_Prob9_Active: req.body.discreteInputs[31],
+    Alrm_Prob10_Active: req.body.discreteInputs[32],
+    Hot1_Flow_Al_Active: req.body.discreteInputs[33],
+    Hot2_Flow_Al_Active: req.body.discreteInputs[34],
+    ColdFlow_Al_Active: req.body.discreteInputs[35],
+    HP_Al_Active: req.body.discreteInputs[36],
+    LP_Al_Active: req.body.discreteInputs[37],
+    Comp_Oload_Al_Active: req.body.discreteInputs[38],
+    High_DiscT_Al_Active: req.body.discreteInputs[39],
+    Fan_Over_Al_Active: req.body.discreteInputs[40],
+    Low_SuctT_Al_Active: req.body.discreteInputs[41],
+    Board2_Offline: req.body.discreteInputs[42],
+    Comp_On: req.body.discreteInputs[43],
+    Flush_Valve_Flush_Valve_On: req.body.discreteInputs[44],
+    Flush_Valve_Cold_SuplyW_Vlv: req.body.discreteInputs[45],
+    Alrm_Prob11_Active: req.body.discreteInputs[46],
+    Alrm_Prob12_Active: req.body.discreteInputs[47],
+    Alrm_Master_Unit_Active: req.body.discreteInputs[48],
+    Alrm_Slave_Unit_Active: req.body.discreteInputs[49],
+    Alrm_Low_EvapInT_Active: req.body.discreteInputs[50],
+    Alrm_Low_HT1_Active: req.body.discreteInputs[51],
+    Alrm_High_CT1_Active: req.body.discreteInputs[52],
+    Al_Warm_Supply_Low_Active: req.body.discreteInputs[53],
+    Al_Warm_Supply_High_Active: req.body.discreteInputs[54],
+    AlarmMng_Read_Ain1_Al: req.body.discreteInputs[55],
+    AlarmMng_Read_Ain2_Al: req.body.discreteInputs[56],
+    AlarmMng_Read_Ain3_Al: req.body.discreteInputs[57],
+    Read_Ain4_Al: req.body.discreteInputs[58],
+    Read_Ain5_Al: req.body.discreteInputs[59],
+    Read_Ain6_Al: req.body.discreteInputs[60],
+    AlarmMng_Read_Ain11_Al: req.body.discreteInputs[61],
+    AlarmMng_Read_Ain8_Al: req.body.discreteInputs[62],
+    AlarmMng_Read_Ain9_Al: req.body.discreteInputs[63],
+    Cold_P2: req.body.discreteInputs[64],
+    LowP_SenserRead_Active: req.body.discreteInputs[65],
+    HighP_SenserRead_Active: req.body.discreteInputs[66],
 
     //HOLDING REGISTERS
     Master_Ctrl_Mng_Fan_Setp: uInt16ToFloat32([req.body.holdingRegisters[1],req.body.holdingRegisters[2]]),
@@ -1497,3 +1600,5 @@ function ReverseduInt16ToFloat32(uint16array) {
   realNumber = Math.round(floatView[0] * 10) / 10
   return realNumber;
 }
+
+LGDataLabelsList.sort();
