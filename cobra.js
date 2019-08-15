@@ -1338,9 +1338,10 @@ app.get("/:deviceid/tablegrab/:from/:to/:getCount", function(req, res) {
     }
     var keysToDelete = [];
     var keys = Object.keys(docs[0]);
+    keys.push("time");
     keys.forEach(key => {
       var keyWanted = false;
-      tableList.forEach(wantedKey => {
+      LGDataLabelsList.forEach(wantedKey => {
         if (key == wantedKey){
           keyWanted = true;
         }
