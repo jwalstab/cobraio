@@ -1239,6 +1239,7 @@ app.post("/:deviceid/betweendates", function(req, res) {
 
 app.get("/:deviceid/betweendates/:from/:to/:getCount", function(req, res) {
   dataLabelsList = LGDataLabelsList;
+  
   console.log("Between dates fired!");
   var innerquery = {
     $gt: parseInt(req.params.from),
@@ -1317,6 +1318,66 @@ app.get("/:deviceid/betweendates/:from/:to/:getCount", function(req, res) {
   });
 });
 
+app.get("/:deviceid/tablegrab/:from/:to/:getCount", function(req, res) {
+  tableList.push("time");
+  var innerquery = {
+    $gt: parseInt(req.params.from),
+    $lt: parseInt(req.params.to)
+  };
+  var query = {
+    time: innerquery
+  };
+  
+  iotdb.collection(req.params.deviceid).find(query).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == null)
+    {
+      console.log("no data");
+      res.send("No Data");
+      res.end();
+      return;
+    }
+    var keysToDelete = [];
+    var keys = Object.keys(docs[0]);
+    keys.forEach(key => {
+      var keyWanted = false;
+      tableList.forEach(wantedKey => {
+        if (key == wantedKey){
+          keyWanted = true;
+        }
+      });
+      if (keyWanted == false)
+      {
+        keysToDelete.push(key);
+      }
+    });
+    //delete useless keys
+    docs.forEach(doc => {
+      keysToDelete.forEach(keyToDelete => {
+        delete doc[keyToDelete];
+      });
+    });
+
+    //fix way time is displayed
+    docs.forEach(doc => {
+      doc.time = new Date(doc.time).toLocaleDateString() + "  " + new Date(doc.time).toLocaleTimeString();
+    });
+/* 
+    var mainTableArray = [];
+    docs.forEach(doc =>{
+      mainTableArray.push(doc);
+    });
+
+    var averageData;
+    LGDataLabelsList.forEach(label => {
+      docs[label] = averageData[label] / data.length;
+    }) */
+
+    res.send(docs);
+    res.end();
+  });
+});
+
 
 
 var dataLabelsList = [];
@@ -1325,6 +1386,11 @@ var LGDataLabelsList = ["Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Su
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"];
 
+var tableList = LGDataLabelsList;
+
+
+
+                        
 
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
@@ -1600,5 +1666,6 @@ function ReverseduInt16ToFloat32(uint16array) {
   realNumber = Math.round(floatView[0] * 10) / 10
   return realNumber;
 }
+
 
 LGDataLabelsList.sort();

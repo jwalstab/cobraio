@@ -1,6 +1,5 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script type="text/javascript" src="http://oss.sheetjs.com/js-xlsx/xlsx.full.min.js"></script>
 
 <section class="content">
     <div class="container">
@@ -37,8 +36,7 @@
                                 <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="dropper">
                                 </ul>
                         </div>
-                        <button class="btn btn-primary btn-simple btn-round" id="myButton" onclick="GetAPIData()">Load Data Table</button>
-                        <button class="btn btn-primary btn-simple btn-round" id="download-xlsx" onclick="GetAPIData()">Export To Spreadsheet</button>
+                        <button class="btn btn-success" id="myButton" onclick="GetAPIData()">Load data table</button>
                         <br />
                         </div>
                 </div>
@@ -47,17 +45,16 @@
                 <div class="card">
                     <div class="header">
                         <h2><strong>Main Table</strong></h2>
-                        <p id="responsebody"></p>
                     </div>
                     <div class="body">
                         <div id="maintable"></div>
                     </div>
-<!--                     <div class="header">
+                    <div class="header">
                             <h2><strong>Table Averages</strong></h2>
-                    </div> -->
-<!--                     <div class="body">
+                    </div>
+                    <div class="body">
                     <div id="averagetable"></div>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -71,7 +68,6 @@
     LoadDropDownBox();
     LoadDatePickers();
     var chosenDevice;
-    var chosenDeviceName;
     var deviceList = [];
     
     //////////////////////////////////////////////////////////////////////drop down box area
@@ -99,7 +95,6 @@
                         if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
                         {
                             chosenDevice = element.deviceID;
-                            chosenDeviceName = element.devicename;
                         }
                     });
                     console.log(chosenDevice);
@@ -114,24 +109,16 @@
     ///////////////////////////////////////////////////////////////////////////////////////////////////table area
     function crazytable(data){
         //main table creation, link to ext script
-    table = new Tabulator("#maintable", {
-        height:"400px",
-        autoColumns:true
-/*         pagination:"local",
+    var table = new Tabulator("#maintable", {
+        pagination:"local",
         paginationSize:10,
         paginationSizeSelector:[10, 25, 50, 100, 250, 500, 1000],
-        autoColumns:true */
+        autoColumns:true
     });
-
     
     //average table calculation
     table.setData(data);
-    var myNode2 = document.getElementById("responsebody");
-    while (myNode2.firstChild) {myNode2.removeChild(myNode2.firstChild);}
-    var rbody = $('<p>Now viewing table for device: ' + chosenDeviceName +'.</p>');
-    $('#responsebody').append(rbody);
-}
-    /* var labels = (Object.keys(data[0]));
+    var labels = (Object.keys(data[0]));
     averageData = JSON.parse(JSON.stringify(data[0])); // clone object here
     var counter = 0;
     for (var i = 0; i < data.length; i++) //cycles through all rows pulled from db
@@ -159,43 +146,63 @@
     averageDataArray = [];
     averageDataArray.push(averageData); //table needs an array or some bs to work
     averagetable.setData(averageDataArray);
-    } */
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////load data to table from api area
     function GetAPIData() {
-      
-      var fromVal = new Date(document.getElementById("dateFrom").value);
-      var fromValSeconds = fromVal.getTime();
-      var toVal = new Date(document.getElementById("dateTo").value);
-      var toValSeconds = toVal.getTime();
-      var res3 = masterURL + "/" + chosenDevice + "/tablegrab/" + fromValSeconds + "/" + toValSeconds + "/" + 1;
-      var myNode2 = document.getElementById("responsebody");
-         while (myNode2.firstChild) {myNode2.removeChild(myNode2.firstChild);}
-        var rbody = $('<p>Loading table for: ' + chosenDeviceName + '.</p>');
-            $('#responsebody').append(rbody);
-      $.ajax({
-          type: "GET",
-          url: res3,
-          crossDomain: true,
-          success: function (data, status, jqXHR) {
-            if (data == "No Data"){
-                console.log("NO DATA!");
-                var myNode2 = document.getElementById("responsebody");
-                while (myNode2.firstChild) {myNode2.removeChild(myNode2.firstChild);}
-                var rbody = $('<p>No data for : ' + chosenDeviceName +' between these times.</p>');
-                $('#responsebody').append(rbody);
+        var packetsToDisplay = 10;
+        var fromVal = new Date(document.getElementById("dateFrom").value);
+        var toVal = new Date(document.getElementById("dateTo").value);
+        console.log(fromVal);
+        var fromValSeconds = fromVal.getTime();
+        var toVal = new Date(document.getElementById("dateTo").value);
+        console.log(toVal);
+        var toValSeconds = toVal.getTime();
+        var findString = "{time:{$gt:" + fromValSeconds +",$lt:"+ toValSeconds +"}}";
+        var res3 = masterURL + "/" + chosenDevice + "/betweendates";
+        $.ajax({
+            type: "POST",
+            url: res3,
+            data: JSON.stringify(findString),
+            contentType: "application/javascript",
+            crossDomain: true,
+            //dataType: "json",
+            success: function (data, status, jqXHR) {
+                GlobalData = [];
+                data.forEach(element => {
+                    GlobalData.push(element);
+                });
+                var expressedData = data[0];
+                var maxPackets = packetsToDisplay;
+                for (var ed = 0; ed < 10; ed++) {
+                    const dataCheck = data[ed];
+                    if (dataCheck == null) {
+                        maxPackets = ed - 1;
+                        console.log(maxPackets + "data check phase");
+                    }
+                }
+                var maxPacketsFinal;
+                if (maxPackets < packetsToDisplay) {
+                    maxPacketsFinal = maxPackets;
+                }
+                else {
+                    maxPacketsFinal = packetsToDisplay;
+                }
+                ///(((((((((((((((((((((((((((((((())))))))))))))))))))))))))))))))
+                if (expressedData != null)
+                {
+                    //TableAPP(data);
+                    crazytable(data);
+                }
+                else {
+                    console.log("EXPRESSED DATA NULL!")
+                }
+            },
+            error: function (jqXHR, status) {
+                console.log("ERROR");
             }
-            else{
-                //console.log(data);
-                crazytable(data);
-            }
-            
-          },
-          error: function (jqXHR, status) {
-            console.log("ERROR" + jqXHR + " status: " + status);
-          }
-      });
-  }
+        });
+    }
     
     //////////////////////////////////////////////////////////////////////////////////////////////load date pickers
     function LoadDatePickers(){
@@ -211,11 +218,5 @@
     dateFormat: "Y-m-d H:i",
 });
     }
-
-var table;
-
-$("#download-xlsx").click(function(){
-    table.download("xlsx", "" + chosenDeviceName +".xlsx", {sheetName:"" + chosenDeviceName + " Data"});
-});
 
 </script>
