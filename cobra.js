@@ -1338,10 +1338,9 @@ app.get("/:deviceid/tablegrab/:from/:to/:getCount", function(req, res) {
     }
     var keysToDelete = [];
     var keys = Object.keys(docs[0]);
-    keys.push("time");
     keys.forEach(key => {
       var keyWanted = false;
-      LGDataLabelsList.forEach(wantedKey => {
+      tableList.forEach(wantedKey => {
         if (key == wantedKey){
           keyWanted = true;
         }
@@ -1386,7 +1385,7 @@ var LGDataLabelsList = ["Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Su
 "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
 "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"];
 
-var tableList = ["Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
+var tableList = ["time","Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"];                        
 
