@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Phaser 3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="phaser-example"></div>
+</body>
+</html>
+
+<script src="js/phaser.min.js"></script>
+<script>
+    var chosenDeviceName;
+    var chosenDevice;
+    var diagramStatusText = "Please select an IoT device to begin monitoring"
+var diagramTimeText;
+var Cold_Tank_Temp1 = 0;
+var Cold_Tank_Temp2 = 0;
+var Cold_Tank_Temp3 = 0;
+var Hot_Tank_temp1 = 0;
+var Hot_Tank_temp2 = 0;
+var Hot_Tank_temp3 = 0;
+var Cold_Return_Temp = 0;
+var Cold_Supply_Temp = 0;
+var Suct_Temp = 0;
+var Disc_temp = 0;
+var Evap_Inlet_Temp = 0;
+var Hot_Return_Temp = 0;
+var Hot_Supply_Temp = 0;
+var Flow_Switch_ColdFS_Char = 0;
+var Flow_Switch_ColdFS2_Char = 0;
+var Flow_Switch_HotFS1_Char = 0;
+var Flow_Switch_HotFS2_Char = 0;
+var fanOn;
+var Hot_Fan = false;
+
+var lastTime;
+
+        var recieving;
+        var coldTankText;
+        var titleText;
+        var coldReturnTempText;
+        var coldSupplyTempText;
+        var Suct_Temp_Text;
+        var Disc_temp_Text;
+        var Evap_Inlet_Temp_Text;
+        var Hot_Return_Temp_Text;
+        var Hot_Supply_Temp_Text;
+
+        var Flow_Switch_ColdFS_Char_Text;
+        var Flow_Switch_ColdFS2_Char_Text;
+        var Flow_Switch_HotFS1_Char_Text;
+        var Flow_Switch_HotFS2_Char_Text;
+
+        var Hot_Fan_Text;
+
+
+        var arrowsCounter;
+        var arrowsVisible;
+
+        var num = 1;
+        
+        var fanImageOn;
+        var fanImageOff;
+
+    var MonitoringDiagramScreen = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function MonitoringDiagramScreen ()
+        {
+            Phaser.Scene.call(this, { key: 'MonitoringDiagramScreen' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('background', 'phaser/MainCanvas.png');
+            this.load.image('fansmallon', 'phaser/fansmallon.png');
+            this.load.image('lcdfan', 'phaser/lcdfan.png');
+            this.load.image('fansmalloff', 'phaser/fansmalloff.png');
+            this.load.image('greenstatus', 'phaser/greenstatus.png')
+            this.load.image('arrows', 'phaser/arrows.png')
+            this.load.image('greenvalve', 'phaser/greenvalve.png')
+
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+                LoadMenuButtons(this);
+                this.add.image(600, 300, 'background');
+                arrows = this.add.image(600, 300, 'arrows');
+                arrows.setVisible(false);
+                /* fanImageOn = this.add.image(970, 300, 'fansmallon');
+                fanImageOff = this.add.image(970, 300, 'fansmalloff'); */
+                lcdFan = this.add.image(970, 330, 'lcdfan'); 
+                greenStatusLight = this.add.image(1155, 45, 'greenstatus');
+
+                this.add.image(537, 365, 'greenvalve'); 
+                this.add.image(610, 410, 'greenvalve'); 
+                this.add.image(690, 375, 'greenvalve'); 
+
+/*                 fanImageOn.setVisible(false);
+                fanImageOff.setVisible(true); */
+                greenStatusLight.setVisible(false);
+
+                this.add.text(400, 30, "Connection Status: ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                this.add.text(400, 60, "Monitoring IoT Device: ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                this.add.text(400, 90, "Last Data Recieved at: ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                
+                titleText = [
+                this.add.text(600, 30, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }),
+                this.add.text(600, 60, ' ', { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }),
+                this.add.text(600, 90, ' ', { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' })
+                ];
+
+                
+                titleText[0].setInteractive();
+                titleText[0].on('pointerdown', () => { 
+                    this.scene.start("SystemControl");
+                    console.log("pressed!");
+                });
+
+                coldTankText = [
+                    this.add.text(55, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }),
+                    this.add.text(55, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }),
+                    this.add.text(55, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }) 
+                ];
+
+                hotTankText = [
+                    this.add.text(1075, 340, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }),
+                    this.add.text(1075, 300, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }),
+                    this.add.text(1075, 260, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' }) 
+                ];
+                
+
+                this.add.text(175, 160, "Cold Return Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                coldReturnTempText = this.add.text(175, 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(110, 400, "Cold Supply Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                coldSupplyTempText = this.add.text(110, 415, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                
+                this.add.text(405, 160, "Suction Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Suct_Temp_Text = this.add.text(405 , 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(390, 405, "Evap Inlet Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Evap_Inlet_Temp_Text = this.add.text(390 , 420, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(660, 160, "Exhaust Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Disc_temp_Text = this.add.text(660 , 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(830, 410, "Hot Return Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Hot_Return_Temp_Text = this.add.text(830 , 425, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                this.add.text(930, 160, "Hot Supply Temp", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Hot_Supply_Temp_Text = this.add.text(930 , 175, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+
+                //pumps
+                Flow_Switch_ColdFS_Char_Text = this.add.text(237 , 377, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                Flow_Switch_ColdFS2_Char_Text = this.add.text(237 , 450, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                Flow_Switch_HotFS1_Char_Text = this.add.text(803 , 184, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+                Flow_Switch_HotFS2_Char_Text = this.add.text(803 , 257, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+
+                //fan
+                this.add.text(860, 325, "Hot Fan", { fontFamily: 'Arial', fontSize: 10, color: '#ffffff' });
+                Hot_Fan_Text = this.add.text(860 , 345, " ", { fontFamily: 'Arial', fontSize: 16, color: '#ffffff' });
+        },
+
+        update: function (time, delta)
+        {
+            //lcdFan.angle+=5;
+            if (Hot_Fan == true){
+                Hot_Fan_Text.setText("ON");
+                lcdFan.angle+=5;
+            }
+            else{
+                Hot_Fan_Text.setText("OFF");
+            }
+            if (recieving == true){
+                greenStatusLight.setVisible(true);
+            }
+            else{
+                greenStatusLight.setVisible(false);
+            }
+            if (arrowsCounter < 75){
+                arrowsCounter++;
+            }
+            else{
+                arrowsCounter = 0;
+                arrowsVisible = !arrowsVisible;
+            }
+
+            if (arrowsVisible == true){
+                arrows.setVisible(true);
+            }
+            else{
+                arrows.setVisible(false);
+            }
+
+
+            titleText[0].setText(diagramStatusText);
+            titleText[1].setText(chosenDeviceName);
+            titleText[2].setText(diagramTimeText);
+            coldTankText[0].setText("T1: " + Cold_Tank_Temp1 + "°C");
+            coldTankText[1].setText("T2: " + Cold_Tank_Temp2 + "°C");
+            coldTankText[2].setText("T3: " + Cold_Tank_Temp3 + "°C");
+            hotTankText[0].setText("T1: " + Hot_Tank_temp1 + "°C");
+            hotTankText[1].setText("T2: " + Hot_Tank_temp2 + "°C");
+            hotTankText[2].setText("T3: " + Hot_Tank_temp3 + "°C");
+            coldReturnTempText.setText(Cold_Return_Temp + "°C");
+            coldSupplyTempText.setText(Cold_Supply_Temp + "°C");
+            Suct_Temp_Text.setText(Suct_Temp + "°C");
+            Disc_temp_Text.setText(Disc_temp + "°C");
+            Evap_Inlet_Temp_Text.setText(Evap_Inlet_Temp + "°C");
+            Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");
+            Hot_Supply_Temp_Text.setText(Hot_Supply_Temp + "°C");
+            Flow_Switch_ColdFS_Char_Text.setText(Flow_Switch_ColdFS_Char + " L/H");
+            Flow_Switch_ColdFS2_Char_Text.setText(Flow_Switch_ColdFS2_Char + " L/H");
+            Flow_Switch_HotFS1_Char_Text.setText(Flow_Switch_HotFS1_Char + " L/H");
+            Flow_Switch_HotFS2_Char_Text.setText(Flow_Switch_HotFS2_Char + " L/H");
+        }
+
+        });
+
+    var SystemControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function SystemControl ()
+        {
+            Phaser.Scene.call(this, { key: 'SystemControl' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('scbackground', 'phaser/systemcontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'scbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+
+    var CompControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function CompControl ()
+        {
+            Phaser.Scene.call(this, { key: 'CompControl' });
+        },
+
+        preload: function ()
+        {
+            console.log("loading comp");
+            this.load.image('ccbackground', 'phaser/compcontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'ccbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+
+    var FlushControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function CompControl ()
+        {
+            Phaser.Scene.call(this, { key: 'FlushControl' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('fcbackground', 'phaser/flushcontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'fcbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+
+    var FanControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function FanControl ()
+        {
+            Phaser.Scene.call(this, { key: 'FanControl' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('fancbackground', 'phaser/fancontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'fancbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+
+    var ProbeControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function ProbeControl ()
+        {
+            Phaser.Scene.call(this, { key: 'ProbeControl' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('pcbackground', 'phaser/probecontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'pcbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+
+    var EEVControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function EEVControl ()
+        {
+            Phaser.Scene.call(this, { key: 'EEVControl' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('eevbackground', 'phaser/eevcontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'eevbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+
+    var PumpControl = new Phaser.Class({
+
+        Extends: Phaser.Scene,
+
+        initialize:
+
+        function PumpControl ()
+        {
+            Phaser.Scene.call(this, { key: 'PumpControl' });
+        },
+
+        preload: function ()
+        {
+            this.load.image('pumpbackground', 'phaser/pumpcontrol.png');
+            this.load.image('buttonmask', 'phaser/buttonmask.png')
+        },
+
+        create: function ()
+        {
+            this.add.image(600, 300, 'pumpbackground');
+            LoadMenuButtons(this);
+        },
+
+        update: function (){
+
+        }
+        });
+    
+    
+    var config = {
+            type: Phaser.AUTO,
+            scale: {
+                parent: 'phaserdiv',
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 1200,
+                height: 600
+            },
+
+/*             physics: {
+                default: 'arcade',
+            }, */
+            scene: [MonitoringDiagramScreen,SystemControl,CompControl,FlushControl,FanControl,ProbeControl,EEVControl,PumpControl]
+        };
+    var game = new Phaser.Game(config);
+
+function LoadMenuButtons(sceneobj)
+{
+    var systemControlButton = sceneobj.add.image(1100,545, 'buttonmask');
+                systemControlButton.setInteractive();
+                systemControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("SystemControl");
+                    console.log("pressed!");
+                });
+                var diagramViewButton = sceneobj.add.image(90,545, 'buttonmask');
+                diagramViewButton.setInteractive();
+                diagramViewButton.on('pointerdown', () => { 
+                    game.scale.startFullscreen();
+                    sceneobj.scene.start("MonitoringDiagramScreen");
+                    console.log("pressed!");
+                });
+                var compControlButton = sceneobj.add.image(240,545, 'buttonmask');
+                compControlButton.setInteractive();
+                compControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("CompControl");
+                    console.log("pressed!");
+                });
+                var flushControlButton = sceneobj.add.image(380,545, 'buttonmask');
+                flushControlButton.setInteractive();
+                flushControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("FlushControl");
+                    console.log("pressed!");
+                });
+                var fanControlButton = sceneobj.add.image(525,545, 'buttonmask');
+                fanControlButton.setInteractive();
+                fanControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("FanControl");
+                    console.log("pressed!");
+                });
+                var probeControlButton = sceneobj.add.image(675,545, 'buttonmask');
+                probeControlButton.setInteractive();
+                probeControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("ProbeControl");
+                    console.log("pressed!");
+                });
+                var eevControlButton = sceneobj.add.image(805,545, 'buttonmask');
+                eevControlButton.setInteractive();
+                eevControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("EEVControl");
+                    console.log("pressed!");
+                });
+                var pumpControlButton = sceneobj.add.image(960,545, 'buttonmask');
+                pumpControlButton.setInteractive();
+                pumpControlButton.on('pointerdown', () => { 
+                    sceneobj.scene.start("PumpControl");
+                    console.log("pressed!");
+                });
+}
+</script>

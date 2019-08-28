@@ -1,0 +1,11 @@
+.bottom-right {
+  position: absolute;
+  bottom: 1px;
+  right: 25px;
+}
+
+.responsivejay {
+  width: auto;
+  height: 100%;
+border: 3px solid;
+}

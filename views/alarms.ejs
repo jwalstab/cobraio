@@ -1,121 +1,114 @@
+<link href="assets/tabulator.css" rel="stylesheet">
+<script type="text/javascript" src="assets/tabulator.js"></script>
 
-
-<section class="content">
-    <div class="container">
-        <div class="row clearfix">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="body block-header">
-                        <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                <h2>IoT Alarm Management</h2>
-                                <ul class="breadcrumb" id="responsebody">
-                                </ul>
-                            </div>
-                        </div>
+<div class="row mt">
+    <div class="col-lg-2 col-md-2">
+        <div class ="card" style="width:100%; height:100%;">
+            <!-- <div class="showback"> -->
+                    <div class="btn-group">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Select Device U1 <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu scrollable-menu" id="addalarmchoosedevicemenu">
+                            </ul>
                     </div>
+                <br>
+                <h4>Create Alarm</h4>
+                <div class="form-group">
+                        <input type="text" id="alarmnameinputbox" class="form-control" placeholder="Name of alarm">
                 </div>
-            </div>
-        </div>
-        <!-- Inline Layout -->
-        <!-- VIEW ALARMS SECTION-->
-        <div class="row clearfix">
-            <div class="col-lg-3 col-sm-12">
-                <div class="card">
-                    <div class="header">
-                        <h2><strong>Selected IoT Device</strong></h2>
-                        <div class="dropdown">
-                            <button class="btn btn-primary btn-round dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                Select Device
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="addalarmchoosedevicemenu">
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="header">
-                        <h2><strong>Add new alarm</strong></h2>
-                        <div class="form-group">
-                                <input type="text" id="alarmnameinputbox" class="form-control" placeholder="Name of alarm">
-                        </div>
-                        <!--choose label dropdown-->
-                        <div class="dropdown">
-                            <button class="btn btn-primary btn-round dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Select Value
-                            <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu scrollable-menu" aria-labelledby="dataLabelsMenu1" id="dataLabelsMenu">
-                                <li><a data-value="action"> No Data </a></li>
-                            </ul>
-                        </div>
-                        <!--choose operator dropdown-->
-                        <div class="dropdown">
-                                <button class="btn btn-primary btn-round dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                  Choose Operator
-                                  <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu scrollable-menu" aria-labelledby="alarmOperatorMenu" id="alarmOperatorMenu">
+                <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Select Value <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu scrollable-menu" id="dataLabelsMenu">
+                        </ul>
+                </div>
+                <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Select Operator <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu scrollable-menu" id="alarmOperatorMenu">
                                 <li><a data-value="action">Greater than</a></li>
                                 <li><a data-value="action">Less than</a></li>
                                 <li><a data-value="action">Equal to</a></li>
-                                </ul>
-                        </div>
-                        <div class="form-group">
-                                <input type="text" id="alarmnumberinputbox" class="form-control" placeholder="Number to check agaisnt">
-                        </div>
-                        <div class="dropdown">
-                                <button class="btn btn-primary btn-round dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                  Email Alerts Options
-                                  <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu scrollable-menu" aria-labelledby="emailMenu1" id="emailMenu">
+                        </ul>
+                </div>
+                <div class="form-group">
+                        <input type="text" id="alarmnumberinputbox" class="form-control" placeholder="Number to check agaisnt">
+                </div>
+                <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Email Alerts Options <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu scrollable-menu" id="emailMenu">
                                 <li><a data-value="action">Email Alerts: ON</a></li>
                                 <li><a data-value="action">Email Alerts: OFF</a></li>
-                                </ul>
-                        </div>
-                        <div class="form-group">
-                                <input type="text" id="emailAddressInputBox" class="form-control" placeholder="Email Address">
-                        </div>
-                        <button class="btn btn-success btn-round" id="myButton" onclick="AddAlarmButtonPress()">Create new alarm</button>
-                    </div>
-                    <div class="header">
-                            <h2><strong>Remove an alarm</strong></h2>
-                            <div class="dropdown">
-                                <button class="btn btn-primary btn-round dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    Select Alarm
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="alarmMenu">
-                                </ul>
-                            </div>
-                            <button class="btn btn-danger btn-round" id="myButton" onclick="RemoveAlarmButtonPress()">Remove alarm</button>
-                    </div>
-                    <div class="header">
-                            <h2><strong>Triggered Alarms</strong></h2>
-                            <button class="btn btn-danger btn-round" onclick="ClearTriggeredAlarms()">Clear Triggered Alarms</button>
-                    </div>
+                        </ul>
                 </div>
-            </div>
-            <div class="col-lg-9 col-md-9">
-                <div class="card">
-                    <div class="header" id="alarmtitlearea">
-                        <h2><strong>View alarms: Please select an IoT device to view</strong></h2>
-                    </div>
-                    <div class="body">
-                        <div id="maintable"></div>
-                    </div>
+                <div class="form-group">
+                        <input type="text" id="emailAddressInputBox" class="form-control" placeholder="Email Address">
                 </div>
-                <div class="card">
-                        <div class="header" id="triggeredalarmtitlearea">
-                            <h2><strong>View triggered alarms: Please select an IoT device to view</strong></h2>
-                        </div>
-                        <div class="body">
-                            <div id="triggeredAlarmsTable"></div>
-                        </div>
-                    </div>
+                <button class="btn btn-success" id="myButton" onclick="AddAlarmButtonPress()">Create new alarm</button>
+                <br>
+                <h4>Remove Alarm</h4>
+
+                <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Select Alarm <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu scrollable-menu" id="alarmMenu">
+                        </ul>
+                </div>
+
+                <button class="btn btn-danger" id="myButton" onclick="RemoveAlarmButtonPress()">Remove alarm</button>
+                <br>
+                <h4>Triggered Alarms</h4>
+                <button class="btn btn-danger" onclick="ClearTriggeredAlarms()">Clear Triggered Alarms</button>
+            <!-- </div> -->
+        </div>
+    </div>
+    <div class="col-lg-9 col-md-9">
+            <div class ="card" style="width:100%; height:100%;">
+                <h5 id ="responsebody">tables</h5>
+                <br>
+                <div id ="alarmtitlearea"></div>
+                <div id="maintable"></div>
+                <div id ="triggeredalarmtitlearea"></div>
+                <div id="triggeredAlarmsTable"></div>
             </div>
-        </div> 
-</section>
+    </div>
+</div>
+
+
+<!-- 
+        <div class="header">
+                <h2><strong>Triggered Alarms</strong></h2>
+                
+        </div>
+    </div>
+</div>
+<div class="col-lg-9 col-md-9">
+    <div class="card">
+        <div class="header" id="alarmtitlearea">
+            <h2><strong>View alarms: Please select an IoT device to view</strong></h2>
+        </div>
+        <div class="body">
+            <div id="maintable"></div>
+            <div id="triggeredAlarmsTable"></div>
+        </div>
+    </div>
+    <div class="card">
+            <div class="header" id="triggeredalarmtitlearea">
+                <h2><strong>View triggered alarms: Please select an IoT device to view</strong></h2>
+            </div>
+            <div class="body">
+                
+            </div>
+        </div>
+</div>
+ -->
+</div>
 
 <!--SCRIPT FOR ADDING NEW ALARMS-->
 <script>
@@ -268,6 +261,7 @@
             crossDomain: true,
             dataType: "json",
             success: function (data, status, jqXHR) {
+                console.log(data);
                 var keyNames = [];
                 if (data[0] != null)
                 {
@@ -306,9 +300,9 @@
     //adds code to change when device selected
     $("#addalarmchoosedevicemenu li a").click(function(){
         DisplayResult();
-        $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-        $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-        var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+        $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+        $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+        var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
         //
         deviceList.forEach(element => {
         if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
@@ -321,13 +315,13 @@
                 //set title of the table
                 var alarmtitle = document.getElementById("alarmtitlearea");
                 while (alarmtitle.firstChild) {alarmtitle.removeChild(alarmtitle.firstChild);}
-                var alarmTitleWithName = $('<h2><strong>Viewing alarms for ' + chosenDeviceName + '</strong></h2>');
+                var alarmTitleWithName = $('<h4><strong>Viewing alarms for ' + chosenDeviceName + '</strong></h4>');
                 $('#alarmtitlearea').append(alarmTitleWithName);
 
                 //set title of triggered alarm area
                 var tAlarmtitle = document.getElementById("triggeredalarmtitlearea");
                 while (tAlarmtitle.firstChild) {tAlarmtitle.removeChild(tAlarmtitle.firstChild);}
-                var tAlarmTitleWithName = $('<h2><strong>Viewing triggered alarms for ' + chosenDeviceName + '</strong></h2>');
+                var tAlarmTitleWithName = $('<h4><strong>Viewing triggered alarms for ' + chosenDeviceName + '</strong></h4>');
                 $('#triggeredalarmtitlearea').append(tAlarmTitleWithName);
             }
         });
@@ -338,9 +332,9 @@
     function ChooseValueDropDownBox(){
     //adds code to change when device selected
     $("#dataLabelsMenu li a").click(function(){
-        $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-        $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-        var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+        $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+        $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+        var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
         chosenValue = selectedvaluefromdropdownbox[0].innerText;
         console.log(chosenValue);
     });
@@ -349,9 +343,9 @@
     function ChooseOperatorDropDownBox(){
     //adds code to change when device selected
     $("#alarmOperatorMenu li a").click(function(){
-        $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-        $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-        var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+        $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+        $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+        var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
         chosenOperator = selectedvaluefromdropdownbox[0].innerText;
         console.log(chosenOperator);
     });
@@ -360,9 +354,9 @@
     function ChooseEmailNotificationDropDownBox(){
     //adds code to change when device selected
     $("#emailMenu li a").click(function(){
-        $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-        $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-        var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+        $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+        $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+        var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
         if (selectedvaluefromdropdownbox[0].innerText == "Email Alerts: ON")
         {
             chosenEmailAlerts = "On"
@@ -377,9 +371,9 @@
     function ChooseAlarmDropDownBox(){
     //adds code to change when device selected
     $("#alarmMenu li a").click(function(){
-        $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-        $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-        var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+        $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+        $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+        var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
         chosenAlarm = selectedvaluefromdropdownbox[0].innerText;
         console.log(chosenAlarm);
     });

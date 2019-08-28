@@ -1,62 +1,63 @@
 <link href="assets/scroll.css" rel="stylesheet">
-<!-- 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 
 <script type="text/javascript" src="assets/highcharts.js"></script>
 
-<section class="content">
-    <div class="container">
-        <div class="row clearfix">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="body block-header">
-                        <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                <h2>Real Time IoT Device Monitor</h2>
-                                <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
-                                    <li class="breadcrumb-item active">Select an IoT device to monitor incoming data in real time</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-            <div class="col-lg-12 col-md-12">
-                    <div class="card">
-<!--                         <div class="header" id="rheader">
-                            <h2><strong>Loading chart...</strong></h2>
+<br>
+    
 
-                            </div>
-                        </div> -->
-                        <div class="body">
-                                <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                          Select Device
-                                          <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenu">
-                                        </ul>
-                                </div>
-                                <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                          Select Device
-                                          <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenuDEVICE2">
-                                        </ul>
-                                </div>
-                                <div id="chart2">
-                                        <div id="container" style="width:100%; height:600px;"></div>
-                                </div>
-                        </div>
-                    </div>
+<div class="col-lg-12 col-md-12">
+    <div class="card">
+        <div class="showback">
+            <!-- Single button -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                Select Device U1 <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenu">
+                </ul>
             </div>
+            <!-- Single button -->
+        <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                Select Device U2 <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenuDEVICE2">
+                </ul>
+        </div>      
+        <div id="chart2">
+                <div id="containerC" style="width:100%; height:600px;"></div>
         </div>
     </div>
-</section>
+</div>
+
+</div>
+
+
+<!-- <div class="col-lg-12 col-md-12">
+        <div class="card">
+            <div class="btn-group">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Select Device
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenu">
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Select Device
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu" aria-labelledby="dropdownMenu1" id="deviceSelectMenuDEVICE2">
+                    </ul>
+                </div>
+            </div>
+            <div id="chart2">
+                    <div id="containerC" style="width:100%; height:600px;"></div>
+            </div>
+        </div>
+    </div> -->
 
 <script>
 
@@ -100,9 +101,10 @@
 
                 //adds code to change when device selected
                 $("#deviceSelectMenu li a").click(function(){
-                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+                    $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+                    var bla = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+                    var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
                     deviceList.forEach(element => {
                         if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
                         {
@@ -136,9 +138,9 @@
 
                 //adds code to change when device selected
                 $("#deviceSelectMenuDEVICE2 li a").click(function(){
-                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+                    $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+                    var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
                     DEVICE2_deviceList.forEach(element => {
                         if (element.devicename == selectedvaluefromdropdownbox[0].innerText)
                         {
@@ -247,7 +249,7 @@
         }
     }
     var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]
-    var chart1 = Highcharts.chart('container', {
+    var chart1 = Highcharts.chart('containerC', {
             chart: {
                 zoomType: 'x',
                 /* marginBottom: 180 */

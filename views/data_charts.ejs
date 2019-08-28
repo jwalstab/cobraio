@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <link href="assets/scroll.css" rel="stylesheet">
@@ -71,12 +71,63 @@
                 </div>
         </div>
     </div>
-</section>
+</section> -->
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<script type="text/javascript" src="assets/highcharts.js"></script>
+
+<div class="col-lg-12 col-md-12">
+    <div class="card">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                    Select Device<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenu">
+                </ul>
+            </div>
+            <button class="btn btn-primary" id="time">Select Time Range</button>
+            <button class="btn btn-success" id="myButton" onclick="GetAPIData()">Load Chart</button>
+            <button class="btn btn-danger" id="download-xlsx" onclick="GetAPIData()">Clear All</button>
+            <p id="responsebody"></p>
+            <div id="chart2">
+            <div id="containerC" style="width:100%; height:600px;"></div>
+    </div>
+</div>
+
+<script>
+var to;
+var from;
+$('#time').daterangepicker({
+    "showDropdowns": true,
+    "timePicker": true,
+    "timePickerSeconds": true,
+    "opens": "center",
+    ranges: {
+        'Today': [moment().startOf('day'), moment().endOf('day')],
+        'Yesterday': [moment().startOf('day').subtract(1, 'days'), moment().endOf('day').subtract(1, 'days')],
+        'Last 7 Days': [moment().startOf('day').subtract(6, 'days'), moment().endOf('day')],
+        'Last 30 Days': [moment().startOf('day').subtract(29, 'days'), moment().endOf('day')],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    },
+    "startDate": "08/16/2019",
+    "endDate": "08/22/2019"
+}, function(start, end, label) {
+  //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+  from = start._d;
+  to = end._d;
+  //LoadResponse();
+});
+</script>
 
 <script type="text/javascript">
+
+
     //global variables and function loaders
     LoadDropDownBox();
-    LoadDatePickers();
+    //LoadDatePickers(); LEGACY
     var chosenDevice;
     var chosenDeviceName;
     var deviceList = [];
@@ -95,14 +146,14 @@
                 //creates the links in the dropdown menu
                 data.forEach(element => {
                     var newlink = $('<li><a href="#" data-value="action">' + element.devicename + '</a></li>');
-                    $('#dropper').append(newlink);
+                    $('#deviceSelectMenu').append(newlink);
                     deviceList.push(element);
                 });
                 //adds code to change when device selected
                 $(".dropdown-menu li a").click(function(){
-                    $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-                    $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-                    var selectedvaluefromdropdownbox = $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                    $(this).parents(".btn-group").find('.btn').html($(this).text() + '<span class="caret"></span>');
+                    $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
+                    var selectedvaluefromdropdownbox = $(this).parents(".btn-group").find('.btn').val($(this).data('value'));
                     
 
 /*                     while(chart1.series.length > 0){
@@ -129,27 +180,29 @@
     //////////////////////////////////////////////////////////////////////////////////////////////load data to table from api area
     function GetAPIData() {
       
-        var fromVal = new Date(document.getElementById("dateFrom").value);
-        var fromValSeconds = fromVal.getTime();
-        var toVal = new Date(document.getElementById("dateTo").value);
-        var toValSeconds = toVal.getTime();
+        //var fromVal = new Date(document.getElementById("dateFrom").value);
+        var fromValSeconds = from.getTime();
+        //var toVal = new Date(document.getElementById("dateTo").value);
+        var toValSeconds = to.getTime();
         var res3 = masterURL + "/" + chosenDevice + "/betweendates/" + fromValSeconds + "/" + toValSeconds + "/" + grabCount;
         
-        chart1.setTitle({text: "Now loading data for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
+        chart1.setTitle({text: "Now loading data for " + chosenDeviceName + " between the times of " + to.toLocaleString() + " and " + to.toLocaleString()});
         $.ajax({
             type: "GET",
             url: res3,
             crossDomain: true,
             success: function (data, status, jqXHR) {
+                console.log("OKK!!!");
+                
               if (data == "No Data"){
-                chart1.setTitle({text: "No data found for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString()});
+                chart1.setTitle({text: "No data found for " + chosenDeviceName + " between the times of " + from.toLocaleString() + " and " + to.toLocaleString()});
               }
               else{
                 data.forEach(element => {
                     chart1.addSeries(element);
                 });
                 
-              chart1.setTitle({text: "Chart data for " + chosenDeviceName + " between the times of " + fromVal.toLocaleString() + " and " + toVal.toLocaleString() + " has loaded sucessfully"});
+              chart1.setTitle({text: "Chart data for " + chosenDeviceName + " between the times of " + from.toLocaleString() + " and " + to.toLocaleString() + " has loaded sucessfully"});
               grabCount++;
                 }
               
@@ -168,7 +221,7 @@
     }
 
     var datat = [[1167609600000,0.7537], [1167696000000,0.7537]]
-    var chart1 = Highcharts.chart('container', {
+    var chart1 = Highcharts.chart('containerC', {
             chart: {
                 zoomType: 'x'
             },

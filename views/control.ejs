@@ -1,40 +1,70 @@
-<section class="content">
-    <div class="container">
-        <div class="row clearfix">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="body block-header">
-                        <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <h2>IoT Monitoring and Control Page</h2>
-<!--                                     <ul class="breadcrumb p-l-0 p-b-0" id="responsebody">
-                                        <li class="breadcrumb-item active" >Select an IoT device to monitor incoming data in real time</li>
-                                    </ul> -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="row mt">
+    <div class="showback">
+            <div class="card" style="width:100%; height:100%;" id="phaserdiv">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card" id="phaserdiv">
-                </div>
-            </div>
-        </div>
     </div>
-</section>
-
+</div>
 
 
 
 <script src="assets/js/phaser.min.js"></script>
-<!-- <script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
-<script type="text/javascript" src="assets/ScaleManager.js"></script>
-<script src="https://github.com/photonstorm/phaser/tree/v3.17.0/src/scale/index.js"></script> -->
 
 <script>
+
+ReSizer();
+function ReSizer() {
+  //var x = "Total Height: " + screen.height + "px";
+  
+  //var b = screen.height;
+/*   document.getElementById("phaserdiv").style.height = "300px";
+  var b = document.getElementById("phaserdiv").style.height;
+  console.log(b); */
+}
+
+var currMode = "";
+
+function checkOrientation(){
+ 
+      switch(window.orientation){
+ 
+           case 0:
+           currMode = "portrait";
+           document.getElementById("phaserdiv").style.height = "100%";
+           game.scale.updateCenter()
+           game.scale.updateScale();
+           
+           break;
+ 
+           case -90:
+           currMode = "landscape";
+           document.getElementById("phaserdiv").style.height = screen.height + "px";
+           document.getElementById("phaserdiv").style.width = "100%";
+           game.scale.updateCenter()
+           game.scale.updateScale();
+           break;
+ 
+           case 90:
+           currMode = "landscape";
+           document.getElementById("phaserdiv").style.height = screen.height + "px";
+           document.getElementById("phaserdiv").style.width = "100%";
+           game.scale.updateCenter()
+           game.scale.updateScale();
+           break;
+ 
+           case 180:
+           currMode = "landscape";
+           document.getElementById("phaserdiv").style.height = screen.height + "px";
+           document.getElementById("phaserdiv").style.width = "100%";
+           game.scale.updateCenter()
+           game.scale.updateScale();
+           break;
+     }
+     
+}
+
+window.onorientationchange = function(){
+      checkOrientation();
+}
 
 var chosenDevice;
 var chosenDeviceName;
@@ -228,7 +258,7 @@ var fanImageOff;
 var userAccessLevel = 1;
 var num = 1;
 
-
+var or;
 //choose device menu
 var cdmButtons = [];
 var cdmStatusText = [];
@@ -266,6 +296,7 @@ var ChooseDeviceMenu = new Phaser.Class({
     {
         
         this.add.image(600, 300, 'choosedevicebackground');
+        or = this.add.text(50, 50, "", { fontFamily: 'Arial', fontSize: 22, color: '#ffffff' }),
         
         //deviceNameTitle = this.add.text(80, 20, "Select IoT Device to Monitor", { fontFamily: 'Arial', fontSize: 36, color: '#ffffff' })
         
@@ -344,7 +375,7 @@ var ChooseDeviceMenu = new Phaser.Class({
     },
 
     update: function (){
-
+        //or.setText(currMode);
         cdmCounter++;
         if (cdmCounter > 100){
             cdmCounter = 0;
@@ -1875,5 +1906,3 @@ var Flow_Switch_ColdFS2_Char_Text;
 var Low_Pressure_Text;
 var High_Pressure_Text;
 </script>
-
-

@@ -5,6 +5,8 @@ var app = express();
 var expressLayouts = require('express-ejs-layouts');
 app.use(bodyParser.json());
 
+app.use(bodyParser.urlencoded({ extended: false }))
+
 var session = require('express-session')
 var MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -28,8 +30,14 @@ app.use(session({
 
 //return res.sendStatus(401);
 var auth = function(req, res, next) {
-  if (req.session && req.session.user && req.session.pool)
+/*   var skipauth = true;
+  if (skipauth == true){
     return next();
+  } */
+  
+  if (req.session && req.session.user && req.session.pool){
+    return next();
+  }
   else
     return res.render('sign_in', { layout: 'emptylayout' });
 };
@@ -55,21 +63,6 @@ var outsideDatabase;
   console.log("Cobra is up and running on port 3000 since " + new Date().toLocaleDateString() + "  " + new Date().toLocaleTimeString());
 });
 
-/*   app.post('/logincheck', function (req, res) {
-    console.log(req.body)
-    if (req.body.user == "Jwalstab" && req.body.pass == "Quantum4277"){
-      console.log("USER LOGGED IN AT ");
-      req.session.user = "Jay Walstab";
-      req.session.level = "1";
-      req.session.tag = "Engineer"
-      res.send("OK");
-    }
-    else{
-      console.log("USER LOGIN DENIED!");
-      res.send("NO ACCESS!");
-    }
-    
-  }); */
 
 
 const nodemailer = require("nodemailer");
@@ -137,10 +130,10 @@ app.post('/logincheck', function (req, res) {
         }
         usersdb.collection('LoginLog').insertOne(loginObj).then (function() {});
       }
-      res.send("OK");
+      res.redirect('control');
     }
     else{
-      res.send("NO ACCESS!");
+      res.redirect('sign_in_error');
     }
   });
 });
@@ -605,12 +598,11 @@ app.get("/phaser", function(req, res) {
 });
 
 app.get("/", function(req, res) {
-/*   if (req.session.user){
-  res.render('devices');
-  }
-  else{ */
     res.render('sign_in', { layout: 'emptylayout' });
-  //}
+});
+
+app.get("/sign_in_error", function(req, res) {
+  res.render('sign_in_error', { layout: 'emptylayout' });
 });
 
 app.get("/sign_out", function(req, res) {
@@ -846,6 +838,48 @@ app.get("/:deviceid/monitorgraphbigupdate/:number", function(req, res) {
       });
       returnArray.push(recordArray);
     });
+  res.send(returnArray);
+  res.end();
+  });
+});
+
+app.get("/:deviceid/backload/:page", function(req, res) {
+  dataLabelsList = LGDataLabelsList;
+  var getAmount = parseInt(req.params.number);
+  var pageNum = parseInt(req.params.page);
+  returnArray = [];
+  //iotdb.collection(req.params.deviceid).find( { _id: { $lt: 1 } } ).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(10).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
+      res.send("Null");
+      res.end();
+      return;
+    }
+    docs.forEach(record => {
+      var recordArray = [];
+      dataLabelsList.forEach(propname => {
+        if (typeof record[propname] === "boolean")
+        {
+          
+          if (record[propname] == true)
+          {
+            record[propname] = 10;
+          }
+          else
+          {
+              (record[propname] = 0);
+          }
+        }
+        var miniArray = [];
+        var timeS = new Date(record.time);
+        var timeSR = timeS.getTime();
+        miniArray.push(timeSR, record[propname]);
+        recordArray.push(miniArray);
+      });
+      returnArray.push(recordArray);
+    });
+    console.log("ok");
   res.send(returnArray);
   res.end();
   });
@@ -1361,17 +1395,23 @@ app.get("/:deviceid/tablegrab/:from/:to/:getCount", function(req, res) {
     docs.forEach(doc => {
       doc.time = new Date(doc.time).toLocaleDateString() + "  " + new Date(doc.time).toLocaleTimeString();
     });
-/* 
-    var mainTableArray = [];
-    docs.forEach(doc =>{
-      mainTableArray.push(doc);
-    });
 
-    var averageData;
-    LGDataLabelsList.forEach(label => {
-      docs[label] = averageData[label] / data.length;
-    }) */
+    res.send(docs);
+    res.end();
+  });
+});
 
+app.get("/:deviceid/ajaxgrab", function(req, res) {
+  iotdb.collection(req.params.deviceid).find({}).toArray(function(err, docs){
+    if (err){console.log(err);}
+    if (docs[0] == null)
+    {
+      console.log("no data");
+      res.send("No Data");
+      res.end();
+      return;
+    }
+    console.log("OK!");
     res.send(docs);
     res.end();
   });
@@ -1388,11 +1428,6 @@ var LGDataLabelsList = ["Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Su
 var tableList = ["time","Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Suct_Temp", "Evap_Inlet_Temp","Cond_Outlet_Temp","Hot_Supply_Temp","Hot_Return_Temp","Cold_Supply_Temp","Cold_Return_Temp",
                         "Hot_Tank_Temp1","Hot_Tank_Temp2","Hot_Tank_Temp3","Cold_Tank_Temp1","Cold_Tank_Temp2","Cold_Tank_Temp3","Cold_SupToVlv_Temp",
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"];                        
-
-
-
-
-                        
 
 
 app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
