@@ -164,16 +164,17 @@
             crossDomain: true,
             dataType: "json",
             success: function (data, status, jqXHR) {
-/*                 if (data[0] != null){
+                if (data[0] != null){
 
-                } */
+                
                 data.forEach(element => {
                     for (let index = 0; index < sizer; index++) {
                         chart1.series[index].addPoint(element[index], false);
                     }
                 });
-                loadCounter = loadCounter + 100;
+                loadCounter = loadCounter + 1000;
                 chart1.redraw();
+            }
             },
             error: function (jqXHR, status) {
                 console.log("jqXHYR:" + jqXHR + "status:" + status)

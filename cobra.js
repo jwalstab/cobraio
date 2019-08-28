@@ -849,7 +849,7 @@ app.get("/:deviceid/backload/:page", function(req, res) {
   var pageNum = parseInt(req.params.page);
   returnArray = [];
   //iotdb.collection(req.params.deviceid).find( { _id: { $lt: 1 } } ).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
-    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(100).toArray(function(err, docs){
+    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(1000).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
