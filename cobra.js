@@ -849,7 +849,7 @@ app.get("/:deviceid/backload/:page", function(req, res) {
   var pageNum = parseInt(req.params.page);
   returnArray = [];
   //iotdb.collection(req.params.deviceid).find( { _id: { $lt: 1 } } ).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
-    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(1000).toArray(function(err, docs){
+    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(10000).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
@@ -1430,12 +1430,15 @@ var tableList = ["time","Comp_On","Hot_Fan","Cold_EleHeater","Hot_EleHeater","Su
                         "Warm_ToBuild_Temp","Warm_ReturnBuild_Temp","Hot_SupToVlv_Temp","Ele_Boost_Temp","Heat_Exchange_Cold","Heat_Exchange_Hot","Disc_Temp","EEV_Pos"];                        
 
 
-app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
-    
+app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) {
+  
+  var saveFor = parseInt(req.params.savefor);
+
   LegioGuardDataObject = {
 
     status: req.body.status,
     time: req.body.time,
+    save: saveFor,
 
     //COILS
     EleHeater_Mng_Hot_Ele_Man_Msk: req.body.coils[7],
@@ -1640,6 +1643,49 @@ app.post("/legioguard/postdatafordevice/:deviceid", function(req, res) {
   var hardcodedIoTPool = 'Quantum'
   AlarmProcessor(req.params.deviceid,LegioGuardDataObject,hardcodedIoTPool);
   iotdb.collection(req.params.deviceid).insertOne(LegioGuardDataObject).then (function() {
+  });
+
+  LegiGuardLogObject = {
+
+    status: req.body.status,
+    time: req.body.time,
+    save: saveFor,
+
+    Cold_EleHeater: LegioGuardDataObject.Cold_EleHeater,
+    Hot_EleHeater: LegioGuardDataObject.Hot_EleHeater,
+    Hot_Fan: LegioGuardDataObject.Hot_Fan,
+    Injection_Vlv: LegiGuardLogObject.Injection_Vlv,
+    Comp_On: LegioGuardDataObject.Comp_On,
+
+    Suct_Temp: LegioGuardDataObject.Suct_Temp,
+    Evap_Inlet_Temp: LegioGuardDataObject.Evap_Inlet_Temp,
+    Cond_Outlet_Temp: LegioGuardDataObject.Cond_Outlet_Temp,
+    Hot_Supply_Temp: LegioGuardDataObject.Hot_Supply_Temp,
+    Hot_Return_Temp: LegioGuardDataObject.Hot_Return_Temp,
+    Cold_Supply_Temp: LegioGuardDataObject.Cold_Supply_Temp,
+    Cold_Return_Temp: LegioGuardDataObject.Cold_Return_Temp,
+    Hot_Tank_Temp1: LegioGuardDataObject.Hot_Tank_Temp1,
+    Hot_Tank_Temp2: LegioGuardDataObject.Hot_Tank_Temp2,
+    HP_Yout1_Act: LegioGuardDataObject.HP_Yout1_Act,
+    HP_Yout2_Act: LegioGuardDataObject.HP_Yout2_Act,
+    Disc_Temp: LegioGuardDataObject.Disc_Temp,
+
+    Hot_Tank_Temp3: LegioGuardDataObject.Hot_Tank_Temp3,
+    Cold_Tank_Temp1: LegioGuardDataObject.Cold_Tank_Temp1,
+    Cold_Tank_Temp2: LegioGuardDataObject.Cold_Tank_Temp2,
+    Cold_Tank_Temp3: LegioGuardDataObject.Cold_Tank_Temp3,
+    Cold_SupToVlv_Temp: LegioGuardDataObject.Cold_SupToVlv_Temp,
+    Warm_ToBuild_Temp: LegioGuardDataObject.Warm_ToBuild_Temp,
+    Warm_ReturnBuild_Temp: LegioGuardDataObject.Warm_ReturnBuild_Temp,
+    Hot_SupToVlv_Temp: LegioGuardDataObject.Hot_SupToVlv_Temp,
+
+    Ele_Boost_Temp: LegioGuardDataObject.Ele_Boost_Temp,
+    Heat_Exchange_Cold: LegioGuardDataObject.Heat_Exchange_Cold,
+    Heat_Exchange_Hot: LegioGuardDataObject.Heat_Exchange_Hot,
+    EEV_Pos: LegioGuardDataObject.EEV_Pos
+  }
+
+  iotdb.collection(req.params.deviceid + "log").insertOne(LegiGuardLogObject).then (function() {
   });
   
   iotdb.collection(req.params.deviceid + "raw").insertOne(req.body).then (function() {
