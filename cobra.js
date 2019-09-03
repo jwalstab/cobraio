@@ -92,6 +92,7 @@ async function SendEmail(emailAddress,subjectToUse,htmlToUse){
 }
 
 
+
 //////////API SERVER
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -592,11 +593,6 @@ app.get("/index", function(req, res) {
 });
 
 
-
-app.get("/phaser", function(req, res) {
-  res.render('phaser', { layout: 'emptylayout' });
-});
-
 app.get("/", function(req, res) {
     res.render('sign_in', { layout: 'emptylayout' });
 });
@@ -698,7 +694,9 @@ app.get("/phaser/:fileToGet", function(req, res) {
   res.sendFile(__dirname + '/public/assets/phaser/' + req.params.fileToGet);
 });
 
-
+app.get("/img/nav-expand.png", function(req, res) {
+  res.sendFile(__dirname + '/public/img/nav-expand.png');
+});
 //graph API 
 
 //retrieve last known data with a packet amount
@@ -1042,6 +1040,9 @@ app.get("/:deviceid/:device2id/duallivechartupdate/:number", function(req, res) 
 
   });
 });
+
+
+
 
 app.get("/:deviceid/:device2id/dualgraphstart/:number", function(req, res) {
   var x = Number(req.params.deviceid);
@@ -1438,6 +1439,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
 
     status: req.body.status,
     time: req.body.time,
+    timeUTC: req.body.timeUTC,
     save: saveFor,
 
     //COILS
@@ -1639,22 +1641,22 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
     High_Pressure: uInt16ToFloat32([req.body.inputRegisters2[66],req.body.inputRegisters2[67]])
   }
 
-
   var hardcodedIoTPool = 'Quantum'
   AlarmProcessor(req.params.deviceid,LegioGuardDataObject,hardcodedIoTPool);
   iotdb.collection(req.params.deviceid).insertOne(LegioGuardDataObject).then (function() {
   });
 
-  LegiGuardLogObject = {
+  LegioGuardLogObject = {
 
     status: req.body.status,
     time: req.body.time,
+    timeUTC: req.body.timeUTC,
     save: saveFor,
 
     Cold_EleHeater: LegioGuardDataObject.Cold_EleHeater,
     Hot_EleHeater: LegioGuardDataObject.Hot_EleHeater,
     Hot_Fan: LegioGuardDataObject.Hot_Fan,
-    Injection_Vlv: LegiGuardLogObject.Injection_Vlv,
+    Injection_Vlv: LegioGuardDataObject.Injection_Vlv,
     Comp_On: LegioGuardDataObject.Comp_On,
 
     Suct_Temp: LegioGuardDataObject.Suct_Temp,
@@ -1685,7 +1687,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
     EEV_Pos: LegioGuardDataObject.EEV_Pos
   }
 
-  iotdb.collection(req.params.deviceid + "log").insertOne(LegiGuardLogObject).then (function() {
+  iotdb.collection(req.params.deviceid + "log").insertOne(LegioGuardLogObject).then (function() {
   });
   
   iotdb.collection(req.params.deviceid + "raw").insertOne(req.body).then (function() {
@@ -1753,3 +1755,58 @@ function ReverseduInt16ToFloat32(uint16array) {
 
 LGDataLabelsList.sort();
 tableList.push("time");
+
+var curTime = new Date();
+console.log(curTime);
+
+setTimeout(CleanUpOldData, 3000);
+
+function CleanUpOldData(){
+  console.log("Starting scheduled old record clean up at " + curTime);
+  
+  devicedb.collection("Quantum").find({}).toArray(function(err, devices){
+    var deviceTotal = devices.length;
+    var deviceCount = 0;
+    devices.forEach(device => {
+      var curTime = new Date();
+      curTime.setMinutes(curTime.getMinutes() - 2);
+      var mongoTime = curTime.getTime();
+      iotdb.collection(device.deviceID + "log").find( { save: 1, timeUTC: {$lt: mongoTime} } ).toArray (function(err, docs) {
+        deviceCount++;
+        var recordsCleaned = 0;
+        if (docs[0] == null){
+          console.log("No old records found for device " + device.deviceID);
+        }
+        else{
+          console.log(docs.length + " old records found for device " + device.deviceID + ", cleaning now...");
+        }
+        
+        docs.forEach(record => {
+          //console.log("Cleaning record: " + record._id);
+          recordsCleaned++;
+          deleteQuery = {
+            time: record.time
+          }
+          
+          iotdb.collection(device.deviceID + "log").deleteOne(deleteQuery).then(function(err, r){
+          });
+        });
+        console.log("Record clean up complete for " + device.deviceID + ", " + recordsCleaned + " records cleaned.");
+        if (deviceCount == deviceTotal){
+          var nextTime = new Date(curTime.setHours(curTime.getHours() + 1));
+          console.log("Record cleanup completed, next record clean scheduled for " + nextTime)
+        }
+      });
+    });
+  });
+  setTimeout(CleanUpOldData, 3600000);
+}
+
+
+
+app.get("/phaser", function(req, res) {
+  CleanUpOldData();
+  res.send("OK!");
+  res.end();
+  //res.render('phaser', { layout: 'emptylayout' });
+});

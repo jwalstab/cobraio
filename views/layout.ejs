@@ -28,11 +28,6 @@
   <link href="css/spinners.css" rel="stylesheet">
   <link href="assets/scroll.css" rel="stylesheet">
 
-  
-
-
-
-
 
 </head>
 
@@ -61,118 +56,19 @@
             </div>
             <!--logo start-->
             <!--  -->
-            <a href="index.html" class="logo"> <img src="img/qlogo.png"height="40" width="120"/></a>
+            <a href="" class="logo"> <img src="img/qlogo.png"height="40" width="120"/></a>
             <!--logo end-->
             <div class="nav notify-row" id="top_menu">
               <!--  notification start -->
               <ul class="nav top-menu">
-                <!-- inbox dropdown start-->
-<!--                 <li id="header_inbox_bar" class="dropdown">
-                  <a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-theme">5</span>
-                    </a>
-                  <ul class="dropdown-menu extended inbox">
-                    <div class="notify-arrow notify-arrow-green"></div>
-                    <li>
-                      <p class="green">You have 5 new messages</p>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="photo"><img alt="avatar" src="img/ui-zac.jpg"></span>
-                        <span class="subject">
-                        <span class="from">Zac Snider</span>
-                        <span class="time">Just now</span>
-                        </span>
-                        <span class="message">
-                        Hi mate, how is everything?
-                        </span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="photo"><img alt="avatar" src="img/ui-divya.jpg"></span>
-                        <span class="subject">
-                        <span class="from">Divya Manian</span>
-                        <span class="time">40 mins.</span>
-                        </span>
-                        <span class="message">
-                        Hi, I need your help with this.
-                        </span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="photo"><img alt="avatar" src="img/ui-danro.jpg"></span>
-                        <span class="subject">
-                        <span class="from">Dan Rogers</span>
-                        <span class="time">2 hrs.</span>
-                        </span>
-                        <span class="message">
-                        Love your new Dashboard.
-                        </span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="photo"><img alt="avatar" src="img/ui-sherman.jpg"></span>
-                        <span class="subject">
-                        <span class="from">Dj Sherman</span>
-                        <span class="time">4 hrs.</span>
-                        </span>
-                        <span class="message">
-                        Please, answer asap.
-                        </span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">See all messages</a>
-                    </li>
-                  </ul>
-                </li> -->
-                <!-- inbox dropdown end -->
                 <!-- notification dropdown start-->
                 <li id="header_notification_bar" class="dropdown">
-                  <a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
+                  <a data-toggle="dropdown" class="dropdown-toggle" href="">
                     <i class="fa fa-bell-o"></i>
-                    <span class="badge bg-warning">7</span>
+                    <span class="badge bg-warning" id="myspan">0</span>
                     </a>
-                  <ul class="dropdown-menu extended notification">
-<!--                     <div class="notify-arrow notify-arrow-yellow"></div>
-                    <li>
-                      <p class="yellow">You have 7 new notifications</p>
-                    </li>p
-                    <li>
-                      <a href="index.html#">
-                        <span class="label label-danger"><i class="fa fa-bolt"></i></span>
-                        Server Overloaded.
-                        <span class="small italic">4 mins.</span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="label label-warning"><i class="fa fa-bell"></i></span>
-                        Memory #2 Not Responding.
-                        <span class="small italic">30 mins.</span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="label label-danger"><i class="fa fa-bolt"></i></span>
-                        Disk Space Reached 85%.
-                        <span class="small italic">2 hrs.</span>
-                        </a>
-                    </li>
-                    <li>
-                      <a href="index.html#">
-                        <span class="label label-success"><i class="fa fa-plus"></i></span>
-                        New User Registered.
-                        <span class="small italic">3 hrs.</span>
-                        </a>
-                    </li> -->
-                    <li>
-                      <a href="index.html#">See all notifications</a>
-                    </li>
+                  <ul class="dropdown-menu extended notification scrollable-menu" id="bellMenu">
+                    <div class="notify-arrow notify-arrow-yellow"></div>
                   </ul>
                 </li>
                 <!-- notification dropdown end -->
@@ -196,14 +92,14 @@
       <div id="sidebar" class="nav-collapse ">
         <!-- sidebar menu start-->
         <ul class="sidebar-menu" id="nav-accordion">
-          <h5 class="centered">Jay Walstab</h5>
-          <h5 class="centered">Access Level 1</h5>
-          <li class="mt">
+          <h5 class="centered"><%= loggedInName %></h5>
+          <h5 class="centered">Access Level: <%= loggedInTag %></h5>
+<!--           <li class="mt">
             <a href="index.html">
               <i class="fa fa-dashboard"></i>
               <span>Dashboard</span>
               </a>
-          </li>
+          </li> -->
           <li>
                 <a href="control">
                   <i class="fa fa-desktop"></i>
@@ -256,18 +152,11 @@
     <!--main content start-->
     <section id="main-content">
       <section class="wrapper site-min-height">
-<!--         <h3><i class="fa fa-angle-right"></i> Blank Page</h3>
-        <div class="row mt">
-          <div class="col-lg-12">
-            <p>Place your content here.</p>
-          </div>
-        </div> -->
         <script src="lib/jquery/jquery.min.js"></script>
         <%- body %>
       </section>
       <!-- /wrapper -->
     </section>
-    <!-- /MAIN CONTENT -->
     <!--main content end-->
     <!--footer start-->
     <footer class="site-footer">
@@ -310,4 +199,63 @@ window.onload = function(){
   while (spinnerToDelete.firstChild) {spinnerToDelete.removeChild(spinnerToDelete.firstChild);}
 }
 
+</script>
+
+
+
+<script>
+  //ALARM BELL SCRIPTS
+/* function ClearList(){
+  var clearBellAlarmListURL = masterURL + "/deletebellalarms/<%= loggedInPool %>";
+      $.ajax({ type: "GET", url: clearBellAlarmListURL, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
+          success: function (data, status, jqXHR) {
+          console.log("alarm bell list cleared!");
+          //$("#bellMenu").empty();
+          LoadAlarmBell();
+
+          var alarmBellListToClear = document.getElementById("bellMenu");
+          while (alarmBellListToClear.firstChild) { alarmBellListToClear.removeChild(alarmBellListToClear.firstChild); }
+          },
+          error: function (jqXHR, status) {console.log("ERROR");}
+      });
+} */
+
+
+BellUpdater();
+
+function BellUpdater(){
+  LoadAlarmBell();
+  setTimeout(BellUpdater, 30000);
+}
+function LoadAlarmBell(){
+  var alarmbellURL = masterURL + "/triggeredbellalarmlist/<%= loggedInPool %>/";
+      $.ajax({ type: "GET", url: alarmbellURL, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
+          success: function (data, status, jqXHR) {
+              if (data != null)
+              {
+                  var alarmBellListToClear = document.getElementById("bellMenu");
+                  while (alarmBellListToClear.firstChild) { alarmBellListToClear.removeChild(alarmBellListToClear.firstChild); }
+                  var bellCount = 0;
+                  var dataCount = data.length
+                  notiCount = '<div class="notify-arrow notify-arrow-yellow"></div><li><p class="yellow"> ' + dataCount +' Alarms Triggered</p></li>'
+                  $('#bellMenu').append(notiCount);
+                  data.forEach(element => {
+                      console.log(data[0]);
+                      bellCount ++;
+                      var jsTime = new Date(element.alarmTriggeredAt);
+                      let hoursDiff = jsTime.getHours() + jsTime.getTimezoneOffset() / 60;
+                      let minutesDiff = (jsTime.getMinutes() + jsTime.getTimezoneOffset()) % 60;
+                      jsTime.setHours(hoursDiff + 1);
+                      jsTime.setMinutes(minutesDiff);
+                      var bellAlertTime = jsTime.toLocaleString();
+                      //var newAlert = $('<li class="body"> <div class="media" id="bellMenu"> <div class="media-body"> <span class="name">' + element.deviceName + '<span class="time">' + bellAlertTime +'</span></span> <span class="message">' + element.alarmName + '</span> </div> </div> </li>');
+                      var newAlert = $('<li> <a href="/alarms"> <span class="label label-danger"><i class="fa fa-bell"></i></span> ' + element.alarmName +'<span class="small italic"> <br>'+ element.deviceName +' <br> ' + bellAlertTime + '</span></a></li>')
+                      $('#bellMenu').append(newAlert);
+                  });
+                  document.getElementById("myspan").textContent=bellCount;
+              }
+              else {console.log("EXPRESSED DATA NULL!")}},
+          error: function (jqXHR, status) {console.log("ERROR");}
+      });
+}
 </script>
