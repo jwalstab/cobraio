@@ -28,6 +28,11 @@
   <link href="css/spinners.css" rel="stylesheet">
   <link href="assets/scroll.css" rel="stylesheet">
 
+  
+
+
+
+
 
 </head>
 
@@ -69,6 +74,40 @@
                     </a>
                   <ul class="dropdown-menu extended notification scrollable-menu" id="bellMenu">
                     <div class="notify-arrow notify-arrow-yellow"></div>
+<!--                     <li>
+                      <p class="yellow">You have 7 new notifications</p>
+                    </li>
+                    <li>
+                      <a href="index.html#">
+                        <span class="label label-danger"><i class="fa fa-bolt"></i></span>
+                        Server Overloaded.
+                        <span class="small italic">4 mins.</span>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="index.html#">
+                        <span class="label label-warning"><i class="fa fa-bell"></i></span>
+                        Memory #2 Not Responding.
+                        <span class="small italic">30 mins.</span>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="index.html#">
+                        <span class="label label-danger"><i class="fa fa-bolt"></i></span>
+                        Disk Space Reached 85%.
+                        <span class="small italic">2 hrs.</span>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="index.html#">
+                        <span class="label label-success"><i class="fa fa-plus"></i></span>
+                        New User Registered.
+                        <span class="small italic">3 hrs.</span>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="/alarms">See all notifications</a>
+                    </li> -->
                   </ul>
                 </li>
                 <!-- notification dropdown end -->
@@ -152,11 +191,18 @@
     <!--main content start-->
     <section id="main-content">
       <section class="wrapper site-min-height">
+<!--         <h3><i class="fa fa-angle-right"></i> Blank Page</h3>
+        <div class="row mt">
+          <div class="col-lg-12">
+            <p>Place your content here.</p>
+          </div>
+        </div> -->
         <script src="lib/jquery/jquery.min.js"></script>
         <%- body %>
       </section>
       <!-- /wrapper -->
     </section>
+    <!-- /MAIN CONTENT -->
     <!--main content end-->
     <!--footer start-->
     <footer class="site-footer">
@@ -205,7 +251,7 @@ window.onload = function(){
 
 <script>
   //ALARM BELL SCRIPTS
-/* function ClearList(){
+function ClearList(){
   var clearBellAlarmListURL = masterURL + "/deletebellalarms/<%= loggedInPool %>";
       $.ajax({ type: "GET", url: clearBellAlarmListURL, contentType: "application/json; charset=utf-8", crossDomain: true, dataType: "json",
           success: function (data, status, jqXHR) {
@@ -218,14 +264,14 @@ window.onload = function(){
           },
           error: function (jqXHR, status) {console.log("ERROR");}
       });
-} */
+}
 
 
 BellUpdater();
 
 function BellUpdater(){
   LoadAlarmBell();
-  setTimeout(BellUpdater, 30000);
+  setTimeout(BellUpdater, 10000);
 }
 function LoadAlarmBell(){
   var alarmbellURL = masterURL + "/triggeredbellalarmlist/<%= loggedInPool %>/";
@@ -239,6 +285,8 @@ function LoadAlarmBell(){
                   var dataCount = data.length
                   notiCount = '<div class="notify-arrow notify-arrow-yellow"></div><li><p class="yellow"> ' + dataCount +' Alarms Triggered</p></li>'
                   $('#bellMenu').append(notiCount);
+                  clearListDiv = '<li><a href="#" onclick="ClearList()">Clear List</a></li>';
+                  $('#bellMenu').append(clearListDiv);
                   data.forEach(element => {
                       console.log(data[0]);
                       bellCount ++;

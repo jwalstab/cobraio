@@ -1769,7 +1769,7 @@ function CleanUpOldData(){
     var deviceCount = 0;
     devices.forEach(device => {
       var curTime = new Date();
-      curTime.setMinutes(curTime.getMinutes() - 2);
+      curTime.setHours(curTime.getHours() - 24);
       var mongoTime = curTime.getTime();
       iotdb.collection(device.deviceID + "log").find( { save: 1, timeUTC: {$lt: mongoTime} } ).toArray (function(err, docs) {
         deviceCount++;
