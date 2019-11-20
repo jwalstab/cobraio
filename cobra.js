@@ -149,12 +149,12 @@ app.post("/:iotpool/register_device", function(req, res) {
   });
 });
 
-setInterval(function(){
+/* setInterval(function(){
   devicedb.collection(req.params.iotpool).insertOne(req.body).then (function() {
     res.send(req.body);
     res.end();
   });
-}, 3000);
+}, 3000); */
 
 //returns list of IDs/Names based on iot pool
 app.get("/:iotpool/lookup_devices", function(req, res) {
