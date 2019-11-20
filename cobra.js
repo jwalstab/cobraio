@@ -11,7 +11,9 @@ var session = require('express-session')
 var MongoDBStore = require('connect-mongodb-session')(session);
 
 var store = new MongoDBStore({
-  uri: 'mongodb://165.22.241.11:27017',
+  uri: 'mongodb://masteruser:Quantum4277@165.22.241.11:27017',
+  user: 'control',
+  password: 'Quantum4277',
   databaseName: 'sessions',
   collection: 'mySessions'
 });
@@ -49,7 +51,7 @@ var auth = function(req, res, next) {
 var MongoClient = require('mongodb').MongoClient;
 
 var outsideDatabase;
-  MongoClient.connect("mongodb://165.22.241.11:27017", {useNewUrlParser: true}, function(err, database) {
+  MongoClient.connect("mongodb://masteruser:Quantum4277@165.22.241.11:27017", {useNewUrlParser: true}, function(err, database) {
   //MongoClient.connect("mongodb://127.0.0.1:27017", {useNewUrlParser: true}, function(err, database) {
   if(err)
   throw err;
@@ -147,6 +149,12 @@ app.post("/:iotpool/register_device", function(req, res) {
   });
 });
 
+setInterval(function(){
+  devicedb.collection(req.params.iotpool).insertOne(req.body).then (function() {
+    res.send(req.body);
+    res.end();
+  });
+}, 3000);
 
 //returns list of IDs/Names based on iot pool
 app.get("/:iotpool/lookup_devices", function(req, res) {
@@ -746,7 +754,8 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
           name: propname,
           data: null,
           marker: {symbol : 'square', radius : 2 },
-          visible: false};
+          visible: false,
+          showInNavigator: true};
           objectArray.push(returnData);
         }
       else{
@@ -755,7 +764,8 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
           name: propname,
           data: null,
           marker: {symbol : 'square', radius : 2 },
-          visible: false};
+          visible: false,
+          showInNavigator: true};
           objectArray.push(returnData);
         }
     });
@@ -847,7 +857,7 @@ app.get("/:deviceid/backload/:page", function(req, res) {
   var pageNum = parseInt(req.params.page);
   returnArray = [];
   //iotdb.collection(req.params.deviceid).find( { _id: { $lt: 1 } } ).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
-    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(10000).toArray(function(err, docs){
+    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(100).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
@@ -872,7 +882,9 @@ app.get("/:deviceid/backload/:page", function(req, res) {
         var miniArray = [];
         var timeS = new Date(record.time);
         var timeSR = timeS.getTime();
+        //var timeSR = 1;
         miniArray.push(timeSR, record[propname]);
+        //miniArray.push(record[propname]);
         recordArray.push(miniArray);
       });
       returnArray.push(recordArray);

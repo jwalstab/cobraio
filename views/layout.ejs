@@ -4,8 +4,8 @@
 
 <head>
     <script>
-            var masterURL = "http://165.22.241.11:3000" //CLOUD
-            //var masterURL = "http://127.0.0.1:3000" //LOCAL
+            //var masterURL = "http://165.22.241.11:3000" //CLOUD
+            var masterURL = "http://127.0.0.1:3000" //LOCAL
     </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -271,7 +271,7 @@ BellUpdater();
 
 function BellUpdater(){
   LoadAlarmBell();
-  setTimeout(BellUpdater, 10000);
+  setTimeout(BellUpdater, 60000);
 }
 function LoadAlarmBell(){
   var alarmbellURL = masterURL + "/triggeredbellalarmlist/<%= loggedInPool %>/";
@@ -288,7 +288,6 @@ function LoadAlarmBell(){
                   clearListDiv = '<li><a href="#" onclick="ClearList()">Clear List</a></li>';
                   $('#bellMenu').append(clearListDiv);
                   data.forEach(element => {
-                      console.log(data[0]);
                       bellCount ++;
                       var jsTime = new Date(element.alarmTriggeredAt);
                       let hoursDiff = jsTime.getHours() + jsTime.getTimezoneOffset() / 60;
