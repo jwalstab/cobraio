@@ -1717,6 +1717,10 @@ app.post("/legioguard/mitsubishi/", function(req,res){
   //console.log("RESULT:");
   //console.log(bla);
   console.log(masterbla);
+  console.log(masterbla[0]);
+  console.log(masterbla.data[0]);
+  console.log(masterbla.length);
+  console.log(masterbla.data.length);
   res.send("OK!");
 });
 
