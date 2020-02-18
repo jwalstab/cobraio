@@ -1712,6 +1712,11 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
 
 app.post("/legioguard/mitsubishi/", function(req,res){
   console.log(req.body);
+  console.log(req.body.payload);
+  if (req.body[0] != null){
+    console.log("NOT NULL");
+    console.log(req.body[0]);
+  }
 });
 
 app.post("/testdevice/postdatafordevice/:deviceid", function (req, res) {
