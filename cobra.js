@@ -1709,12 +1709,14 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
 
   //AlarmProcessor(req.params.deviceid,req.body,"jwalstab");
 });
-
+var masterbla;
 app.post("/legioguard/mitsubishi/", function(req,res){
-  console.log(req.body.data);
-  var bla = uInt16ToFloat32(req.body.data);
-  console.log("RESULT:");
-  console.log(bla);
+  //console.log(req.body.data);
+  masterbla = req.body.data;
+  //var bla = uInt16ToFloat32(req.body.data);
+  //console.log("RESULT:");
+  //console.log(bla);
+  console.log(masterbla);
   res.send("OK!");
 });
 
