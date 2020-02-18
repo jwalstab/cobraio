@@ -3,8 +3,7 @@ var path= require('path');
 const bodyParser = require('body-parser');
 var app = express();
 var expressLayouts = require('express-ejs-layouts');
-app.use(bodyParser.json());
-
+app.use(bodyParser.json({limit: '100mb'})); //added in if crashing
 app.use(bodyParser.urlencoded({ extended: false }))
 
 var session = require('express-session')
@@ -1709,6 +1708,10 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
   res.end();
 
   //AlarmProcessor(req.params.deviceid,req.body,"jwalstab");
+});
+
+app.post("/legioguard/mitsubishi/", function(req,res){
+  console.log(req.body);
 });
 
 app.post("/testdevice/postdatafordevice/:deviceid", function (req, res) {
