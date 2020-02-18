@@ -1720,6 +1720,11 @@ app.post("/legioguard/mitsubishi/", function(req,res){
   res.send("OK!");
 });
 
+app.get("/mitdata", function(req, res) {
+  res.send(masterbla);
+  res.end();
+});
+
 app.post("/testdevice/postdatafordevice/:deviceid", function (req, res) {
   testDataObect = {
     time: req.body.time,
