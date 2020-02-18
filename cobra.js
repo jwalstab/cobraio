@@ -599,6 +599,10 @@ app.get("/index", function(req, res) {
   res.render('index');
 });
 
+app.get("/mitsubishi", function(req, res) {
+  res.render('mitsubishi', {layout: 'emptylayout'});
+});
+
 
 app.get("/", function(req, res) {
     res.render('sign_in', { layout: 'emptylayout' });
@@ -1709,23 +1713,22 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
 
   //AlarmProcessor(req.params.deviceid,req.body,"jwalstab");
 });
-var masterbla;
+var mitData;
+var mitCounter = 0;
 app.post("/legioguard/mitsubishi/", function(req,res){
   //console.log(req.body.data);
-  masterbla = req.body.data;
+  mitData = req.body.data;
   //var bla = uInt16ToFloat32(req.body.data);
   //console.log("RESULT:");
   //console.log(bla);
-  console.log(masterbla);
-  console.log(masterbla[0]);
-  console.log(masterbla.data[0]);
-  console.log(masterbla.length);
-  console.log(masterbla.data.length);
+  console.log(mitData);
+  console.log(mitData.data[0]);
+  console.log(mitData.data.length);
   res.send("OK!");
 });
 
-app.get("/mitdata", function(req, res) {
-  res.send(masterbla);
+app.get("/mitData", function(req, res) {
+  res.send(mitData);
   res.end();
 });
 

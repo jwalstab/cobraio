@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<head>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+          background-color: #dddddd;
+        }
+        </style>
+</head>
+<body>
+<table id="table">
+</table>
+</body>
+
+<script>
+
+var data;
+var rowCount = 0;
+FetchTheData();
+
+function FetchTheData(){
+    fetch('http://165.22.241.11:3000/mitdata')
+    .then((response) => {
+      return response.json();
+    })
+    .then((myJson) => {
+        console.log(myJson);
+      /*if (data != null){
+          var i = 0;
+          var isNew = false;
+          while (i < data.length){
+              if (data[i] != myJson.data[i]){
+                  isNew = true;
+                  console.log(isNew);
+              }
+              i++;
+          }
+          if (isNew == true){
+              data = myJson;
+              UpdateTable();
+          }
+      }*/
+      //else{
+          data = myJson.data;
+          UpdateTable();
+      //}
+  });
+  setTimeout(FetchTheData,65000);
+}
+
+function UpdateTable(){
+    var table = document.getElementById("table");
+    var row = table.insertRow(rowCount);
+    rowCount++;
+    var timeCell = row.insertCell(0);
+    var date = new Date().toLocaleTimeString();
+    timeCell.innerHTML = date;
+    var j = 1;
+    var cellCounter = 1;
+    while (j < data.length){
+        var cell = row.insertCell(cellCounter);
+        cell.innerHTML = data[j];
+        j++;
+        j++;
+        cellCounter++;
+    }
+}
+</script>
