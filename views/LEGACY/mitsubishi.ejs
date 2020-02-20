@@ -20,29 +20,17 @@
 </head>
 <body>
 <table id="table">
-    <tr>
-        <th>Updated At</th>
-        <th>Comp. Exhaust</th>
-        <th>Comp. Suction</th>
-        <th>Cold Return</th>
-        <th>Hot Return</th>
-        <th>Hot Tank</th>
-        <th>Cold Tank</th>
-        <th>Hot Supply</th>
-        <th>Evap. Inlet</th>
-    </tr>
 </table>
 </body>
 
 <script>
 
 var data;
-var rowCount = 1;
-var finalResultArray;
+var resultArray;
+var rowCount = 0;
 FetchTheData();
 
 function FetchTheData(){
-    var resultArray = [];
     fetch('http://165.22.241.11:3000/mitdata')
     .then((response) => {
       return response.json();
@@ -51,21 +39,16 @@ function FetchTheData(){
         console.log(myJson);
         var p = 0;
         while (p < myJson.data.length){
-            var DataArray = [];
-            DataArray[0] = myJson.data[p + 1];
-            DataArray[1] = myJson.data[p];
+            var DataArray = new int[2];
+            DataArray[0] = myjson.data[p];
+            DataArray[1] = myjson.data[p + 1];
             var result = (DataArray[0] & 0xff) |
                     ((DataArray[1] & 0xff) << 8);
-            var dResult = result / 10;
             p++;
             p++;
-            resultArray.push(dResult);
+            resultArray.
         }
         data = myJson.data;
-        resultArray.forEach(resulta =>{
-            console.log(resulta);
-        })
-        finalResultArray = resultArray;
         UpdateTable();
   });
   setTimeout(FetchTheData,65000);
@@ -80,9 +63,9 @@ function UpdateTable(){
     timeCell.innerHTML = date;
     var j = 1;
     var cellCounter = 1;
-    while (j < finalResultArray.length){
+    while (j < data.length){
         var cell = row.insertCell(cellCounter);
-        cell.innerHTML = finalResultArray[j - 1];
+        cell.innerHTML = data[j];
         j++;
         cellCounter++;
     }
