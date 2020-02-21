@@ -1816,7 +1816,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       AlarmMng_HP_Diff: 0,
   
       //INPUT REGISTERS
-      Suct_Temp: data[1],
+      Suct_Temp: req.body.data[0],
       Evap_Inlet_Temp: 0,
       Cond_Outlet_Temp: 0,
       Hot_Supply_Temp: 0,
@@ -1827,7 +1827,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       Hot_Tank_Temp2: 0,
       HP_Yout1_Act: 0,
       HP_Yout2_Act: 0,
-      Disc_Temp: data[0],
+      Disc_Temp: req.body.data[0],
       Flow_Switch_Read_Cold_FlowS1: 0,
       Flow_Switch_Read_Hot_FlowS1: 0,
       Flow_Switch_Read_Hot_FlowS2: 0,
