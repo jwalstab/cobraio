@@ -1659,6 +1659,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
     }
   }
   else{
+    console.log(req.body.data);
     LegioGuardDataObject = {
 
       status: req.body.status,
@@ -1963,7 +1964,7 @@ app.post("/testdevice/postdatafordevice/:deviceid", function (req, res) {
   });
 });
 
-function uInt16ToFloat32(uint16array) {
+/*function uInt16ToFloat32(uint16array) {
   var buffer = new ArrayBuffer(4);
   var intView = new Uint16Array(buffer);
   var floatView = new Float32Array(buffer);
@@ -1974,7 +1975,7 @@ function uInt16ToFloat32(uint16array) {
   //var realNumber = floatView[0].toFixed(2);
   var realNumber = Math.round(floatView[0] * 1e2 ) / 1e2;
   return realNumber;
-}
+} DUPLICATE?!!?! */
 
 function uInt16ToFloat32(uint16array) {
   var buffer = new ArrayBuffer(4);
