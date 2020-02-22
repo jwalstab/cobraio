@@ -1659,7 +1659,6 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
     }
   }
   else{
-    console.log(req.body.data);
     LegioGuardDataObject = {
 
       status: req.body.status,
@@ -1680,10 +1679,10 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       Cold_EleHeater: 0,
       Hot_P1: 0,
       Hot_Solend1: 0,
-      Hot_EleHeater: 0,
+      Hot_EleHeater: req.body.data[8],
       Glob_Al: 0,
       Hot_P2: 0,
-      Hot_Fan: 0,
+      Hot_Fan: req.body.data[9],
       Blance_Vlv: 0,
       Injection_Vlv: 0,
       Hot_Solend2: 0,
@@ -1717,7 +1716,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       Fan_Over_Al_Active: 0,
       Low_SuctT_Al_Active: 0,
       Board2_Offline: 0,
-      Comp_On: 0,
+      Comp_On: req.body.data[10],
       Flush_Valve_Flush_Valve_On: 0,
       Flush_Valve_Cold_SuplyW_Vlv: 0,
       Alrm_Prob11_Active: 0,
@@ -1816,14 +1815,14 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       AlarmMng_HP_Diff: 0,
   
       //INPUT REGISTERS
-      Suct_Temp: req.body.data[0],
-      Evap_Inlet_Temp: 0,
+      Suct_Temp: req.body.data[1],
+      Evap_Inlet_Temp: req.body.data[7],
       Cond_Outlet_Temp: 0,
-      Hot_Supply_Temp: 0,
-      Hot_Return_Temp: 0,
+      Hot_Supply_Temp: req.body.data[6],
+      Hot_Return_Temp: req.body.data[3],
       Cold_Supply_Temp: 0,
-      Cold_Return_Temp: 0,
-      Hot_Tank_Temp1: 0,
+      Cold_Return_Temp: req.body.data[2],
+      Hot_Tank_Temp1: req.body.data[4],
       Hot_Tank_Temp2: 0,
       HP_Yout1_Act: 0,
       HP_Yout2_Act: 0,
@@ -1845,7 +1844,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
   
   
       Hot_Tank_Temp3: 0,
-      Cold_Tank_Temp1: 0,
+      Cold_Tank_Temp1: req.body.data[5],
       Cold_Tank_Temp2: 0,
       Cold_Tank_Temp3: 0,
       Cold_SupToVlv_Temp: 0,

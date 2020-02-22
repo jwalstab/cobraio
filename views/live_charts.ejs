@@ -101,16 +101,20 @@ var chart1 = Highcharts.stockChart('containerC', {
                 }
         },
     },
-/* 
+
     rangeSelector: {
         buttons: [{
-            count: 1,
-            type: 'minute',
-            text: '1M'
-        }, {
             count: 5,
             type: 'minute',
             text: '5M'
+        }, {
+            count: 1,
+            type: 'hour',
+            text: '1Hr'
+        }, {
+            count: 12,
+            type: 'hour',
+            text: '12Hrs'
         }, {
             type: 'all',
             text: 'All'
@@ -118,7 +122,6 @@ var chart1 = Highcharts.stockChart('containerC', {
         inputEnabled: false,
         selected: 0
     },
- */
     title: {
         text: 'Live Monitor Chart'
     },
@@ -128,7 +131,7 @@ var chart1 = Highcharts.stockChart('containerC', {
     },
     series: [{
                 type: 'area',
-                name: 'USD to EUR',
+                name: 'empty',
                 data: datat
     }]
 });
@@ -248,7 +251,7 @@ function DataUpdate(){
 });
 }
 
-var loadCounter = 0;
+var loadCounter = 100;
 
 function BackLoad(){
             
@@ -268,8 +271,9 @@ function BackLoad(){
                         chart1.series[index].addPoint(element[index], false);
                     }
                 });
-                loadCounter = loadCounter + 1000;
+                loadCounter = loadCounter + 100;
                 chart1.redraw();
+                BackLoad();
             }
             },
             error: function (jqXHR, status) {
