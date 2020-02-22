@@ -737,7 +737,7 @@ app.get("/:deviceid/monitorgraphstart/:number", function(req, res) {
   var getAmount = parseInt(req.params.number);
   var limitAmount = getAmount - 1;
   var objectArray = [];
-  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+  iotdb.collection(req.params.deviceid + "log").find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       console.log("was undefined");
@@ -819,7 +819,7 @@ app.get("/:deviceid/monitorgraphbigupdate/:number", function(req, res) {
   dataLabelsList = LGDataLabelsList;
   var getAmount = parseInt(req.params.number);
   returnArray = [];
-  iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
+  iotdb.collection(req.params.deviceid + "log").find({}).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
@@ -860,7 +860,7 @@ app.get("/:deviceid/backload/:page", function(req, res) {
   var pageNum = parseInt(req.params.page);
   returnArray = [];
   //iotdb.collection(req.params.deviceid).find( { _id: { $lt: 1 } } ).sort( { _id : -1 } ).limit(getAmount).toArray(function(err, docs){
-    iotdb.collection(req.params.deviceid).find({}).sort( { _id : -1 } ).skip( pageNum ).limit(1000).toArray(function(err, docs){
+    iotdb.collection(req.params.deviceid + "log").find({}).sort( { _id : -1 } ).skip( pageNum ).limit(1000).toArray(function(err, docs){
     if (err){console.log(err);}
     if (docs[0] == undefined){ //checks to make sure the iot device has actual data, if not returns
       res.send("Null");
@@ -2063,6 +2063,7 @@ function QuickCleaner(){
   devicedb.collection("Quantum").find({}).toArray(function(err, devices){
     devices.forEach(device => {
       iotdb.collection(device.deviceID + "log").find( { save: 1 } ).toArray (function(err, docs) {
+        console.log(docs.length);
         docs.forEach(record => {
           deleteQuery = {
             time: record.time
