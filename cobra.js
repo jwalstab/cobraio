@@ -2062,7 +2062,6 @@ function QuickCleaner(){
   devicedb.collection("Quantum").find({}).toArray(function(err, devices){
     devices.forEach(device => {
       iotdb.collection(device.deviceID + "log").find( { save: 1 } ).toArray (function(err, docs) {
-        deviceCount++;
         docs.forEach(record => {
           recordsCleaned++;
           deleteQuery = {
@@ -2084,11 +2083,6 @@ function Longcleaner(){
       curTime.setHours(curTime.getHours() - 24);
       var mongoTime = curTime.getTime();
       iotdb.collection(device.deviceID + "log").find( { save: 24, timeUTC: {$lt: mongoTime} } ).toArray (function(err, docs) {
-        deviceCount++;
-        if (docs[0] == null){
-        }
-        else{
-        }
         docs.forEach(record => {
           recordsCleaned++;
           deleteQuery = {
