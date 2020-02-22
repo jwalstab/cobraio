@@ -892,7 +892,7 @@ app.get("/:deviceid/backload/:page", function(req, res) {
       });
       returnArray.push(recordArray);
     });
-    console.log("ok");
+    //console.log("ok");
   res.send(returnArray);
   res.end();
   });
