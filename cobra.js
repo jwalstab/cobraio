@@ -2076,7 +2076,7 @@ function QuickCleaner(){
       });
     });
   });
-  setTimeout(Longcleaner, 15000);
+  setTimeout(QuickCleaner, 15000);
 }
 
 function Longcleaner(){
