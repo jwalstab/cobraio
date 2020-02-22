@@ -2011,7 +2011,7 @@ tableList.push("time");
 var curTime = new Date();
 console.log(curTime);
 
-setTimeout(CleanUpOldData, 60000);
+//setTimeout(CleanUpOldData, 60000);
 
 function CleanUpOldData(){
   console.log("Starting scheduled old record clean up at " + curTime);
@@ -2062,8 +2062,10 @@ function QuickCleaner(){
   console.log("Quick cleaner INIT");
   devicedb.collection("Quantum").find({}).toArray(function(err, devices){
     devices.forEach(device => {
-      iotdb.collection(device.deviceID + "log").find( { save: 1 } ).toArray (function(err, docs) {
-        console.log(docs.length);
+      var curTime = new Date();
+      curTime.setHours(curTime.getHours() - 0.1);
+      var mongoTime = curTime.getTime();
+      iotdb.collection(device.deviceID + "log").find( { save: 1, timeUTC: {$lt: mongoTime} } ).toArray (function(err, docs) {
         docs.forEach(record => {
           deleteQuery = {
             time: record.time
@@ -2074,7 +2076,7 @@ function QuickCleaner(){
       });
     });
   });
-  setTimeout(QuickCleaner, 60000);
+  setTimeout(Longcleaner, 160000);
 }
 
 function Longcleaner(){
