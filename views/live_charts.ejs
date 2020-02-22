@@ -251,7 +251,7 @@ function DataUpdate(){
 });
 }
 
-var loadCounter = 100;
+var loadCounter = 10000;
 
 function BackLoad(){
             
@@ -272,7 +272,7 @@ function BackLoad(){
                     }
                 });
                 loadCounter = loadCounter + 10;
-                //chart1.redraw();
+                chart1.redraw();
             }
             },
             error: function (jqXHR, status) {
