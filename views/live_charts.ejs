@@ -271,9 +271,8 @@ function BackLoad(){
                         chart1.series[index].addPoint(element[index], false);
                     }
                 });
-                loadCounter = loadCounter + 100;
+                loadCounter = loadCounter + 10;
                 chart1.redraw();
-                BackLoad();
             }
             },
             error: function (jqXHR, status) {
