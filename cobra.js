@@ -2011,7 +2011,7 @@ tableList.push("time");
 var curTime = new Date();
 console.log(curTime);
 
-setTimeout(CleanUpOldData, 3000);
+setTimeout(CleanUpOldData, 60000);
 
 function CleanUpOldData(){
   console.log("Starting scheduled old record clean up at " + curTime);
@@ -2021,7 +2021,7 @@ function CleanUpOldData(){
     var deviceCount = 0;
     devices.forEach(device => {
       var curTime = new Date();
-      curTime.setHours(curTime.getHours() - 24);
+      curTime.setHours(curTime.getHours() - 1);
       var mongoTime = curTime.getTime();
       iotdb.collection(device.deviceID + "log").find( { save: 1, timeUTC: {$lt: mongoTime} } ).toArray (function(err, docs) {
         deviceCount++;
@@ -2051,7 +2051,56 @@ function CleanUpOldData(){
       });
     });
   });
-  setTimeout(CleanUpOldData, 3600000);
+  setTimeout(CleanUpOldData, 60000);
+}
+
+
+setTimeout(QuickCleaner, 15000);
+setTimeout(Longcleaner, 25000);
+
+function QuickCleaner(){
+  devicedb.collection("Quantum").find({}).toArray(function(err, devices){
+    devices.forEach(device => {
+      iotdb.collection(device.deviceID + "log").find( { save: 1 } ).toArray (function(err, docs) {
+        deviceCount++;
+        docs.forEach(record => {
+          recordsCleaned++;
+          deleteQuery = {
+            time: record.time
+          }
+          iotdb.collection(device.deviceID + "log").deleteOne(deleteQuery).then(function(err, r){
+          });
+        });
+      });
+    });
+  });
+  setTimeout(QuickCleaner, 60000);
+}
+
+function Longcleaner(){
+  devicedb.collection("Quantum").find({}).toArray(function(err, devices){
+    devices.forEach(device => {
+      var curTime = new Date();
+      curTime.setHours(curTime.getHours() - 24);
+      var mongoTime = curTime.getTime();
+      iotdb.collection(device.deviceID + "log").find( { save: 24, timeUTC: {$lt: mongoTime} } ).toArray (function(err, docs) {
+        deviceCount++;
+        if (docs[0] == null){
+        }
+        else{
+        }
+        docs.forEach(record => {
+          recordsCleaned++;
+          deleteQuery = {
+            time: record.time
+          }
+          iotdb.collection(device.deviceID + "log").deleteOne(deleteQuery).then(function(err, r){
+          });
+        });
+      });
+    });
+  });
+  setTimeout(Longcleaner, 160000);
 }
 
 
