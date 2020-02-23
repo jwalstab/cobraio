@@ -1659,6 +1659,17 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
     }
   }
   else{
+    var eleValue;
+    var fanValue;
+    var compValue;
+    
+    if (req.body.data[8] === 0){eleValue = false;}
+    else{eleValue = true;}
+    if (req.body.data[9] === 0){fanValue = false;}
+    else{fanValue = true;}
+    if (req.body.data[8] === 0){compValue = false;}
+    else{compValue = true;}
+      
     LegioGuardDataObject = {
 
       status: req.body.status,
@@ -1679,10 +1690,10 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       Cold_EleHeater: 0,
       Hot_P1: 0,
       Hot_Solend1: 0,
-      Hot_EleHeater: req.body.data[8],
+      Hot_EleHeater: eleValue,
       Glob_Al: 0,
       Hot_P2: 0,
-      Hot_Fan: req.body.data[9],
+      Hot_Fan: fanValue,
       Blance_Vlv: 0,
       Injection_Vlv: 0,
       Hot_Solend2: 0,
@@ -1716,7 +1727,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       Fan_Over_Al_Active: 0,
       Low_SuctT_Al_Active: 0,
       Board2_Offline: 0,
-      Comp_On: req.body.data[10],
+      Comp_On: compValue,
       Flush_Valve_Flush_Valve_On: 0,
       Flush_Valve_Cold_SuplyW_Vlv: 0,
       Alrm_Prob11_Active: 0,
