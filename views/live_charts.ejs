@@ -20,7 +20,7 @@
                     <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenu">
                     </ul>
             </div>
-            <button class="btn btn-primary" id="myButton" onclick="BackLoadButton()">Load 24 Hrs of data</button>
+            <button class="btn btn-primary" id="backloadbutton" onclick="BackLoadButton()">Load 24 Hrs of data</button>
                 <div id="chart2">
                         <div id="containerC" style="width:100%; height:600px;"></div>
                 </div>
@@ -219,6 +219,7 @@ function GetFirstData(){
     }
 
 var deviceChanged = true;
+var loadNumber = 1000;
 function DataUpdate(){
     if (deviceChanged == true)
     {
@@ -247,7 +248,7 @@ function DataUpdate(){
             var dt = new Date();
             var dtl = dt.toLocaleString();
             chart1.setTitle({text: "Now monitoring " + chosenDeviceName + ". Last data recieved at :" + dtl});
-            BackLoad();
+            //BackLoad();
         }
         data.forEach(element => {
             for (let index = 0; index < sizer; index++) {
@@ -274,6 +275,8 @@ var backLoadButtonPressed = false;
 function BackLoadButton(){
     if (backLoadButtonPressed == false){
         backLoadButtonPressed = true;
+        document.getElementById("backloadbutton").className = "btn btn-danger";
+        document.getElementById("backloadbutton").innerHTML = "Loading 24 Hour data";
         BackLoad();
     }
 }
@@ -298,7 +301,12 @@ function BackLoad(){
                     loadCounter = loadCounter + 20;
                     chart1.redraw();
                     chart1.rangeSelector.clickButton(6, true);
-                    setTimeout(BackLoad, 1500);
+                    //loadNumber = loadNumber + 500
+                    setTimeout(BackLoad, 1000);
+                }
+                else{
+                    document.getElementById("backloadbutton").className = "btn btn-success";
+                    document.getElementById("backloadbutton").innerHTML = "24 Hour data loaded";
                 }
             },
             error: function (jqXHR, status) {
