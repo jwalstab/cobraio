@@ -2,9 +2,9 @@
 <!-- 
 <script type="text/javascript" src="assets/highcharts.js"></script>
  -->
-<script src="https://code.highcharts.com/stock/highstock.js"></script>
-<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+ <script src="assets/highstock.js"></script>
+ <script src="assets/exporting.js"></script>
+ <script src="assets/export-data.js"></script>
 
 
 <br>
@@ -20,6 +20,7 @@
                     <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenu">
                     </ul>
             </div>
+            <button class="btn btn-primary" id="myButton" onclick="BackLoad()">Load 24 Hrs of data</button>
                 <div id="chart2">
                         <div id="containerC" style="width:100%; height:600px;"></div>
                 </div>
@@ -108,14 +109,29 @@ var chart1 = Highcharts.stockChart('containerC', {
             type: 'minute',
             text: '5M'
         }, {
+            count: 15,
+            type: 'minute',
+            text: '15M '
+        }, {
+            count: 30,
+            type: 'minute',
+            text: '30M'
+        }, {
             count: 1,
             type: 'hour',
-            text: '1Hr'
+            text: '1H'
+        }, {
+            count: 6,
+            type: 'hour',
+            text: '6H'
         }, {
             count: 12,
             type: 'hour',
-            text: '12Hrs'
+            text: '12H'
         }, {
+            //count: 24,
+            //type: 'hour',
+            //text: '24H'
             type: 'all',
             text: 'All'
         }],
@@ -228,7 +244,6 @@ function DataUpdate(){
     success: function (data, status, jqXHR) {
         if (pullAmount === 1)
         {
-            BackLoad();
             var dt = new Date();
             var dtl = dt.toLocaleString();
             chart1.setTitle({text: "Now monitoring " + chosenDeviceName + ". Last data recieved at :" + dtl});
@@ -240,7 +255,8 @@ function DataUpdate(){
         });
         chart1.redraw();
         if (pullAmount === 100){
-            chart1.series[11].setVisible(true);
+            chart1.series[20].setVisible(true);
+            chart1.rangeSelector.clickButton(6, true);
         }
         dataUpdateTimeout = setTimeout(DataUpdate, 5000);
         pullAmount = 1;
@@ -254,7 +270,9 @@ function DataUpdate(){
 var loadCounter = 0;
 
 function BackLoad(){
-            
+            if (chosenDevice == null){
+                return;
+            }
             var lastDataURL = masterURL + "/" + chosenDevice + "/backload/" + loadCounter;
             $.ajax({
             type: "GET",
@@ -264,16 +282,16 @@ function BackLoad(){
             dataType: "json",
             success: function (data, status, jqXHR) {
                 if (data[0] != null){
-
-                
-                data.forEach(element => {
-                    for (let index = 0; index < sizer; index++) {
-                        chart1.series[index].addPoint(element[index], false);
-                    }
-                });
-                loadCounter = loadCounter + 1000;
-                chart1.redraw();
-            }
+                    data.forEach(element => {
+                        for (let index = 0; index < sizer; index++) {
+                            chart1.series[index].addPoint(element[index], false);
+                        }
+                    });
+                    loadCounter = loadCounter + 1000;
+                    chart1.redraw();
+                    chart1.rangeSelector.clickButton(6, true);
+                    BackLoad();
+                }
             },
             error: function (jqXHR, status) {
                 console.log("jqXHYR:" + jqXHR + "status:" + status)

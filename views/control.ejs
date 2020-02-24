@@ -439,7 +439,8 @@ var MonitoringDiagramScreen = new Phaser.Class({
 
             eevValveLight.setVisible(false);
             injValveLight.setVisible(false);
-
+            plcDataText = this.add.text(130, 60, " ", { fontFamily: 'System', fontSize: 22, color: 'yellow' })
+            plcDataText.setText("Mitsubishi PLC detected, all control disabled and some values will not be available and will show as 0 or closed.");
             connectionText = this.add.text(130, 30, " ", { fontFamily: 'System', fontSize: 22, color: '#ffffff' })
             statusText = this.add.text(100, 50, "", { fontFamily: 'System', fontSize: 18, color: '#ffffff' })
 
@@ -547,7 +548,7 @@ var MonitoringDiagramScreen = new Phaser.Class({
 
         EEV_Pos_Text.setText(EEV_Pos + "%");
 
-        if (Injection_Vlv === false){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
+        if (Injection_Vlv != true){Injection_Vlv_Text.setText("Closed"); injValveLight.setVisible(false);}
         else{Injection_Vlv_Text.setText("Open"); injValveLight.setVisible(true);}
     }
 
@@ -837,7 +838,7 @@ var FanControl = new Phaser.Class({
     update: function (){
         UpdateConnectionTextAndLights(greenStatusLight,blueStatusLight,connectionText);
 
-        if (Hot_Fan === 0){Hot_Fan_Text.setText("OFF");}
+        if (Hot_Fan != true){Hot_Fan_Text.setText("OFF");}
         else{Hot_Fan_Text.setText("ON");}
         Master_Ctrl_Mng_Fan_Setp_Text.setText(Master_Ctrl_Mng_Fan_Setp + "°C");
         Hot_Return_Temp_Text.setText(Hot_Return_Temp + "°C");

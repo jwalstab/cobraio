@@ -18,6 +18,7 @@
                 <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenu">
                 </ul>
             </div>
+            <button class="btn btn-primary" id="time">Select Time Range</button>
             <button class="btn btn-primary" id="myButton" onclick="GetAPIData()">Load Data Table</button>
             <button class="btn btn-primary" id="download-xlsx" onclick="GetAPIData()">Export To Spreadsheet</button>
             <p id="responsebody"></p>
@@ -31,12 +32,30 @@
 
 <script>
 var date1 = new Date();
-var date2 = new Date();
-date1.setHours(date1.getHours() + 72);
-date2.setHours(date2.getHours() - 72);
-//var starterDate = date1.getMonth() + "/" + date1.getDate() + "/" + date1.getFullYear();
-var to = date1;
-var from = date2;
+var starterDate = date1.getMonth() + "/" + date1.getDate() + "/" + date1.getFullYear();
+var to;
+var from;
+$('#time').daterangepicker({
+    "showDropdowns": true,
+    "timePicker": false,
+    "timePickerSeconds": true,
+    "opens": "center",
+    ranges: {
+        'Today': [moment().startOf('day'), moment().endOf('day')],
+        'Yesterday': [moment().startOf('day').subtract(1, 'days'), moment().endOf('day').subtract(1, 'days')],
+        'Last 7 Days': [moment().startOf('day').subtract(6, 'days'), moment().endOf('day')],
+        'Last 30 Days': [moment().startOf('day').subtract(29, 'days'), moment().endOf('day')],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    },
+    "startDate": starterDate,
+    "endDate": starterDate
+}, function(start, end, label) {
+  //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+  from = start._d;
+  to = end._d;
+  LoadResponse();
+});
 </script>
 
 <script type="text/javascript">

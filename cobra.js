@@ -1458,6 +1458,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       time: req.body.time,
       timeUTC: req.body.timeUTC,
       save: saveFor,
+      plcDataType: "carel",
   
       //COILS
       EleHeater_Mng_Hot_Ele_Man_Msk: req.body.coils[7],
@@ -1676,6 +1677,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
       time: req.body.time,
       timeUTC: req.body.timeUTC,
       save: saveFor,
+      plcDataType: "mitsubishi",
   
       //COILS
       EleHeater_Mng_Hot_Ele_Man_Msk: 0,
