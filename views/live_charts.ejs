@@ -20,7 +20,7 @@
                     <ul class="dropdown-menu scrollable-menu" id="deviceSelectMenu">
                     </ul>
             </div>
-            <button class="btn btn-primary" id="myButton" onclick="BackLoad()">Load 24 Hrs of data</button>
+            <button class="btn btn-primary" id="myButton" onclick="BackLoadButton()">Load 24 Hrs of data</button>
                 <div id="chart2">
                         <div id="containerC" style="width:100%; height:600px;"></div>
                 </div>
@@ -269,7 +269,14 @@ function DataUpdate(){
 }
 
 var loadCounter = 0;
+var backLoadButtonPressed = false;
 
+function BackLoadButton(){
+    if (backLoadButtonPressed == false){
+        backLoadButtonPressed = true;
+        BackLoad();
+    }
+}
 function BackLoad(){
             if (chosenDevice == null){
                 return;
@@ -288,10 +295,10 @@ function BackLoad(){
                             chart1.series[index].addPoint(element[index], false);
                         }
                     });
-                    loadCounter = loadCounter + 100;
+                    loadCounter = loadCounter + 20;
                     chart1.redraw();
                     chart1.rangeSelector.clickButton(6, true);
-                    setTimeout(BackLoad, 1000);
+                    setTimeout(BackLoad, 1500);
                 }
             },
             error: function (jqXHR, status) {
