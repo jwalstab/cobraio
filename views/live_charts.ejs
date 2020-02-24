@@ -290,7 +290,7 @@ function BackLoad(){
                     loadCounter = loadCounter + 500;
                     chart1.redraw();
                     chart1.rangeSelector.clickButton(6, true);
-                    BackLoad();
+                    setTimeout(BackLoad, 1000);
                 }
             },
             error: function (jqXHR, status) {
