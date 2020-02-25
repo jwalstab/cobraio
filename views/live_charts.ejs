@@ -298,13 +298,20 @@ function BackLoad(){
                             chart1.series[index].addPoint(element[index], false);
                         }
                     });
-                    loadCounter = loadCounter + 20;
+                    loadCounter = loadCounter + 100;
                     chart1.redraw();
                     chart1.rangeSelector.clickButton(6, true);
                     //loadNumber = loadNumber + 500
                     setTimeout(BackLoad, 1000);
+                    console.log(data.length);
+                    if (data.length < 99){
+                        console.log("data length less than 99");
+                        document.getElementById("backloadbutton").className = "btn btn-success";
+                        document.getElementById("backloadbutton").innerHTML = "24 Hour data loaded";
+                    }
                 }
                 else{
+                    console.log("ELSE");
                     document.getElementById("backloadbutton").className = "btn btn-success";
                     document.getElementById("backloadbutton").innerHTML = "24 Hour data loaded";
                 }
