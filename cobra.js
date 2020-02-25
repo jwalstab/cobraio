@@ -1668,7 +1668,7 @@ app.post("/legioguard/postdatafordevice/:deviceid/:savefor", function(req, res) 
     else{eleValue = true;}
     if (req.body.data[9] === 0){fanValue = false;}
     else{fanValue = true;}
-    if (req.body.data[8] === 0){compValue = false;}
+    if (req.body.data[10] === 0){compValue = false;}
     else{compValue = true;}
       
     LegioGuardDataObject = {
