@@ -182,8 +182,6 @@ function LoadDeviceSelectBox(){
                     });
                     console.log(chosenDeviceBox);
                     deviceChanged = true;
-                    document.getElementById("backloadbutton").className = "btn btn-primary";
-                    document.getElementById("backloadbutton").innerHTML = "Load 24 Hrs of data";
                     backLoadButtonPressed = false;
                     chart1.setTitle({text: "Connecting to device: " + chosenDeviceName});
                     DataUpdate();
@@ -281,11 +279,16 @@ function BackLoadButton(){
         backLoadButtonPressed = true;
         document.getElementById("backloadbutton").className = "btn btn-danger";
         document.getElementById("backloadbutton").innerHTML = "Loading 24 Hour data";
-        BackLoad();
+        setTimeout(BackLoad, 5000);
     }
 }
 function BackLoad(){
             if (chosenDevice == null){
+                return;
+            }
+            if (backLoadButtonPressed = false){
+                document.getElementById("backloadbutton").className = "btn btn-primary";
+                document.getElementById("backloadbutton").innerHTML = "Load 24 Hrs of data";
                 return;
             }
             var lastDataURL = masterURL + "/" + chosenDevice + "/backload/" + loadCounter + "/" + backloadAmount;
