@@ -182,6 +182,9 @@ function LoadDeviceSelectBox(){
                     });
                     console.log(chosenDeviceBox);
                     deviceChanged = true;
+                    document.getElementById("backloadbutton").className = "btn btn-primary";
+                    document.getElementById("backloadbutton").innerHTML = "Load 24 Hrs of data";
+                    backLoadButtonPressed = false;
                     chart1.setTitle({text: "Connecting to device: " + chosenDeviceName});
                     DataUpdate();
                     });
@@ -271,6 +274,7 @@ function DataUpdate(){
 
 var loadCounter = 0;
 var backLoadButtonPressed = false;
+var backloadAmount = 50;
 
 function BackLoadButton(){
     if (backLoadButtonPressed == false){
@@ -284,7 +288,7 @@ function BackLoad(){
             if (chosenDevice == null){
                 return;
             }
-            var lastDataURL = masterURL + "/" + chosenDevice + "/backload/" + loadCounter;
+            var lastDataURL = masterURL + "/" + chosenDevice + "/backload/" + loadCounter + "/" + backloadAmount;
             $.ajax({
             type: "GET",
             url: lastDataURL,
@@ -298,22 +302,17 @@ function BackLoad(){
                             chart1.series[index].addPoint(element[index], false);
                         }
                     });
-                    loadCounter = loadCounter + 100;
+                    loadCounter = loadCounter + backloadAmount;
                     chart1.redraw();
                     chart1.rangeSelector.clickButton(6, true);
                     //loadNumber = loadNumber + 500
                     setTimeout(BackLoad, 1000);
                     console.log(data.length);
-                    if (data.length < 99){
+                    if (data.length < 49){
                         console.log("data length less than 99");
                         document.getElementById("backloadbutton").className = "btn btn-success";
                         document.getElementById("backloadbutton").innerHTML = "24 Hour data loaded";
                     }
-                }
-                else{
-                    console.log("ELSE");
-                    document.getElementById("backloadbutton").className = "btn btn-success";
-                    document.getElementById("backloadbutton").innerHTML = "24 Hour data loaded";
                 }
             },
             error: function (jqXHR, status) {
