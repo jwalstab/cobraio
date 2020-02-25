@@ -183,6 +183,8 @@ function LoadDeviceSelectBox(){
                     console.log(chosenDeviceBox);
                     deviceChanged = true;
                     backLoadButtonPressed = false;
+                    document.getElementById("backloadbutton").className = "btn btn-primary";
+                    document.getElementById("backloadbutton").innerHTML = "Load 24 Hrs of data";
                     chart1.setTitle({text: "Connecting to device: " + chosenDeviceName});
                     DataUpdate();
                     });
@@ -235,7 +237,10 @@ function DataUpdate(){
         GetFirstData();
         return;
     }
-    
+    if (backLoadButtonPressed == false){
+        document.getElementById("backloadbutton").className = "btn btn-primary";
+        document.getElementById("backloadbutton").innerHTML = "Load 24 Hrs of data";
+    }
     var lastDataURL = masterURL + "/" + chosenDevice + "/monitorgraphbigupdate/" + pullAmount;
     $.ajax({
     type: "GET",
@@ -272,13 +277,14 @@ function DataUpdate(){
 
 var loadCounter = 0;
 var backLoadButtonPressed = false;
-var backloadAmount = 50;
+var backloadAmount = 500;
 
 function BackLoadButton(){
     if (backLoadButtonPressed == false){
         backLoadButtonPressed = true;
         document.getElementById("backloadbutton").className = "btn btn-danger";
         document.getElementById("backloadbutton").innerHTML = "Loading 24 Hour data";
+        loadCounter = 0;
         setTimeout(BackLoad, 5000);
     }
 }
@@ -287,8 +293,6 @@ function BackLoad(){
                 return;
             }
             if (backLoadButtonPressed == false){
-                document.getElementById("backloadbutton").className = "btn btn-primary";
-                document.getElementById("backloadbutton").innerHTML = "Load 24 Hrs of data";
                 return;
             }
             var lastDataURL = masterURL + "/" + chosenDevice + "/backload/" + loadCounter + "/" + backloadAmount;
@@ -306,13 +310,14 @@ function BackLoad(){
                         }
                     });
                     loadCounter = loadCounter + backloadAmount;
-                    chart1.redraw();
-                    chart1.rangeSelector.clickButton(6, true);
-                    //loadNumber = loadNumber + 500
-                    setTimeout(BackLoad, 1000);
-                    console.log(data.length);
-                    if (data.length < 49){
-                        console.log("data length less than 99");
+                    setTimeout(BackLoad, 2000);
+                    var percentage = ((loadCounter / 1500) * 100);
+                    if (percentage < 100){
+                        document.getElementById("backloadbutton").innerHTML = "Loading... " + percentage.toFixed(2) + "%";
+                    }
+                    else{
+                        chart1.redraw();
+                        chart1.rangeSelector.clickButton(6, true);
                         document.getElementById("backloadbutton").className = "btn btn-success";
                         document.getElementById("backloadbutton").innerHTML = "24 Hour data loaded";
                     }
