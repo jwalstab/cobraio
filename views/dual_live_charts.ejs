@@ -181,6 +181,15 @@
                     chart1.addSeries(element);
                 });
                 DataUpdate();
+                let defaultLabels = [1,4,7,9,12,17,19,20,23];
+                defaultLabels.forEach(value =>{
+                    chart1.series[value].setVisible(true);
+                });
+                let defaultLabelsU2 = [27,30,33,35,38,43,45,46,49];
+                defaultLabelsU2.forEach(value =>{
+                    chart1.series[value].setVisible(true);
+                });
+
             },
             error: function (jqXHR, status) {
                 console.log("jqXHYR:" + jqXHR + "status:" + status)
@@ -226,12 +235,14 @@
         
         data.forEach(element => {
             for (let index = 0; index < sizer; index++) {
-                console.log(element[index] + "          at pos"  +index)
+                //console.log(element[index] + "          at pos"  +index)
                 chart1.series[index].addPoint(element[index], false);
             }
         });
-        console.log(chart1.series);
+        //console.log(chart1.series);
         pullAmount = 1;
+        chart1.rangeSelector.clickButton(3, true);
+        
         chart1.redraw();
         dataUpdateTimeout = setTimeout(DataUpdate, 5000);
         
@@ -269,7 +280,7 @@
         },
         legend: {
             enabled: true,
-            maxHeight: 100,
+            maxHeight: 130,
             labelFormatter: function() {
                 if (this.userOptions.type == "line"){ 
                     var lastVal = this.yData[this.yData.length - 1];
@@ -329,7 +340,7 @@
                 text: 'All'
             }],
             inputEnabled: false,
-            selected: 0
+            selected: 3
         },
         title: {
             text: 'Live Monitor Chart'
@@ -345,5 +356,13 @@
         }]
     });
     chart1.series[0].remove();
+
+    ChartCheck();
+    function ChartCheck(){
+        if (chart1.rangeSelector.selected == null){
+            chart1.rangeSelector.clickButton(3, true);
+            setTimeout(ChartCheck,1000);
+        };
+    }
 </script>
 
